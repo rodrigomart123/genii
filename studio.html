@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -13,16 +13,1189 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     
     <script type="module" src="static/js/components.js"></script>
-    <link rel="stylesheet" href="static/css/style.css?v=3" />
     <script src="static/js/theme.js"></script>
     <script>if(localStorage.getItem('genii_ai_disabled')==='true'){document.documentElement.setAttribute('data-ai-disabled','true');var _s=document.createElement('style');_s.textContent='html[data-ai-disabled="true"] #tab-ai,html[data-ai-disabled="true"] #btn-generate-ai-single,html[data-ai-disabled="true"] #ai-gen-loading,html[data-ai-disabled="true"] .mobile-bar-geno{display:none!important}';document.head.appendChild(_s)}</script>
 
+    <style>
+        :root {
+            --primary: #00cfc1;
+            --primary-dark: #00a398;
+            --secondary: #1cb0f6;
+            --secondary-dark: #0c8bc4;
+            --accent: #ffce00;
+            --accent-dark: #ccb000;
+            --purple: #a270f4;
+            --purple-dark: #824dd6;
+            --coral: #ff6b6b;
+            --coral-dark: #d44343;
+            --dark: #3a3a3a;
+            --grey: #6e7b82;
+            --bg-light: #f7f9fa;
+            --bg-off: #ffffff;
+            --surface: #ffffff;
+            --border: #e8edf1;
+            --border-dark: #c5d2db;
+            --success: #2ecc71;
 
-    
+            --input-bg: #F9FAFB;
+            --input-border: #E5E7EB;
+            --hover-light: #E0F7FA;
+            --hover-light-purple: #F3F0FF;
+            --text-muted: #444444;
+            --text-light: #555555;
+            --text-faint: #999999;
+            --text-ghost: #cccccc;
+            --text-aaa: #aaaaaa;
+            --bg-elevated: #eeeeee;
+            --cancel-shadow: #d4d4d4;
+            --code-display-border: #cccccc;
+        }
+
+        [data-theme="dark"] {
+            --bg-light: #121212;
+            --bg-off: #1a1a1a;
+            --surface: #222222;
+            --dark: #ffffff;
+            --grey: #b0b0b0;
+            --border: #444444;
+            --border-dark: #0a0a0a;
+
+            --input-bg: #2a2a2a;
+            --input-border: #444444;
+            --hover-light: #1a3a3a;
+            --hover-light-purple: #2a1a3a;
+            --text-muted: #cccccc;
+            --text-light: #aaaaaa;
+            --text-faint: #777777;
+            --text-ghost: #555555;
+            --text-aaa: #666666;
+            --bg-elevated: #333333;
+            --cancel-shadow: #222222;
+            --code-display-border: #555555;
+        }
+
+        [data-theme="dark"] .quiz-title-input { color: #ffffff !important; }
+        [data-theme="dark"] .question-input { color: #ffffff !important; }
+        [data-theme="dark"] .box-A, [data-theme="dark"] .box-B, [data-theme="dark"] .box-C, [data-theme="dark"] .box-D { color: #ffffff; }
+        [data-theme="dark"] .box-A .ans-input, [data-theme="dark"] .box-B .ans-input, [data-theme="dark"] .box-C .ans-input, [data-theme="dark"] .box-D .ans-input { color: #ffffff !important; }
+        [data-theme="dark"] .answer-box .ans-input { color: #ffffff !important; }
+        [data-theme="dark"] .thumb-q-bar { color: #ffffff; }
+        [data-theme="dark"] .setting-label { color: #ffffff; }
+        [data-theme="dark"] .modal-title { color: #ffffff; }
+        [data-theme="dark"] .genii-select { color: #ffffff; }
+        [data-theme="dark"] .modal-input { color: #ffffff; }
+        [data-theme="dark"] .icon-btn { color: #ffffff; }
+        [data-theme="dark"] .btn-exit { color: #ffffff; }
+
+        * { box-sizing: border-box; outline: none; }
+
+        body {
+            margin: 0; font-family: 'Nunito', sans-serif;
+            height: 100vh; display: flex; flex-direction: column;
+            background-color: var(--bg-light); overflow-x: clip;
+            position: relative;
+        }
+
+        /* --- MODAIS --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1000;
+            display: none; align-items: center; justify-content: center;
+        }
+        .modal-box {
+            background: var(--surface); width: 95%; max-width: 500px; padding: 30px; border-radius: 24px; text-align: center; animation: popUp 0.3s forwards;
+            max-height: 90vh; overflow-y: auto;
+        }
+        .modal-title { font-family: 'Fredoka', sans-serif; font-size: 1.5rem; margin-bottom: 10px; color: var(--dark); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .modal-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+        .modal-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: 16px; font-size: 1rem; font-family: 'Nunito', sans-serif; font-weight: 600; margin: 5px 0 15px 0; transition:0.2s; background: var(--bg-off); color: var(--dark); }
+        .modal-input:focus { border-color: var(--purple); outline: none; }
+
+        [data-theme="dark"] .modal-input { color: #ffffff; background: #2a2a2a; border-color: #555555; }
+        [data-theme="dark"] .modal-input::placeholder { color: #777777; }
+
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        /* --- HEADER --- */
+        .studio-header {
+            height: 60px; background: var(--surface); border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100;
+            gap: 16px; min-width: 0; overflow: hidden;
+        }
+        .studio-logo { font-family: 'Fredoka'; font-weight: 700; font-size: 1.5rem; color: var(--purple); display: flex; align-items: center; gap: 15px; flex-shrink: 0; }
+        .title-area { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+        .status-lock {
+            font-size: 0.85rem; color: var(--grey); cursor: pointer;
+            width: 32px; height: 32px; border-radius: 10px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--bg-elevated); transition: 0.2s; flex-shrink: 0;
+        }
+        .status-lock:hover { background: var(--border); }
+        .status-lock.public { color: var(--primary); background: rgba(0,207,193,0.12); }
+        .status-lock.public:hover { background: rgba(0,207,193,0.2); }
+        [data-theme="dark"] .status-lock { background: #333333; }
+        [data-theme="dark"] .status-lock:hover { background: #444444; }
+        [data-theme="dark"] .status-lock.public { background: rgba(0,207,193,0.15); }
+        
+        .quiz-title-input {
+            background: transparent; border: 2px dashed var(--border); border-radius: 14px; padding: 8px 16px;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--dark);
+            transition: 0.2s; min-width: 120px; max-width: 350px; width: 100%; flex: 1;
+            text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
+        }
+        .quiz-title-input:hover { border-color: var(--purple); background: var(--bg-off); }
+        .quiz-title-input:focus { border-style: solid; border-color: var(--primary); background: var(--surface); }
+
+        [data-theme="dark"] .quiz-title-input { color: #ffffff; border-color: #555555; }
+        [data-theme="dark"] .quiz-title-input:hover { background: #2a2a2a; }
+        [data-theme="dark"] .quiz-title-input:focus { background: #222222; }
+
+        .header-actions { display: flex; gap: 10px; align-items: center; flex-shrink: 0; }
+        .studio-credits {
+            display: flex; align-items: center; gap: 5px;
+            font-weight: 800; font-size: 0.95rem; color: var(--purple);
+            padding: 0 10px; white-space: nowrap;
+        }
+        .studio-credits img { width: 18px; height: 18px; }
+        .studio-credits.empty { color: var(--coral); }
+
+        @keyframes creditsPulse {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.25); filter: brightness(1.3); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .credits-spending {
+            animation: creditsPulse 0.35s ease;
+        }
+        .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: none; background: transparent; cursor: pointer; font-size: 1.1rem; color: var(--dark); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .icon-btn:hover { background: var(--bg-elevated); }
+        
+        .icon-btn.ai-btn { color: var(--purple); position: relative; overflow: hidden; background: var(--hover-light-purple); border: 2px solid var(--border); }
+        .icon-btn.ai-btn:hover { background: var(--purple); color: white; border-color: var(--purple); }
+        .icon-btn.ai-btn img { height: 30px; width: 30px; object-fit: contain; }
+        .icon-btn.ai-btn:hover img { filter: brightness(0) invert(1); }
+        
+        .btn { border: none; padding: 10px 22px; border-radius: 16px; font-weight: 700; cursor: pointer; transition: transform 0.1s; font-family: 'Fredoka', sans-serif; text-transform: uppercase; font-size: 0.9rem; }
+        .btn:active { transform: translateY(5px); box-shadow: none !important; }
+        .btn-exit { background: var(--border); color: var(--dark); box-shadow: 0 4px 0 var(--border-dark); }
+        .btn-exit:hover { filter: brightness(0.95); }
+        .btn-save { background: var(--primary); color: white; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 0 #00a89c; }
+        .btn-save:hover { filter: brightness(1.08); box-shadow: 0 6px 0 #00a89c; }
+
+        /* --- WORKSPACE --- */
+        .studio-workspace { display: flex; flex: 1; height: calc(100vh - 60px); }
+
+        .slides-sidebar {
+            width: 280px; background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 15px; overflow-y: auto; gap: 10px; z-index: 10;
+        }
+        .slides-sidebar::-webkit-scrollbar { width: 5px; }
+        .slides-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        [data-theme="dark"] .slides-sidebar::-webkit-scrollbar-thumb { background: #555555; }
+        .slide-thumbnail {
+            position: relative; background: var(--surface); border: 2px solid var(--border); border-radius: 16px;
+            height: 170px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; padding: 0;
+            overflow: hidden; -webkit-touch-callout: none;
+        }
+        .slide-thumbnail:hover { border-color: #bbb; transform: scale(1.02); }
+        .slide-thumbnail.active { border-color: var(--purple); box-shadow: 0 0 0 2px var(--purple); }
+        .slide-thumbnail.dragging { opacity: 0.5; border: 2px dashed #999; }
+
+        .thumb-header { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px 0; flex-shrink: 0; }
+        .thumb-num {
+            background: var(--purple); color: white; width: 22px; height: 22px; border-radius: 7px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.65rem;
+            box-shadow: 0 2px 0 #5a4bd4;
+        }
+        .thumb-type-badge { font-size: 0.5rem; background: var(--bg-elevated); padding: 2px 7px; border-radius: 4px; color: var(--grey); font-weight: 700; font-family: 'Nunito', sans-serif; }
+        .thumb-preview { 
+            flex: 1; display: flex; flex-direction: column; padding: 5px 8px 8px; gap: 5px;
+            overflow: hidden;
+        }
+        .thumb-q-box {
+            background: var(--surface); border-radius: 8px; padding: 6px 8px;
+            font-size: 0.55rem; font-weight: 600; color: var(--dark); line-height: 1.3;
+            font-family: 'Fredoka', sans-serif; text-align: center;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.08); border: 2px solid transparent;
+            overflow: hidden; word-break: break-word; display: flex; align-items: center; justify-content: center;
+        }
+        .thumb-img-mini { width: 100%; max-height: 40px; aspect-ratio: 16/9; border-radius: 4px; object-fit: contain; background: transparent; display: block; flex-shrink: 0; }
+        .thumb-answers { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: auto; }
+        .thumb-ans {
+            border-radius: 6px; display: flex; align-items: center; padding: 2px 4px; gap: 4px;
+            font-family: 'Nunito', sans-serif; font-size: 0.45rem; font-weight: 700;
+            overflow: hidden; min-height: 18px; box-shadow: 0 3px 0 rgba(0,0,0,0.08); border: 1.5px solid transparent; margin-bottom: 2px;
+        }
+        .thumb-ans-icon {
+            width: 13px; height: 13px; border-radius: 4px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.45rem;
+        }
+        .thumb-ans-text { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.2; word-break: break-word; }
+        .thumb-ans.correct-mark { outline: 1.5px solid var(--success); outline-offset: 0.5px; }
+        /* --- CONTEXT MENU --- */
+        .slide-hover-actions { display: none; }
+        .thumb-context-menu {
+            position: fixed; z-index: 5000; background: var(--surface);
+            border: 2px solid var(--border); border-radius: 14px;
+            padding: 6px; min-width: 160px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            animation: popUp 0.15s ease-out;
+        }
+        .thumb-context-menu .cm-item {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+            padding: 10px 12px; border: none; background: transparent;
+            border-radius: 10px; cursor: pointer; font-family: 'Nunito', sans-serif;
+            font-weight: 700; font-size: 0.85rem; color: var(--dark);
+            transition: background 0.12s; text-align: left;
+        }
+        .thumb-context-menu .cm-item:hover { background: var(--hover-light); }
+        .thumb-context-menu .cm-item i { width: 18px; text-align: center; font-size: 0.8rem; }
+        .thumb-context-menu .cm-item.cm-danger { color: var(--coral); }
+        .thumb-context-menu .cm-item.cm-danger:hover { background: rgba(255,107,107,0.1); }
+        .thumb-context-menu .cm-divider { height: 1px; background: var(--border); margin: 4px 8px; }
+        [data-theme="dark"] .thumb-context-menu .cm-item:hover { background: var(--hover-light); }
+        [data-theme="dark"] .thumb-context-menu .cm-item.cm-danger:hover { background: rgba(255,107,107,0.15); }
+        
+        .btn-add-slide {
+            width: 100%; padding: 14px; background: var(--purple); color: white;
+            border-radius: 16px; font-family: 'Fredoka', sans-serif; font-weight: 700; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 5px 0 #5a4bd4; transition: transform 0.1s;
+            text-transform: uppercase; font-size: 0.9rem;
+            position: sticky; bottom: 0; z-index: 5;
+            margin-top: auto;
+        }
+        .btn-add-slide:hover { filter: brightness(1.08); box-shadow: 0 7px 0 #5a4bd4; }
+
+        /* Mobile settings toggle (hidden on all screens) */
+        .mobile-settings-toggle { display: none !important; }
+        /* Bottom handle - replaced by bottom bar */
+        .sheet-drag-handle { display: none; }
+        /* Mobile-only elements hidden on desktop via media query */
+        @media (min-width: 769px) {
+            .mobile-bottom-bar { display: none !important; }
+            .geno-sheet-wrapper, .geno-sheet, .geno-sheet-backdrop { display: none !important; }
+        }
+
+        /* --- CONTEXT TOOLBAR --- */
+        .studio-context-bar {
+            width: 100%; height: 0; background: var(--surface);
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            transition: height 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            z-index: 99; flex-shrink: 0; border-bottom: 0px solid var(--border);
+        }
+        .studio-context-bar.active { height: 60px; border-bottom-width: 1px; }
+        .context-tools { display: flex; align-items: center; gap: 12px; animation: fadeInDrop 0.2s ease-out; }
+        @keyframes fadeInDrop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .context-label { font-family: 'Fredoka', sans-serif; font-weight: 700; color: var(--grey); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-right: 5px; }
+        .ans-toolbar-divider { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+        
+        .ans-tb-color {
+            position: relative; width: 36px; height: 36px; border-radius: 10px; overflow: hidden;
+            border: 2px solid var(--border); cursor: pointer; transition: 0.15s; flex-shrink: 0;
+        }
+        .ans-tb-color:hover { border-color: var(--purple); transform: scale(1.08); }
+        .ans-tb-color input[type="color"] { width: 150%; height: 150%; margin: -25%; cursor: pointer; border: none; padding: 0; }
+        
+        .ans-tb-btn {
+            width: 36px; height: 36px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 1rem; color: var(--grey); transition: 0.15s; font-family: 'Fredoka', sans-serif;
+        }
+        .ans-tb-btn:hover:not(:disabled) { border-color: var(--purple); color: var(--purple); background: var(--hover-light-purple); transform: scale(1.05); }
+        .ans-tb-btn.active { background: var(--purple); border-color: var(--purple); color: white; }
+        .ans-tb-btn:disabled { opacity: 0.4; cursor: not-allowed; background: var(--bg-elevated); border-color: var(--border); box-shadow: none; }
+        
+        .ans-tb-reset {
+            width: 36px; height: 36px; border-radius: 10px; border: none; background: #FEE2E2; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; color: #DC2626; transition: 0.15s;
+        }
+        .ans-tb-reset:hover { background: #FECACA; transform: scale(1.08); }
+
+        /* CANVAS PRINCIPAL */
+        .main-canvas {
+            flex: 1; background: linear-gradient(160deg, var(--bg-elevated) 0%, var(--border) 100%);
+            display: flex; flex-direction: column; align-items: center; overflow-y: auto; position: relative;
+        }
+
+        [data-theme="dark"] .main-canvas { background: linear-gradient(160deg, #1a1a1a 0%, #2a2a2a 100%); }
+        .canvas-container {
+            width: 100%; max-width: 960px; background: transparent; border-radius: 24px;
+            display: flex; flex-direction: column; padding: 30px 35px; position: relative;
+            gap: 8px; margin: auto 0;
+        }
+
+        .question-input {
+            width: 100%; border: none; text-align: center; font-family: 'Fredoka', sans-serif; font-size: 1.8rem; color: var(--dark);
+            background: var(--surface); padding: 24px 30px; border-radius: 20px; box-shadow: 0 8px 0 rgba(0,0,0,0.08);
+            margin-bottom: 10px; line-height: 1.3; transition: 0.2s; overflow: hidden; min-height: 80px;
+            border: 3px solid transparent; cursor: text; word-break: break-word;
+        }
+        .question-input:empty::before {
+            content: attr(data-placeholder); color: #aaa; pointer-events: none;
+        }
+        .question-input:focus, .question-input.q-selected { box-shadow: 0 8px 0 rgba(108,92,231,0.25); border-color: var(--purple); outline: none; }
+
+        [data-theme="dark"] .question-input { color: #ffffff; background: #222222; box-shadow: 0 8px 0 rgba(0,0,0,0.3); }
+        [data-theme="dark"] .question-input:empty::before { color: #777777; }
+        [data-theme="dark"] .thumb-q-box { background: #222222; box-shadow: 0 3px 0 rgba(0,0,0,0.3); }
+
+        .media-area { display: flex; justify-content: center; align-items: center; margin-bottom: 15px; }
+        .media-placeholder {
+            width: 340px; height: 200px; background: var(--bg-off); border-radius: 20px;
+            border: 3px dashed var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--grey); cursor: pointer;
+            transition: 0.2s; position: relative; gap: 10px;
+        }
+        .media-placeholder:hover { border-color: var(--purple); color: var(--purple); background: rgba(108,92,231,0.06); }
+
+        [data-theme="dark"] .media-placeholder { background: #2a2a2a; border-color: #555555; color: #b0b0b0; }
+        [data-theme="dark"] .media-placeholder:hover { color: #a270f4; background: rgba(108,92,231,0.1); }
+        .media-preview-img { width: 100%; height: 100%; object-fit: contain; border-radius: 16px; display: none; }
+        .remove-img-btn { position: absolute; top: -10px; right: -10px; width: 34px; height: 34px; background: #E31A3C; color: white; border-radius: 50%; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 0 #9e0e0e; z-index: 5; transition: 0.1s; }
+        .remove-img-btn:hover { transform: scale(1.1); }
+        .media-placeholder.has-image { border: 4px solid var(--surface); background: transparent; }
+        .media-placeholder.has-image .media-preview-img { display: block; }
+        .media-placeholder.has-image .placeholder-content { display: none; }
+        .media-placeholder.has-image .remove-img-btn { display: flex; }
+
+        /* --- CAIXAS DE RESPOSTA --- */
+        .answers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+        
+        .answer-box {
+            position: relative; border-radius: 20px; display: flex; align-items: center; padding: 0 16px;
+            min-height: 85px; transition: transform 0.15s, border-color 0.15s; gap: 12px; 
+            border: 3px solid transparent; cursor: grab;
+        }
+        .answer-box:active { cursor: grabbing; }
+        
+        /* Default: Opções Brancas por Defeito (seguindo SKILL.md) */
+        .box-A, .box-B, .box-C, .box-D { background-color: var(--surface); box-shadow: 0 7px 0 var(--border); color: var(--dark); }
+        .box-A .shape-icon, .box-B .shape-icon, .box-C .shape-icon, .box-D .shape-icon { background: var(--bg-elevated); color: var(--grey); }
+        .box-A .ans-input, .box-B .ans-input, .box-C .ans-input, .box-D .ans-input { color: var(--dark); }
+        .box-A .ans-input::placeholder, .box-B .ans-input::placeholder, .box-C .ans-input::placeholder, .box-D .ans-input::placeholder { color: var(--text-faint); }
+        .box-A .add-ans-img-btn, .box-B .add-ans-img-btn, .box-C .add-ans-img-btn, .box-D .add-ans-img-btn { background: var(--bg-elevated); color: var(--grey); }
+        .box-A .check-btn, .box-B .check-btn, .box-C .check-btn, .box-D .check-btn { border-color: var(--text-faint); }
+
+        [data-theme="dark"] .box-A, [data-theme="dark"] .box-B, [data-theme="dark"] .box-C, [data-theme="dark"] .box-D { background-color: #2a2a2a; box-shadow: 0 7px 0 #444444; color: #ffffff; }
+        [data-theme="dark"] .box-A .shape-icon, [data-theme="dark"] .box-B .shape-icon, [data-theme="dark"] .box-C .shape-icon, [data-theme="dark"] .box-D .shape-icon { background: #333333; color: #b0b0b0; }
+        [data-theme="dark"] .box-A .ans-input, [data-theme="dark"] .box-B .ans-input, [data-theme="dark"] .box-C .ans-input, [data-theme="dark"] .box-D .ans-input { color: #ffffff; }
+        [data-theme="dark"] .box-A .ans-input::placeholder, [data-theme="dark"] .box-B .ans-input::placeholder, [data-theme="dark"] .box-C .ans-input::placeholder, [data-theme="dark"] .box-D .ans-input::placeholder { color: #777777; }
+        [data-theme="dark"] .box-A .add-ans-img-btn, [data-theme="dark"] .box-B .add-ans-img-btn, [data-theme="dark"] .box-C .add-ans-img-btn, [data-theme="dark"] .box-D .add-ans-img-btn { background: #333333; color: #b0b0b0; }
+        [data-theme="dark"] .box-A .check-btn, [data-theme="dark"] .box-B .check-btn, [data-theme="dark"] .box-C .check-btn, [data-theme="dark"] .box-D .check-btn { border-color: #777777; }
+
+        /* V/F têm cores especiais (azul/vermelho) */
+        .ans-true { background-color: #4f46e5; box-shadow: 0 7px 0 #3730a3; color: white; }
+        .ans-true .shape-icon { background: rgba(255,255,255,0.22); color: white; }
+        .ans-true .ans-input { color: white; }
+        .ans-true .ans-input::placeholder { color: rgba(255,255,255,0.65); }
+        .ans-false { background-color: #e02424; box-shadow: 0 7px 0 #9e0e0e; color: white; }
+        .ans-false .shape-icon { background: rgba(255,255,255,0.22); color: white; }
+        .ans-false .ans-input { color: white; }
+        .ans-false .ans-input::placeholder { color: rgba(255,255,255,0.65); }
+
+        .answer-box:hover { filter: brightness(1.06); }
+        
+        /* Estado Correto - Novo Design Limpo */
+        .answer-box.correct { border-color: var(--success); }
+        
+        /* Estado Selecionado */
+        .answer-box.ans-selected { border-color: var(--purple); z-index: 50; }
+        .answer-box.drag-over { border: 3px dashed white; opacity: 0.7; }
+        
+        /* Ícone Forma (A, B, C, D) */
+        .shape-icon {
+            width: 38px; height: 38px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 1.1rem;
+            background: rgba(255,255,255,0.25); color: white;
+        }
+
+        /* INPUT PARA RESPOSTAS */
+        .answer-box .ans-input {
+            flex: 1; background: transparent; border: none; color: white;
+            font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1.1rem; resize: none; overflow: hidden; outline: none;
+            padding: 12px 0; cursor: text; line-height: 1.3;
+            user-select: text; -webkit-user-select: text;
+            min-height: 1.3em; word-break: break-word; max-height: 150px;
+        }
+        .answer-box .ans-input::placeholder { color: var(--placeholder-color, rgba(45,52,54,0.4)); }
+        .answer-box .ans-input:empty::before {
+            content: attr(data-placeholder); color: var(--placeholder-color, rgba(45,52,54,0.4));
+            pointer-events: none;
+        }
+        [data-theme="dark"] .answer-box .ans-input:empty::before { color: rgba(255,255,255,0.4); }
+
+        [data-theme="dark"] .answer-box .ans-input { color: #ffffff; }
+        [data-theme="dark"] .answer-box .ans-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        .ans-img-preview { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; background: rgba(0,0,0,0.1); display: none; pointer-events: none; }
+        .answer-box.has-ans-img .ans-img-preview { display: block; }
+        .answer-box.has-ans-img .shape-icon { display: none; }
+
+        .add-ans-img-btn {
+            width: 32px; height: 32px; border-radius: 10px; border: none;
+            background: rgba(255,255,255,0.22); color: white; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
+            transition: 0.2s; flex-shrink: 0;
+        }
+        .add-ans-img-btn:hover { background: rgba(255,255,255,0.4); transform: scale(1.1); }
+
+        /* CHECKMARK CORRETO (Design Limpo - Círculo Vazio vs Cheio) */
+        .check-btn {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.6); background: transparent;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            margin-left: auto; transition: 0.2s; flex-shrink: 0;
+        }
+        .check-btn i { font-size: 1rem; color: transparent; transition: 0.2s; }
+        .check-btn:hover { border-color: white; background: rgba(255,255,255,0.2); }
+        
+        .answer-box.correct .check-btn { background: var(--surface); border-color: white; }
+        .answer-box.correct .check-btn i { color: var(--success); }
+
+        /* TYPE ANSWER MODE */
+        .typing-container { width: 100%; display: none; flex-direction: column; align-items: center; }
+        .typing-input-list { width: 100%; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .typing-chip { background: var(--purple); color: white; padding: 10px 18px; border-radius: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 0 #5a4bd4; font-family: 'Nunito', sans-serif; }
+
+        /* SLIDE BODY EDITOR */
+        .slide-body-container { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+        .slide-body-label {
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.9rem;
+            color: var(--grey); display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .slide-body-label i { color: var(--purple); }
+        .slide-body-textarea {
+            width: 100%; min-height: 180px; padding: 20px 24px;
+            border: 3px solid transparent; border-radius: 20px;
+            font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 600;
+            line-height: 1.6; color: var(--dark); background: var(--surface);
+            box-shadow: 0 8px 0 rgba(0,0,0,0.08); resize: vertical;
+            transition: 0.2s; outline: none;
+        }
+        .slide-body-textarea::placeholder { color: var(--text-faint); }
+        .slide-body-textarea:focus { border-color: var(--purple); box-shadow: 0 8px 0 rgba(108,92,231,0.25); }
+        [data-theme="dark"] .slide-body-textarea { color: #ffffff; background: #222222; box-shadow: 0 8px 0 rgba(0,0,0,0.3); }
+        [data-theme="dark"] .slide-body-textarea::placeholder { color: #777777; }
+
+        /* SETTINGS PANEL */
+        .settings-panel { width: 280px; background: var(--surface); border-left: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 0; overflow-y: auto; z-index: 10; }
+        .panel-section h4 {
+            margin: 0 0 18px 0; color: var(--grey); font-size: 0.7rem; text-transform: uppercase;
+            letter-spacing: 2px; font-family: 'Nunito', sans-serif; font-weight: 800;
+            padding-bottom: 12px; border-bottom: 2px solid var(--border);
+        }
+        .setting-group { margin-bottom: 16px; }
+        .setting-label {
+            display: flex; font-weight: 700; font-size: 0.8rem; margin-bottom: 8px;
+            color: var(--grey); align-items: center; gap: 8px;
+            font-family: 'Nunito', sans-serif; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .setting-label i { width: 16px; text-align: center; font-size: 0.75rem; color: var(--purple); }
+
+        .genii-select {
+            width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--border);
+            font-family: 'Nunito', sans-serif; font-weight: 700; color: var(--dark); font-size: 0.9rem;
+            cursor: pointer; background: var(--bg-off); transition: 0.2s;
+            -webkit-appearance: none; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%236e7b82' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px;
+        }
+        .genii-select:hover { border-color: var(--purple); }
+        .genii-select:focus { border-color: var(--primary); background-color: var(--surface); outline: none; }
+
+        [data-theme="dark"] .genii-select { color: #ffffff; background-color: #2a2a2a; border-color: #444444; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24'%3E%3Cpath fill='%23b0b0b0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); }
+        [data-theme="dark"] .genii-select:hover { border-color: var(--purple); }
+        [data-theme="dark"] .genii-select option { background: #2a2a2a; color: #ffffff; }
+
+        /* Toggle Switch */
+        .toggle-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 14px; background: var(--bg-off); border: 2px solid var(--border);
+            border-radius: 12px; cursor: pointer; transition: 0.2s;
+        }
+        .toggle-row:hover { border-color: var(--purple); }
+        [data-theme="dark"] .toggle-row { background: #2a2a2a; border-color: #444444; }
+        [data-theme="dark"] .toggle-row:hover { border-color: var(--purple); }
+
+        .toggle-label {
+            display: flex; align-items: center; gap: 10px;
+            font-weight: 700; font-size: 0.9rem; color: var(--dark); font-family: 'Nunito', sans-serif;
+        }
+        .toggle-label i { color: var(--purple); font-size: 0.85rem; }
+        [data-theme="dark"] .toggle-label { color: #ffffff; }
+
+        .toggle-switch {
+            position: relative; width: 44px; height: 24px; flex-shrink: 0;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; inset: 0; background: var(--border); border-radius: 24px;
+            transition: 0.25s; cursor: pointer;
+        }
+        .toggle-slider::before {
+            content: ''; position: absolute; width: 18px; height: 18px;
+            background: white; border-radius: 50%; top: 3px; left: 3px;
+            transition: 0.25s; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+        .toggle-switch input:checked + .toggle-slider { background: var(--purple); }
+        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        .settings-divider {
+            height: 1px; background: var(--border); margin: 4px 0 16px 0;
+        }
+
+        /* Delete button */
+        .btn-delete-question {
+            width: 100%; padding: 12px; border-radius: 12px; border: 2px solid transparent;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.85rem;
+            text-transform: uppercase; cursor: pointer; transition: 0.2s;
+            background: var(--bg-off); color: var(--coral); border-color: var(--coral);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-delete-question:hover { background: var(--coral); color: white; }
+        .btn-delete-question:active { transform: scale(0.97); }
+        [data-theme="dark"] .btn-delete-question { background: #2a2a2a; border-color: #ff6b6b; color: #ff6b6b; }
+        [data-theme="dark"] .btn-delete-question:hover { background: #ff6b6b; color: #ffffff; }
+
+        input, select, textarea, button { font-family: 'Nunito', sans-serif; }
+        h1, h2, h3, h4, .modal-title { font-family: 'Fredoka', sans-serif; }
+        input[type="file"] { display: none; }
+
+        /* Image Modal */
+        .image-modal-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; justify-content: space-between; }
+        .img-tab { flex: 1; padding: 14px; border: 2px solid var(--border); background: var(--surface); border-radius: 16px; font-family: 'Fredoka', sans-serif; font-size: 1.1rem; color: var(--grey); cursor: pointer; transition: 0.2s; box-shadow: 0 4px 0 var(--border); font-weight: 600; }
+        .img-tab.active { background: var(--purple); color: white; border-color: var(--purple); box-shadow: 0 4px 0 #5a4bd4; }
+
+        [data-theme="dark"] .img-tab { color: #b0b0b0; border-color: #555555; background: #222222; box-shadow: 0 4px 0 #444444; }
+        [data-theme="dark"] .img-tab.active { color: #ffffff; }
+        .img-tab-content { display: none; }
+        .img-tab-content.active { display: block; }
+        .upload-area { border: 3px dashed var(--text-ghost); border-radius: 20px; padding: 50px 20px; text-align: center; cursor: pointer; transition: 0.2s; background: var(--bg-off); }
+        .upload-area:hover { border-color: var(--primary); background: rgba(56, 191, 203, 0.05); }
+
+        [data-theme="dark"] .upload-area { border-color: #555555; background: #2a2a2a; }
+        [data-theme="dark"] .upload-area:hover { background: rgba(0, 207, 193, 0.05); }
+        .image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-height: 350px; overflow-y: auto; padding: 5px; }
+        .image-grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 16px; cursor: pointer; transition: 0.2s; border: 3px solid transparent; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .image-grid img:hover { transform: scale(1.05); border-color: var(--purple); }
+
+        /* ==========================================
+           GENO AI CHAT PANEL (CONVERSATIONAL AGENT)
+           ========================================== */
+        .geno-panel {
+            position: fixed; right: -480px; bottom: 20px; width: 400px; max-height: 75vh;
+            z-index: 1500; transition: right 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; flex-direction: column; align-items: flex-end; pointer-events: none;
+        }
+        .geno-panel.open { right: 20px; pointer-events: auto; }
+        .geno-panel.fullscreen {
+            right: 0; bottom: 0; width: 100vw; max-height: 100vh;
+            align-items: stretch;
+        }
+        .geno-panel.fullscreen .geno-character-area { display: none; }
+        .geno-panel.fullscreen .geno-chat-box {
+            border-radius: 0; border: none; max-height: 100vh; height: 100vh;
+            box-shadow: none;
+        }
+        .geno-panel.fullscreen .geno-messages { max-height: none; flex: 1; }
+.geno-panel.fullscreen .geno-quick-actions { justify-content: center; }
+
+        .geno-character-area {
+            position: relative; display: flex; align-items: flex-end; margin-bottom: -15px; z-index: 2; margin-right: 20px;
+        }
+        .geno-img-wrapper {
+            position: relative;
+            animation: float 3s ease-in-out infinite; z-index: 2;
+        }
+        .geno-img {
+            height: 110px; width: auto; display: block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: bottom right;
+        }
+
+        .geno-chat-bubble {
+            position: absolute; right: 140px; bottom: 65px; z-index: 5;
+            background: var(--surface); border-radius: 20px 20px 0 20px; padding: 12px 18px;
+            font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--dark);
+            box-shadow: 0 6px 0 var(--border); border: 2px solid var(--border);
+            opacity: 0; transform: scale(0.9); transition: 0.3s;
+            pointer-events: none; width: max-content; max-width: 240px; text-align: center;
+        }
+        .geno-chat-bubble.visible { opacity: 1; transform: scale(1); }
+        .geno-chat-bubble::after { content: ''; position: absolute; bottom: 10px; right: -12px; border-width: 10px 0 10px 12px; border-style: solid; border-color: transparent transparent transparent var(--border); }
+        .geno-chat-bubble::before { content: ''; position: absolute; bottom: 12px; right: -8px; z-index: 2; border-width: 8px 0 8px 10px; border-style: solid; border-color: transparent transparent transparent var(--surface); }
+
+        [data-theme="dark"] .geno-chat-bubble { color: #ffffff; background: #222222; border-color: #555555; box-shadow: 0 6px 0 #444444; }
+        [data-theme="dark"] .geno-chat-bubble::after { border-color: transparent transparent transparent #555555; }
+        [data-theme="dark"] .geno-chat-bubble::before { border-color: transparent transparent transparent #222222; }
+
+        .geno-chat-box {
+            background: var(--surface); width: 100%; border-radius: 24px; padding: 0; border: 2px solid var(--border);
+            display: flex; flex-direction: column; position: relative; z-index: 1; overflow: hidden;
+            max-height: calc(75vh - 120px);
+        }
+        [data-theme="dark"] .geno-chat-box { background: #222222; border-color: #555555; }
+
+        .geno-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px; border-bottom: 2px solid var(--border); flex-shrink: 0;
+        }
+        [data-theme="dark"] .geno-header { border-bottom-color: #444444; }
+        .geno-header-actions { display: flex; align-items: center; gap: 4px; }
+        .geno-expand-btn {
+            width: 32px; height: 32px; border-radius: 10px; border: none; cursor: pointer;
+            background: transparent; color: var(--grey); display: flex; align-items: center; justify-content: center;
+            transition: 0.15s; font-size: 0.95rem;
+        }
+        .geno-expand-btn:hover { background: var(--bg-elevated); color: var(--dark); }
+        [data-theme="dark"] .geno-expand-btn:hover { background: #333333; color: #ffffff; }
+
+        .geno-header h3 { margin: 0; font-size: 1.2rem; color: var(--purple); display: flex; align-items: center; gap: 8px; font-family: 'Fredoka', sans-serif; font-weight: 600; }
+        .geno-header img { height: 28px; width: 28px; object-fit: contain; }
+
+        .geno-messages {
+            flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;
+            min-height: 120px; max-height: 45vh; scroll-behavior: smooth;
+        }
+        .geno-messages::-webkit-scrollbar { width: 5px; }
+        .geno-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        .geno-msg { max-width: 85%; padding: 10px 16px; font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 600; line-height: 1.5; word-wrap: break-word; animation: genoFadeIn 0.25s ease; }
+        .geno-msg.user {
+            align-self: flex-end; background: var(--purple); color: #ffffff;
+            border-radius: 18px 18px 4px 18px;
+        }
+        .geno-msg.assistant {
+            align-self: flex-start; background: var(--bg-light); color: var(--dark);
+            border-radius: 18px 18px 18px 4px; border: 1.5px solid var(--border);
+        }
+        [data-theme="dark"] .geno-msg.assistant { background: #2a2a2a; color: #e0e0e0; border-color: #444444; }
+
+        .geno-typing { display: flex; gap: 5px; align-items: center; padding: 12px 18px; }
+        .geno-typing span {
+            width: 8px; height: 8px; border-radius: 50%; background: var(--grey);
+            animation: genoTypingDot 1.2s infinite ease-in-out;
+        }
+        .geno-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .geno-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+        .geno-quick-actions {
+            display: flex; gap: 8px; padding: 8px 18px; overflow-x: auto; flex-shrink: 0;
+            scrollbar-width: none; cursor: grab; user-select: none;
+        }
+        .geno-quick-actions.dragging { cursor: grabbing; scroll-behavior: auto; }
+        .geno-quick-actions::-webkit-scrollbar { display: none; }
+        .geno-quick-actions:empty { display: none; padding: 0; }
+
+        .geno-qa-btn {
+            flex-shrink: 0; padding: 7px 14px; border-radius: 14px; border: none; cursor: pointer;
+            font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.8rem;
+            background: var(--purple); color: #ffffff;
+            box-shadow: 0 4px 0 #7b50d4; transition: 0.1s; white-space: nowrap;
+        }
+        .geno-qa-btn:hover { filter: brightness(1.1); box-shadow: 0 5px 0 #7b50d4; }
+        .geno-qa-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+
+        .geno-input-row {
+            display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px;
+            border-top: 2px solid var(--border); flex-shrink: 0; background: var(--bg-off);
+        }
+        [data-theme="dark"] .geno-input-row { border-top-color: #444444; background: #1e1e1e; }
+
+        .geno-input-row textarea {
+            flex: 1; border: 2px solid var(--border); border-radius: 16px; padding: 10px 14px;
+            font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.95rem;
+            background: var(--surface); color: var(--dark); resize: none; transition: 0.2s;
+            max-height: 100px; min-height: 42px; line-height: 1.4;
+        }
+        .geno-input-row textarea:focus { border-color: var(--purple); }
+        [data-theme="dark"] .geno-input-row textarea { background: #2a2a2a; color: #ffffff; border-color: #555555; }
+        [data-theme="dark"] .geno-input-row textarea::placeholder { color: #777777; }
+
+        .geno-send-btn {
+            width: 42px; height: 42px; border-radius: 14px; border: none; cursor: pointer;
+            background: var(--purple); color: #ffffff; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 0 #7b50d4; transition: 0.1s; flex-shrink: 0; font-size: 1.1rem;
+        }
+        .geno-send-btn:hover { filter: brightness(1.1); box-shadow: 0 5px 0 #7b50d4; }
+        .geno-send-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+        .geno-send-btn:disabled { background: #B4A9FA; box-shadow: 0 4px 0 #9E91E5; cursor: not-allowed; transform: none; }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes genoFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes genoTypingDot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+        @media (max-width: 700px) { .geno-panel { width: calc(100% - 40px); } }
+
+        /* CUSTOM COLOR PICKER */
+        .color-picker-btn {
+            position: relative; width: 36px; height: 36px; border-radius: 10px; overflow: visible;
+            border: 2px solid var(--border); cursor: pointer; transition: 0.15s; flex-shrink: 0; padding: 0; display: flex; align-items: center; justify-content: center;
+            background: var(--surface);
+        }
+        .color-picker-btn:hover { border-color: var(--purple); transform: scale(1.08); }
+        .color-picker-btn .cp-swatch {
+            width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(0,0,0,0.1);
+            display: block; pointer-events: none;
+        }
+        .color-picker-btn .cp-arrow {
+            position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px;
+            background: var(--surface); border-radius: 4px 0 8px 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.55rem; color: var(--grey); border: 1px solid var(--border); border-top: none; border-right: none;
+        }
+
+        .gcp-popover {
+            position: fixed; width: 280px; background: var(--surface); border: 2px solid var(--border);
+            border-radius: 20px;
+            z-index: 5000; padding: 16px; cursor: default;
+            animation: popUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .gcp-canvas-wrap {
+            position: relative; width: 100%; border-radius: 12px; overflow: hidden;
+            border: 2px solid var(--border); margin-bottom: 10px; cursor: crosshair;
+        }
+        .gcp-canvas-wrap canvas { display: block; width: 100%; }
+        .gcp-cursor {
+            position: absolute; width: 16px; height: 16px; border-radius: 50%;
+            border: 3px solid white; box-shadow: 0 0 0 1.5px rgba(0,0,0,0.3), inset 0 0 0 1px rgba(0,0,0,0.2);
+            pointer-events: none; transform: translate(-50%, -50%); z-index: 2;
+        }
+
+        .gcp-hue-wrap {
+            position: relative; width: 100%; height: 16px; border-radius: 8px; overflow: hidden;
+            border: 2px solid var(--border); margin-bottom: 10px; cursor: pointer;
+            background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+        }
+        .gcp-hue-thumb {
+            position: absolute; top: -2px; width: 8px; height: 20px; border-radius: 4px;
+            background: white; border: 2px solid rgba(0,0,0,0.3); pointer-events: none; transform: translateX(-50%);
+        }
+
+        .gcp-presets { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; margin-bottom: 10px; }
+        .gcp-swatch {
+            width: 100%; aspect-ratio: 1; border-radius: 6px; cursor: pointer; border: 2px solid transparent;
+            transition: transform 0.12s, border-color 0.12s; position: relative;
+        }
+        .gcp-swatch:hover { transform: scale(1.2); z-index: 2; border-color: var(--dark); }
+        .gcp-swatch.active { border-color: var(--purple); transform: scale(1.15); box-shadow: 0 0 0 2px var(--purple); }
+
+        .gcp-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+        .gcp-hex-box {
+            position: relative; flex: 1; display: flex; align-items: center;
+            background: var(--bg-off); border: 2px solid var(--border); border-radius: 10px; overflow: hidden;
+        }
+        .gcp-hex-box:focus-within { border-color: var(--purple); }
+        .gcp-hash { padding-left: 10px; font-family: 'Fredoka', sans-serif; font-weight: 700; color: var(--grey); font-size: 0.9rem; }
+        .gcp-hex {
+            flex: 1; border: none; background: transparent; padding: 8px 10px 8px 2px;
+            font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--dark);
+            text-transform: uppercase; outline: none; width: 60px;
+        }
+        .gcp-preview-box {
+            width: 38px; height: 38px; border-radius: 10px; border: 2px solid var(--border); flex-shrink: 0;
+        }
+
+        .gcp-label { font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.7rem; color: var(--grey); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: block; }
+
+        .gcp-recent { display: flex; gap: 4px; align-items: center; margin-bottom: 10px; min-height: 22px; flex-wrap: wrap; }
+        .gcp-recent-swatch {
+            width: 22px; height: 22px; border-radius: 6px; cursor: pointer; border: 2px solid transparent;
+            transition: transform 0.12s;
+        }
+        .gcp-recent-swatch:hover { transform: scale(1.2); border-color: var(--dark); }
+
+        .gcp-actions { display: flex; gap: 8px; justify-content: flex-end; }
+        .gcp-btn {
+            padding: 6px 14px; border-radius: 10px; border: none; cursor: pointer;
+            font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.8rem;
+            text-transform: uppercase; transition: 0.15s;
+        }
+        .gcp-btn-cancel { background: var(--bg-elevated); color: var(--grey); }
+        .gcp-btn-cancel:hover { background: var(--border); }
+        .gcp-btn-apply { background: var(--purple); color: white; box-shadow: 0 3px 0 #5a4bd4; }
+        .gcp-btn-apply:hover { filter: brightness(1.08); }
+
+        [data-theme="dark"] .gcp-popover { background: #2a2a2a; border-color: #555555; }
+        [data-theme="dark"] .gcp-canvas-wrap { border-color: #555555; }
+        [data-theme="dark"] .gcp-hue-wrap { border-color: #555555; }
+        [data-theme="dark"] .gcp-swatch:hover { border-color: #ffffff; }
+        [data-theme="dark"] .gcp-hex { color: #ffffff; }
+        [data-theme="dark"] .gcp-hex-box { background: #333333; border-color: #555555; }
+        [data-theme="dark"] .gcp-hex-box:focus-within { border-color: var(--purple); }
+        [data-theme="dark"] .gcp-preview-box { border-color: #555555; }
+        [data-theme="dark"] .gcp-recent-swatch:hover { border-color: #ffffff; }
+        [data-theme="dark"] .gcp-btn-cancel { background: #333333; color: #b0b0b0; }
+        [data-theme="dark"] .gcp-btn-cancel:hover { background: #444444; }
+        [data-theme="dark"] .color-picker-btn .cp-arrow { background: #333333; border-color: #555555; color: #b0b0b0; }
+
+        /* UNDO / REDO BUTTONS */
+        .undo-redo-group {
+            display: flex; gap: 4px; align-items: center;
+            background: var(--bg-elevated); border-radius: 12px; padding: 3px;
+        }
+        [data-theme="dark"] .undo-redo-group { background: #333333; }
+        .undo-redo-btn {
+            width: 34px; height: 34px; border-radius: 10px; border: none;
+            background: transparent; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; font-size: 0.95rem;
+            color: var(--grey); transition: 0.15s;
+        }
+        .undo-redo-btn:hover:not(:disabled) { background: var(--hover-light-purple); color: var(--purple); }
+        .undo-redo-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .undo-redo-btn:active:not(:disabled) { transform: scale(0.92); }
+
+        /* RESPONSIVE HEADER */
+        @media (max-width: 1200px) {
+            .quiz-title-input { max-width: 250px; }
+        }
+        @media (max-width: 1000px) {
+            .studio-credits { display: none; }
+            .quiz-title-input { max-width: 200px; }
+        }
+        @media (max-width: 768px) {
+            .studio-header { padding: 0 12px; gap: 10px; }
+            .studio-credits { display: flex !important; font-size: 0.85rem; padding: 0 6px; }
+            .title-area { gap: 6px; }
+            .quiz-title-input { max-width: 150px; font-size: 0.95rem; padding: 6px 12px; }
+            .header-actions { gap: 6px; }
+            .btn { padding: 8px 14px; font-size: 0.8rem; }
+            .btn-save i { margin-right: 0; }
+            .btn-save { padding: 8px 12px; }
+            .studio-header .header-actions > div[style*="width:1px"] { display: none; }
+        }
+        @media (max-width: 560px) {
+            .quiz-title-input { display: none; }
+            .undo-redo-group { display: flex; }
+            .undo-redo-btn { width: 28px; height: 28px; font-size: 0.8rem; }
+            .status-lock { width: 28px; height: 28px; font-size: 0.75rem; }
+        }
+
+        /* =============================================
+           RESPONSIVE ≤ 1000px (Tablet / Small Desktop)
+           ============================================= */
+        @media (max-width: 1000px) {
+            .settings-panel { width: 220px; padding: 16px; }
+            .slides-sidebar { width: 220px; }
+        }
+
+        /* =============================================
+           RESPONSIVE ≤ 768px (Mobile)
+           ============================================= */
+        @media (max-width: 768px) {
+            /* --- HEADER --- */
+            .studio-header .icon-btn:not(.btn-save) { display: none; }
+            .studio-header .btn-exit { display: none; }
+            .studio-header .header-actions > div[style*="width:1px"] { display: none; }
+            .studio-header { padding: 0 10px; gap: 8px; }
+            .btn-save { padding: 8px 14px; font-size: 0.8rem; gap: 4px; }
+            .btn-save i { margin-right: 0; }
+
+            /* --- WORKSPACE: colunas empilhadas --- */
+            .studio-workspace { flex-direction: column; height: calc(100vh - 60px); }
+
+            /* --- SLIDES CAROUSEL (maior) --- */
+            .slides-sidebar {
+                width: 100% !important; height: auto; min-height: 0;
+                flex-direction: row !important; overflow-x: auto; overflow-y: hidden;
+                padding: 12px 14px; gap: 12px; border-right: none;
+                border-bottom: 1px solid var(--border); flex-shrink: 0;
+                scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch;
+            }
+            .slides-sidebar::-webkit-scrollbar { height: 4px; }
+            .slide-thumbnail {
+                flex-shrink: 0; width: 250px; height: 160px;
+                scroll-snap-align: start;
+            }
+            .slide-thumbnail .thumb-header { padding: 5px 8px 0; }
+            .slide-thumbnail .thumb-answers { grid-template-columns: 1fr 1fr; gap: 3px; }
+            .slide-thumbnail .thumb-ans { font-size: 0.5rem; min-height: 16px; padding: 2px 4px; border-radius: 4px; }
+            .slide-thumbnail .thumb-q-box { font-size: 0.6rem; padding: 6px 8px; border-radius: 6px; }
+            .slide-thumbnail .thumb-num { width: 20px; height: 20px; font-size: 0.6rem; border-radius: 6px; }
+            .slide-thumbnail .thumb-type-badge { font-size: 0.5rem; padding: 2px 6px; }
+            .slide-thumbnail .thumb-img-mini { max-height: 32px; }
+            .slide-thumbnail .slide-hover-actions { display: none; }
+            .slides-sidebar #slidesContainer { flex-direction: row !important; gap: 10px !important; }
+            .btn-add-slide {
+                flex-shrink: 0; width: 52px; height: 52px; padding: 0; position: static; margin-top: 0;
+                white-space: nowrap; font-size: 0.85rem; border-radius: 16px;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .btn-add-slide .btn-add-text { display: none; }
+            .btn-add-slide i { font-size: 1.4rem; margin: 0; }
+
+            /* --- CANVAS (centrado verticalmente) --- */
+            .canvas-container { padding: 15px 16px 20px !important; }
+            .question-input { font-size: 1.5rem; padding: 20px 24px; min-height: 70px; }
+            .answers-grid { gap: 12px; }
+            .answer-box { min-height: 85px; padding: 0 12px; gap: 8px; border-radius: 18px; }
+            .answer-box .ans-input { font-size: 1.1rem; padding: 12px 0; max-height: 140px; }
+            .shape-icon { width: 32px; height: 32px; font-size: 1rem; border-radius: 10px; }
+            .check-btn { width: 28px; height: 28px; min-width: 28px; }
+            .add-ans-img-btn { width: 28px; height: 28px; font-size: 0.9rem; }
+            .media-placeholder { width: 100%; height: 160px; border-radius: 16px; }
+            .media-placeholder i { font-size: 1.5rem; }
+
+            /* --- SETTINGS BOTTOM SHEET --- */
+            .settings-panel {
+                position: fixed; bottom: 52px; left: 0; right: 0; top: auto;
+                width: 100% !important; max-width: 100% !important; height: calc(80vh - 52px);
+                z-index: 300; border-radius: 24px; border: 2px solid var(--border);
+                transform: translateY(120%);
+                box-shadow: 0 -8px 30px rgba(0,0,0,0.2); padding: 0 20px 20px;
+                overflow: hidden; background: var(--surface);
+            }
+            .settings-panel.open { transform: translateY(0); overflow-y: auto; }
+            .settings-panel:not(.open) .panel-section { visibility: hidden; }
+            .sheet-drag-handle { display: none !important; }
+            .settings-backdrop {
+                position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 299;
+                display: none;
+            }
+            .settings-backdrop.show { display: block; }
+            .settings-panel .settings-header-row {
+                display: flex; align-items: center; justify-content: center;
+                margin-top: 16px; margin-bottom: 20px;
+            }
+            .settings-panel .settings-header-row h4 {
+                margin: 0; text-align: center; width: 100%;
+            }
+            .settings-panel .toggle-row { padding: 8px 12px; }
+            .settings-panel .toggle-label { font-size: 0.8rem; }
+
+            /* --- CONTEXT TOOLBAR --- */
+            .studio-context-bar.active { height: 50px; }
+            .context-tools { gap: 6px; }
+            .context-label { font-size: 0.7rem; margin-right: 2px; }
+            .ans-tb-btn { width: 30px; height: 30px; font-size: 0.85rem; border-radius: 8px; }
+            .color-picker-btn { width: 30px; height: 30px; }
+            .color-picker-btn .cp-swatch { width: 18px; height: 18px; }
+            .ans-tb-reset { width: 30px; height: 30px; font-size: 0.8rem; }
+            .ans-toolbar-divider { height: 18px; }
+
+            /* --- MODAIS --- */
+            .modal-box { width: 100%; max-width: 100%; border-radius: 20px 20px 0 0; padding: 24px 20px; max-height: 85vh; margin-top: auto; }
+            .modal-overlay { align-items: flex-end; }
+            .img-tab { font-size: 0.9rem; padding: 10px; }
+            .image-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 250px; }
+            .upload-area { padding: 30px 16px; }
+
+            /* --- GENO PANEL (hidden on mobile, using bottom sheet instead) --- */
+            .geno-panel { display: none !important; }
+
+            /* FLOATING SETTINGS FAB - replaced by bottom bar */
+            .mobile-settings-toggle { display: none !important; }
+
+            /* --- MOBILE BOTTOM BAR (gear + geno) --- */
+            .mobile-bottom-bar {
+                display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+                height: 52px; background: var(--surface); border-top: 2px solid var(--border);
+                z-index: 500; gap: 2px; align-items: stretch;
+                border-radius: 0 0 20px 20px; overflow: hidden;
+            }
+            .mobile-bar-btn {
+                flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+                border: none; cursor: pointer; background: transparent;
+                font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 0.85rem;
+                transition: 0.2s; border-radius: 0;
+            }
+            .mobile-bar-btn:active { transform: scale(0.96); }
+            .mobile-bar-settings {
+                color: var(--grey); border-right: 1px solid var(--border);
+            }
+            .mobile-bar-settings:active { color: var(--purple); background: var(--hover-light-purple); }
+            .mobile-bar-geno {
+                color: var(--purple);
+            }
+            .mobile-bar-geno:active { background: var(--hover-light-purple); }
+            .mobile-bar-settings i { font-size: 1.2rem; }
+            .mobile-geno-icon { width: 26px; height: 26px; object-fit: contain; }
+
+            /* --- MOBILE GENO WRAPPER — mascot above + sheet below --- */
+            .geno-sheet-wrapper {
+                display: none; position: fixed; bottom: 52px; left: 0; right: 0;
+                z-index: 400; flex-direction: column; align-items: stretch;
+                pointer-events: none;
+            }
+            .geno-sheet-wrapper.open { display: flex; pointer-events: auto; }
+
+            .geno-sheet-mascot-area {
+                position: absolute; top: -65px; right: 0; z-index: 402;
+                pointer-events: none; opacity: 0; transition: opacity 0.3s;
+                display: flex; align-items: flex-end;
+            }
+            .geno-sheet-mascot-area.visible { opacity: 1; }
+            .geno-sheet-mascot {
+                height: 90px; width: auto; position: relative;
+                animation: float 3s ease-in-out infinite;
+            }
+            .geno-sheet-wrapper.fullscreen { bottom: 0; }
+            .geno-sheet-wrapper.fullscreen .geno-sheet-mascot-area { display: none !important; }
+            .geno-sheet-wrapper.fullscreen .geno-sheet {
+                height: 100vh; max-height: 100vh; border-radius: 0; border: none;
+            }
+            .geno-sheet-wrapper.fullscreen .geno-sheet-messages { max-height: none; }
+            .geno-sheet-bubble {
+                background: var(--surface); border-radius: 20px 20px 0 20px; padding: 10px 16px;
+                font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--dark);
+                box-shadow: 0 4px 0 var(--border); border: 2px solid var(--border);
+                width: max-content; max-width: 180px; text-align: center;
+                position: absolute; right: 100px; bottom: 40px; z-index: 5;
+            }
+            .geno-sheet-bubble:empty { display: none; }
+            [data-theme="dark"] .geno-sheet-bubble { color: #ffffff; background: #222222; border-color: #555555; box-shadow: 0 4px 0 #444444; }
+            .geno-sheet-mascot {
+                height: 90px; width: auto;
+                animation: float 3s ease-in-out infinite;
+            }
+
+            .geno-sheet {
+                display: flex; position: relative; left: 0; right: 0; width: 100%;
+                height: calc(80vh - 52px); background: var(--surface); border: 2px solid var(--border);
+                border-radius: 24px; flex-direction: column; overflow: hidden;
+                max-height: calc(80vh - 52px);
+            }
+            .geno-sheet-header {
+                display: flex; justify-content: space-between; align-items: center;
+                padding: 14px 18px; border-bottom: 2px solid var(--border); flex-shrink: 0;
+                background: var(--surface);
+            }
+            [data-theme="dark"] .geno-sheet-header { border-bottom-color: #444444; background: #222222; }
+            .geno-sheet-title { display: flex; align-items: center; gap: 8px; }
+            .geno-sheet-icon { width: 28px; height: 28px; object-fit: contain; }
+            .geno-sheet-title h3 {
+                margin: 0; font-family: 'Fredoka', sans-serif; font-size: 1.1rem; font-weight: 600;
+                color: var(--purple); display: flex; align-items: center; gap: 8px;
+            }
+            .geno-sheet-close {
+                width: 32px; height: 32px; border-radius: 10px; border: none;
+                background: transparent; color: var(--grey); cursor: pointer;
+                display: flex; align-items: center; justify-content: center; font-size: 0.95rem;
+                transition: 0.15s;
+            }
+            .geno-sheet-close:hover { background: var(--bg-elevated); color: var(--dark); }
+            [data-theme="dark"] .geno-sheet-close:hover { background: #333; color: #fff; }
+
+            .geno-sheet-character {
+                display: flex; align-items: flex-end; padding: 10px 18px 0; flex-shrink: 0;
+            }
+            .geno-sheet-character .geno-sheet-mascot {
+                height: 80px; width: auto;
+                animation: float 3s ease-in-out infinite;
+            }
+
+            .geno-sheet-messages {
+                flex: 1; overflow-y: scroll; padding: 14px 18px; display: flex;
+                flex-direction: column; gap: 10px;
+                -webkit-overflow-scrolling: touch; min-height: 0;
+                overscroll-behavior: contain; touch-action: pan-y;
+                position: relative; max-height: 60vh;
+            }
+            .geno-sheet-messages::-webkit-scrollbar { width: 5px; }
+            .geno-sheet-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+            .geno-sheet-messages .geno-msg {
+                max-width: 85%; padding: 10px 16px; font-family: 'Nunito', sans-serif;
+                font-size: 0.92rem; font-weight: 600; line-height: 1.5;
+                word-wrap: break-word;
+            }
+            .geno-sheet-messages .geno-msg.user {
+                align-self: flex-end; background: var(--purple); color: #ffffff;
+                border-radius: 18px 18px 4px 18px;
+            }
+            .geno-sheet-messages .geno-msg.assistant {
+                align-self: flex-start; background: var(--bg-light); color: var(--dark);
+                border-radius: 18px 18px 18px 4px; border: 1.5px solid var(--border);
+            }
+            [data-theme="dark"] .geno-sheet-messages .geno-msg.assistant { background: #2a2a2a; color: #e0e0e0; border-color: #444444; }
+
+            .geno-sheet-quick {
+                display: flex; gap: 8px; padding: 8px 18px; overflow-x: auto; flex-shrink: 0;
+                scrollbar-width: none;
+            }
+            .geno-sheet-quick::-webkit-scrollbar { display: none; }
+            .geno-sheet-quick:empty { display: none; padding: 0; }
+            .geno-sheet-quick .geno-qa-btn {
+                flex-shrink: 0; padding: 7px 14px; border-radius: 14px; border: none; cursor: pointer;
+                font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 0.8rem;
+                background: var(--purple); color: #ffffff;
+                box-shadow: 0 4px 0 #7b50d4; transition: 0.1s; white-space: nowrap;
+            }
+            .geno-sheet-quick .geno-qa-btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+
+            .geno-sheet-input {
+                display: flex; align-items: flex-end; gap: 8px; padding: 12px 16px;
+                border-top: 2px solid var(--border); flex-shrink: 0; background: var(--bg-off);
+            }
+            [data-theme="dark"] .geno-sheet-input { border-top-color: #444444; background: #1e1e1e; }
+            .geno-sheet-input textarea {
+                flex: 1; border: 2px solid var(--border); border-radius: 16px; padding: 10px 14px;
+                font-family: 'Nunito', sans-serif; font-weight: 600; font-size: 0.95rem;
+                background: var(--surface); color: var(--dark); resize: none; transition: 0.2s;
+                max-height: 100px; min-height: 42px; line-height: 1.4;
+            }
+            .geno-sheet-input textarea:focus { border-color: var(--purple); }
+            [data-theme="dark"] .geno-sheet-input textarea { background: #2a2a2a; color: #ffffff; border-color: #555555; }
+            [data-theme="dark"] .geno-sheet-input textarea::placeholder { color: #777777; }
+
+            .geno-sheet-send {
+                width: 42px; height: 42px; border-radius: 14px; border: none; cursor: pointer;
+                background: var(--purple); color: #ffffff; display: flex; align-items: center;
+                justify-content: center; box-shadow: 0 4px 0 #7b50d4; transition: 0.1s;
+                flex-shrink: 0; font-size: 1.1rem;
+            }
+            .geno-sheet-send:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+            .geno-sheet-send:disabled { background: #B4A9FA; box-shadow: 0 4px 0 #9E91E5; cursor: not-allowed; }
+
+            .geno-sheet-backdrop {
+                position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 399;
+                display: none; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            }
+            .geno-sheet-backdrop.show { display: block; opacity: 1; pointer-events: auto; }
+
+            /* Push workspace above bottom bar */
+            .studio-workspace { height: calc(100vh - 112px); }
+        }
+
+        /* =============================================
+           RESPONSIVE ≤ 480px (Small Mobile)
+           ============================================= */
+        @media (max-width: 480px) {
+            .canvas-container { padding: 16px 12px; }
+            .question-input { font-size: 1.1rem; padding: 12px 16px; min-height: 50px; }
+            .answers-grid { gap: 8px; }
+            .answer-box { min-height: 72px; padding: 0 8px; gap: 6px; }
+            .answer-box .ans-input { font-size: 1rem; padding: 8px 0; max-height: 150px; }
+            .shape-icon { width: 24px; height: 24px; font-size: 0.75rem; border-radius: 7px; }
+            .check-btn { width: 22px; height: 22px; min-width: 22px; }
+            .slide-thumbnail { width: 200px; height: 130px; }
+            .slide-thumbnail .thumb-q-box { font-size: 0.5rem; padding: 4px 6px; }
+            .slide-thumbnail .thumb-answers { grid-template-columns: 1fr 1fr; gap: 2px; }
+            .slide-thumbnail .thumb-ans { font-size: 0.45rem; min-height: 14px; padding: 1px 3px; }
+            .slide-thumbnail .thumb-num { width: 18px; height: 18px; font-size: 0.55rem; border-radius: 5px; }
+            .btn-add-slide { width: 44px; height: 44px; font-size: 0.75rem; border-radius: 14px; }
+            .modal-box { padding: 20px 16px; }
+            .img-tab { font-size: 0.8rem; padding: 8px 6px; }
+            .settings-panel { width: 100%; max-width: 100%; }
+        }
+
+        @keyframes statusPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .status-pulse {
+            animation: statusPulse 1s ease infinite;
+        }
+    </style>
     </head>
 <body data-page="studio">
 
-
+    <!-- WIDGET FLUTUANTE DO GENO (CHAT CONVERSACIONAL) -->
     <div id="geno-panel" class="geno-panel">
         <div class="geno-character-area">
             <div class="geno-img-wrapper">
@@ -49,7 +1222,7 @@
         </div>
     </div>
 
-
+    <!-- MODAL DE IMAGEM UNIVERSAL (MANUAL) -->
     <div id="image-modal" class="modal-overlay">
         <div class="modal-box" style="max-width: 650px;">
             <div class="modal-title" style="color: var(--dark);">
@@ -62,7 +1235,6 @@
                 <button class="img-tab" onclick="switchImageTab('ai')"><i class="fa-solid fa-wand-magic-sparkles"></i> <br> Gerar com IA</button>
             </div>
 
-
             <div class="img-tab-content active" id="tab-upload">
                 <div class="upload-area" id="modal-upload-area" onclick="document.getElementById('modal-file-input').click()">
                     <i class="fa-solid fa-cloud-arrow-up fa-3x" style="color: var(--primary); margin-bottom: 10px;"></i>
@@ -71,7 +1243,6 @@
                     <input type="file" id="modal-file-input" accept="image/*" style="display:none;" onchange="handleModalFileUpload(event)">
                 </div>
             </div>
-
 
             <div class="img-tab-content" id="tab-unsplash">
                 <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -87,18 +1258,15 @@
                 </div>
             </div>
 
-
             <div class="img-tab-content" id="tab-ai">
                 <p style="color:var(--grey); font-size:0.95rem; margin-bottom:15px; font-weight:600; text-align:center;">
                     Descreve o que imaginas. O Geno AI trata do resto!
                 </p>
                 <textarea id="ai-image-prompt" class="modal-input" rows="3" placeholder="Ex: Um gato astronauta em marte a comer pizza..." style="resize:none; font-size: 1.1rem; padding: 16px; border-radius: 20px;"></textarea>
 
-
                 <button id="btn-generate-ai-single" class="btn" style="width: 100%; background: var(--purple); color: white; box-shadow: 0 4px 0 #5a4bd4; font-size: 1.2rem; padding: 16px; border-radius: 16px; margin-top: 15px;" onclick="generateAiImageSingle()">
                     <i class="fa-solid fa-bolt"></i> Gerar
                 </button>
-
 
                 <div id="ai-gen-loading" style="display:none; text-align:center; padding: 20px;">
                     <div style="font-size: 2rem; color: var(--purple); margin-bottom: 10px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
@@ -107,14 +1275,59 @@
                 </div>
             </div>
 
-
             <div class="modal-actions" style="margin-top: 24px;">
                 <button class="btn btn-exit" onclick="closeModal('image-modal')" style="width: 100%; padding: 14px;">Cancelar</button>
             </div>
         </div>
     </div>
 
+    <!-- Shortcuts modal overlay -->
+    <div id="shortcuts-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-title" style="color: var(--dark); font-family: 'Fredoka';">
+                <i class="fa-solid fa-keyboard" style="color: var(--magic-purple);"></i> Atalhos de Teclado
+            </div>
+            <div style="text-align: left; margin: 20px 0; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Guardar Quiz</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Ctrl + S</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Novo Slide</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Ctrl + M / Alt + N</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Desfazer Alteração</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Ctrl + Z</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Refazer Alteração</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Ctrl + Y / Ctrl+Shift+Z</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Abrir/Fechar Geno AI</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Ctrl + G</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Abrir Definições do Quiz</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Ctrl + ,</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Navegar entre Slides</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Seta Cima / Baixo</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                    <span style="font-weight: 700; color: var(--dark);">Marcar Opção como Correta</span>
+                    <span style="background: #eee; padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 0.9rem; font-weight: bold; color: #555;">Alt + 1 / 2 / 3 / 4</span>
+                </div>
+            </div>
+            <div class="modal-actions" style="margin-top: 24px;">
+                <button class="btn btn-exit" onclick="closeModal('shortcuts-modal')" style="width: 100%; padding: 14px;">Fechar</button>
+            </div>
+        </div>
+    </div>
 
+    <!-- CABEÇALHO STUDIO -->
     <header class="studio-header">
         <div style="display:flex; align-items:center; gap:15px;">
             <div class="studio-logo" onclick="confirmExit()" style="cursor:pointer;">
@@ -127,23 +1340,29 @@
                     <button class="undo-redo-btn" id="undoBtn" onclick="undo()" disabled title="Desfazer (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
                     <button class="undo-redo-btn" id="redoBtn" onclick="redo()" disabled title="Refazer (Ctrl+Shift+Z)"><i class="fa-solid fa-rotate-right"></i></button>
                 </div>
+                <div id="save-status-icon" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; font-size:1.1rem; cursor:pointer; opacity:0.8; transition: opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'" onclick="document.getElementById('saveQuizBtn').click()">
+                    <i class="fa-solid fa-cloud" style="color: #10B981;" title="Guardado na nuvem"></i>
+                </div>
             </div>
         </div>
         <div class="header-actions">
             <div class="studio-credits" id="studioCredits"><img src="static/img/icons/credit.png" alt="cr"/><span id="studio-credits-count">100</span></div>
             <div style="width:1px; height:30px; background:var(--border); margin:0 5px;"></div>
+            <!-- BOTÃO IA COM ÍCONE GENO -->
             <button class="icon-btn ai-btn" onclick="toggleGenoPanel()" title="Geno AI">
                 <img src="static/img/geno/genoicon.png" alt="Geno Icon">
             </button>
-            <button class="icon-btn" onclick="openSettingsPage()">
+            <button class="icon-btn" onclick="openSettingsPage()" title="Definições Gerais">
                 <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="icon-btn" onclick="window.openShortcutsModal()" title="Atalhos de Teclado">
+                <i class="fa-solid fa-keyboard"></i>
             </button>
             <div style="width:1px; height:30px; background:var(--border); margin:0 5px;"></div>
             <button class="btn btn-exit" onclick="window.location.href='my_sets.html'">Sair</button>
             <button class="btn btn-save" id="saveQuizBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Guardar</button>
         </div>
     </header>
-
 
     <div class="studio-workspace">
         
@@ -152,16 +1371,18 @@
             <button class="btn-add-slide" id="addSlideBtn"><i class="fa-solid fa-plus"></i><span class="btn-add-text"> Novo Slide</span></button>
         </aside>
 
-
         <main class="main-canvas">
             
+            <!-- BARRA DE FERRAMENTAS CONTEXTUAL -->
             <div class="studio-context-bar" id="context-toolbar">
+                <!-- Conteúdo dinâmico via JS -->
             </div>
 
-
             <div class="canvas-container">
-                <div class="question-input" id="qTextInput" contenteditable="true" data-placeholder="Escreva o slide aqui..." onkeydown="if(event.key==='Enter'){event.preventDefault();}" onpaste="event.preventDefault(); document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));"></div>
-
+                <div style="position: relative; width: 100%;">
+                    <div class="question-input" id="qTextInput" contenteditable="true" data-placeholder="Escreva o slide aqui..."></div>
+                    <div id="qCharCounter" style="position: absolute; right: 15px; bottom: 8px; font-size: 0.75rem; font-weight: 800; color: #888; pointer-events: none; transition: color 0.2s ease;">0 / 120</div>
+                </div>
 
                 <div class="media-area">
                     <div class="media-placeholder" id="mediaUploadBtn">
@@ -175,9 +1396,7 @@
                     </div>
                 </div>
 
-
                 <div class="answers-grid" id="optionsGrid"></div>
-
 
                 <div class="typing-container" id="typingArea">
                     <p style="color:var(--grey); font-weight:700;">Respostas Aceites (Pressione Enter):</p>
@@ -185,14 +1404,12 @@
                     <div class="typing-input-list" id="acceptedAnswersList"></div>
                 </div>
 
-
                 <div class="slide-body-container" id="slideBodyArea" style="display:none;">
                     <label class="slide-body-label"><i class="fa-solid fa-align-left"></i> Conteúdo do Slide</label>
                     <textarea id="slideBodyInput" class="slide-body-textarea" placeholder="Escreve o conteúdo informativo que os alunos vão ler..."></textarea>
                 </div>
             </div>
         </main>
-
 
         <aside class="settings-panel">
             <div class="sheet-drag-handle"><i class="fa-solid fa-gear"></i></div>
@@ -207,10 +1424,9 @@
                         <option value="quiz">Quiz (Padrão)</option>
                         <option value="boolean">Verdadeiro ou Falso</option>
                         <option value="typing">Escrever Resposta</option>
-                        <option value="slide">Apresentação</option>
+                        <option value="slide">Apresentação (Slide)</option>
                     </select>
                 </div>
-
 
                 <div class="setting-group">
                     <label class="setting-label"><i class="fa-regular fa-clock"></i> Tempo Limite</label>
@@ -222,7 +1438,6 @@
                     </select>
                 </div>
 
-
                 <div class="setting-group">
                     <label class="setting-label"><i class="fa-solid fa-trophy"></i> Pontos</label>
                     <select class="genii-select" id="pointsSelect">
@@ -232,9 +1447,7 @@
                     </select>
                 </div>
 
-
                 <div class="settings-divider"></div>
-
 
                 <div class="setting-group">
                     <div class="toggle-row" id="shuffleToggleRow">
@@ -254,10 +1467,9 @@
             </div>
         </aside>
 
-
     </div>
 
-
+    <!-- MOBILE BOTTOM BAR (gear + geno) — OUTSIDE workspace -->
     <div class="mobile-bottom-bar" id="mobileBottomBar">
         <button class="mobile-bar-btn mobile-bar-settings" onclick="toggleMobileSettings()">
             <i class="fa-solid fa-gear"></i>
@@ -267,7 +1479,7 @@
         </button>
     </div>
 
-
+    <!-- MOBILE GENO BOTTOM SHEET — OUTSIDE workspace -->
     <div class="geno-sheet-wrapper" id="genoSheetWrapper">
         <div class="geno-sheet-mascot-area" id="genoSheetMascot">
             <div class="geno-sheet-bubble" id="genoSheetBubble"></div>
@@ -293,12 +1505,10 @@
     </div>
     <div class="geno-sheet-backdrop" id="genoSheetBackdrop" onclick="closeGenoSheet()"></div>
 
-
+    <!-- MOBILE SETTINGS DRAWER BACKDROP — outside workspace -->
     <div class="settings-backdrop" id="settingsBackdrop" onclick="closeMobileSettings()"></div>
 
-
     <input type="file" id="ansImgInput" accept="image/*">
-
 
 <script type="module">
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -307,16 +1517,12 @@
     import "./static/js/components.js";
     import { getAuthHeaders, updateCreditsAfterSpend, showCreditsWarning, refreshCredits } from "./static/js/credits.js";
 
-
     let _cloudinaryToken = null;
-
 
     const params = new URLSearchParams(window.location.search);
     const quizId = params.get('id');
 
-
     if (!quizId) window.location.href = "my_sets.html";
-
 
     let quizData = null;
     let questions =[];
@@ -325,13 +1531,13 @@
     let draggedItemIndex = null;
     let currentAnsImgTarget = null;
 
-
+    // === UNDO / REDO SYSTEM ===
     const _history = [];
     let _historyIdx = -1;
     let _historyPaused = false;
     const MAX_HISTORY = 50;
 
-
+    let _snapshotCount = 0;
     function saveSnapshot() {
         if (_historyPaused) return;
         const snapshot = {
@@ -345,8 +1551,12 @@
         if (_history.length > MAX_HISTORY) _history.shift();
         _historyIdx = _history.length - 1;
         updateUndoRedoButtons();
+        
+        _snapshotCount++;
+        if (_snapshotCount > 1 && typeof window.setSaveStatus === 'function') {
+            window.setSaveStatus('dirty');
+        }
     }
-
 
     function restoreSnapshot(snapshot) {
         _historyPaused = true;
@@ -368,20 +1578,17 @@
         updateUndoRedoButtons();
     }
 
-
     window.undo = () => {
         if (_historyIdx <= 0) return;
         _historyIdx--;
         restoreSnapshot(_history[_historyIdx]);
     };
 
-
     window.redo = () => {
         if (_historyIdx >= _history.length - 1) return;
         _historyIdx++;
         restoreSnapshot(_history[_historyIdx]);
     };
-
 
     function updateUndoRedoButtons() {
         const undoBtn = document.getElementById('undoBtn');
@@ -390,22 +1597,20 @@
         if (redoBtn) redoBtn.disabled = _historyIdx >= _history.length - 1;
     }
 
-
-    let imageModalTargetType = null;
-    let imageModalTargetKey = null;
-
+    // Variáveis para o modal de imagem universal
+    let imageModalTargetType = null; // 'question' | 'answer'
+    let imageModalTargetKey = null; // A, B, C, D if answer
 
     let selectedElementType = null; 
     let selectedElementKey = null;  
     let draggedAnswerKey = null;
 
-
     const NEUTRAL_COLOR = '#FFFFFF';
 
+    // --- LÓGICA DO GENO AI CHAT (AGENTE CONVERSACIONAL) ---
 
     let genoChatHistory = [];
     let genoIsProcessing = false;
-
 
     const GENO_QUICK_ACTIONS = [
         { label: 'Gerar imagem para este slide', prompt: 'Gere uma imagem adequada para a pergunta atual.' },
@@ -417,7 +1622,6 @@
         { label: 'Simplificar texto', prompt: 'Simplifique a linguagem do slide e opções para ser mais fácil de entender.' },
         { label: 'Adicionar dicas', prompt: 'Adicione pequenas dicas de contexto ou explicações às opções de resposta.' },
     ];
-
 
     window.toggleGenoPanel = () => {
         if(localStorage.getItem('genii_ai_disabled') === 'true') { if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
@@ -436,7 +1640,6 @@
         }
     };
 
-
     window.toggleGenoFullscreen = () => {
         const panel = document.getElementById('geno-panel');
         const btn = document.getElementById('geno-expand-btn');
@@ -447,9 +1650,8 @@
         btn.title = isFull ? 'Reduzir' : 'Expandir';
     };
 
-
+    // --- MOBILE GENO BOTTOM SHEET ---
     let genoSheetHistory = [];
-
 
     window.toggleGenoSheet = () => {
         if(localStorage.getItem('genii_ai_disabled') === 'true') { if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
@@ -474,7 +1676,6 @@
         }
     };
 
-
     window.closeGenoSheet = () => {
         stopSheetTypewriter();
         const wrapper = document.getElementById('genoSheetWrapper');
@@ -487,7 +1688,6 @@
         if (bar) bar.style.display = '';
     };
 
-
     window.toggleGenoSheetFullscreen = () => {
         const wrapper = document.getElementById('genoSheetWrapper');
         const btn = wrapper.querySelector('.geno-expand-btn');
@@ -496,7 +1696,6 @@
         if (btn) btn.innerHTML = isFull ? '<i class="fa-solid fa-compress"></i>' : '<i class="fa-solid fa-expand"></i>';
         if (bar) bar.style.display = isFull ? 'none' : '';
     };
-
 
     function renderGenoSheetMessages(msgs) {
         stopSheetTypewriter();
@@ -510,14 +1709,12 @@
         });
     }
 
-
     function renderGenoSheetQuick(actions) {
         const c = document.getElementById('genoSheetQuick');
         c.innerHTML = actions.map(a =>
             `<button class="geno-qa-btn" onclick="sendGenoSheetMessage('${a.prompt.replace(/'/g, "\\'")}')">${a.label}</button>`
         ).join('');
     }
-
 
     window.sendGenoSheetMessage = async (text) => {
         if(localStorage.getItem('genii_ai_disabled') === 'true') { if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
@@ -526,18 +1723,16 @@
         if (!msg || genoIsProcessing) return;
         if (!text) { input.value = ''; input.style.height = 'auto'; }
 
-
         genoSheetHistory.push({ role: 'user', text: msg });
         renderGenoSheetMessages(genoSheetHistory);
         document.getElementById('genoSheetQuick').innerHTML = '';
-
 
         genoIsProcessing = true;
         const sendBtn = document.getElementById('genoSheetSend');
         sendBtn.disabled = true;
         setGenoState('planning', 'A pensar...');
 
-
+        // Typing dots indicator (matches desktop)
         const c = document.getElementById('genoSheetMessages');
         const typingEl = document.createElement('div');
         typingEl.className = 'geno-msg assistant';
@@ -546,11 +1741,9 @@
         c.appendChild(typingEl);
         c.scrollTo({ top: c.scrollHeight, behavior: 'instant' });
 
-
         try {
             const systemPrompt = buildGenoSystemPrompt();
             const apiMessages = [...genoSheetHistory.map(m => ({ role: m.role, text: m.text }))];
-
 
             const response = await fetch('/api/gemini', {
                 method: 'POST',
@@ -558,15 +1751,13 @@
                 body: JSON.stringify({ messages: apiMessages, systemPrompt })
             });
 
-
             if (response.status === 429) { showCreditsWarning(); throw new Error('Créditos insuficientes.'); }
             if (!response.ok) throw new Error('Erro no servidor.');
 
-
+            // Stream token-by-token (same as desktop)
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '', fullText = '';
-
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -581,16 +1772,13 @@
                 }
             }
 
-
             let cleanText = fullText;
             if (cleanText.includes('```json')) cleanText = cleanText.split('```json')[1].split('```')[0].trim();
             else if (cleanText.includes('```')) cleanText = cleanText.split('```')[1].split('```')[0].trim();
 
-
             let parsed;
             try { parsed = JSON.parse(cleanText); }
             catch { const m = cleanText.match(/\{[\s\S]*\}/); if (m) parsed = JSON.parse(m[0]); else throw new Error('Resposta não-JSON'); }
-
 
             if (parsed.tools && parsed.tools.length > 0) {
                 setGenoState('magic', 'A executar...');
@@ -599,14 +1787,13 @@
                 saveSnapshot();
             }
 
-
             const reply = parsed.reply || parsed.chat_reply || 'Feito!';
 
-
+            // Remove typing indicator
             const typingRemove = document.getElementById('geno-sheet-typing');
             if (typingRemove) typingRemove.remove();
 
-
+            // Typewriter effect (matches desktop)
             genoSheetHistory.push({ role: 'assistant', text: reply });
             sheetTypeQueue = reply;
             sheetTypeTarget = null;
@@ -626,17 +1813,16 @@
         }
     };
 
-
+    // --- MOBILE GENO TYPEWRITER (matches desktop streaming) ---
     let sheetTypeQueue = '';
     let sheetTypeTimer = null;
     let sheetTypeTarget = null;
 
-
     function startSheetTypewriter(text) {
         const container = document.getElementById('genoSheetMessages');
+        // Remove any existing typing indicator
         const oldTyping = document.getElementById('geno-sheet-typing');
         if (oldTyping) oldTyping.remove();
-
 
         sheetTypeTarget = document.createElement('div');
         sheetTypeTarget.className = 'geno-msg assistant';
@@ -646,7 +1832,6 @@
         sheetTypeQueue = text;
         sheetTypeTimer = setInterval(sheetTypeTick, 25);
     }
-
 
     function sheetTypeTick() {
         if (sheetTypeQueue.length > 0) {
@@ -661,12 +1846,10 @@
         }
     }
 
-
     function stopSheetTypewriter() {
         if (sheetTypeTimer) { clearInterval(sheetTypeTimer); sheetTypeTimer = null; }
         sheetTypeQueue = '';
     }
-
 
     window.setGenoState = (state, message = null) => {
         const img = document.getElementById('geno-img');
@@ -700,12 +1883,10 @@
         }
     };
 
-
     function addGenoMessage(role, text) {
         genoChatHistory.push({ role, text });
         renderGenoMessages();
     }
-
 
     function renderGenoMessages() {
         const container = document.getElementById('geno-messages');
@@ -716,13 +1897,11 @@
         container.scrollTop = container.scrollHeight;
     }
 
-
     function escapeGenoHtml(str) {
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
     }
-
 
     function showGenoTyping() {
         const container = document.getElementById('geno-messages');
@@ -734,12 +1913,10 @@
         container.scrollTop = container.scrollHeight;
     }
 
-
     function hideGenoTyping() {
         const el = document.getElementById('geno-typing-indicator');
         if (el) el.remove();
     }
-
 
     function renderQuickActions(actions) {
         const container = document.getElementById('geno-quick-actions');
@@ -749,12 +1926,10 @@
         container.style.display = actions.length ? '' : 'none';
     }
 
-
     function clearQuickActions() {
         document.getElementById('geno-quick-actions').innerHTML = '';
         document.getElementById('geno-quick-actions').style.display = 'none';
     }
-
 
     function buildGenoSystemPrompt() {
         const quizTitle = document.getElementById('quizTitleInput')?.value || 'Sem título';
@@ -767,10 +1942,8 @@
         const correctOpt = q.correct_option || [];
         const totalQs = questions.length;
 
-
         return `És o Geno, o assistente robótico super inteligente e simpático da plataforma educacional Genii.
 Falas em português de Portugal (pt-PT). És breve, amigável e usas emojis ocasionalmente.
-
 
 CONTEXTO ATUAL DO EDITOR:
 - Título do quiz: "${quizTitle}"
@@ -780,7 +1953,6 @@ CONTEXTO ATUAL DO EDITOR:
 - Opções: A="${opts.A || ''}" | B="${opts.B || ''}" | C="${opts.C || ''}" | D="${opts.D || ''}"
 - Resposta(s) correta(s): ${Array.isArray(correctOpt) ? correctOpt.join(', ') : correctOpt}
 ${qType === 'slide' ? `- Corpo do slide: "${(q.body || '').substring(0, 200)}"` : ''}
-
 
 FERRAMENTAS DISPONÍVEIS (usa-as quando o utilizador pede alterações ao quiz):
 1. "updateCurrentQuestion" — altera a pergunta atual. Data pode conter: question_text, options (objeto {A,B,C,D}), correct_option (array), timeLimit, points, type, body (para slides), imageKeyword.
@@ -794,7 +1966,6 @@ FERRAMENTAS DISPONÍVEIS (usa-as quando o utilizador pede alterações ao quiz):
 9. "togglePrivacy" — alterna o quiz entre público e privado. Data: {}
 10. "navigateToQuestion" — navega para uma pergunta específica. Data: { slideIndex: número (0-based) }
 
-
 FORMATO DE RESPOSTA OBRIGATÓRIO (JSON puro, sem markdown):
 {
   "reply": "Mensagem curta (max 2 frases) sobre o que fizeste. Usa SEMPRE tempo passado pois é mostrada DEPOIS de executar (ex: 'Criei 5 perguntas sobre X' em vez de 'Vou criar'). Se só conversaste, responde normalmente.",
@@ -803,15 +1974,12 @@ FORMATO DE RESPOSTA OBRIGATÓRIO (JSON puro, sem markdown):
   ]
 }
 
-
 Se o utilizador só quer conversar (sem alterar o quiz), devolve "tools": [].
 NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
     }
 
-
     async function executeGenoTools(tools) {
         if (!tools || !Array.isArray(tools) || tools.length === 0) return;
-
 
         for (const tool of tools) {
             try {
@@ -829,9 +1997,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                         (async () => {
                             const { url: imgUrl, publicId: imgPublicId } = await generateAIImage(tool.data.imageKeyword);
                             if (imgUrl) {
+                                // ­ƒøí´©Å Apagar imagem anterior via proxy
                                 if (q.imagePublicId && _cloudinaryToken) {
                                     window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
                                 } else if (q.imageDeleteToken) {
+                                    // Legacy fallback
                                     fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [q.imageDeleteToken] }) }).catch(() => {});
                                 }
                                 q.imageUrl = imgUrl;
@@ -859,12 +2029,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                         _imageKeyword: q.imageKeyword || null
                     }));
 
-
                     if (questions.length === 1 && questions[0].question_text === '') questions = [];
                     const baseIndex = questions.length;
                     questions.push(...newQs);
                     renderThumbnailList();
-
 
                     const imageTasks = [];
                     for (let i = 0; i < newQs.length; i++) {
@@ -874,12 +2042,12 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                         }
                     }
 
-
                     for (const task of imageTasks) {
                         setGenoState('magic', 'A pintar ilustrações...');
                         const { url: imgUrl, publicId: imgPublicId } = await generateAIImage(task.keyword);
                         if (imgUrl) {
                             const q = questions[task.idx];
+                            // ­ƒøí´©Å Apagar imagem anterior via proxy
                             if (q.imagePublicId && _cloudinaryToken) {
                                 window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
                             } else if (q.imageDeleteToken) {
@@ -898,6 +2066,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                     const { url: imgUrl, publicId: imgPublicId } = await generateAIImage(tool.data.prompt);
                     if (imgUrl) {
                         const q = questions[targetIdx];
+                        // ­ƒøí´©Å Apagar imagem anterior via proxy
                         if (q.imagePublicId && _cloudinaryToken) {
                             window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
                         } else if (q.imageDeleteToken) {
@@ -922,6 +2091,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                     const targetIdx = (tool.data && tool.data.slideIndex !== undefined && tool.data.slideIndex >= 0 && tool.data.slideIndex < questions.length)
                         ? tool.data.slideIndex : currentIndex;
                     const q = questions[targetIdx];
+                    // ­ƒøí´©Å Apagar imagem via proxy
                     if (q.imagePublicId && _cloudinaryToken) {
                         window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
                     } else if (q.imageDeleteToken) {
@@ -938,6 +2108,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                         ? tool.data.slideIndex : currentIndex;
                     const q = questions[targetIdx];
                     const key = tool.data.key;
+                    // ­ƒøí´©Å Apagar imagem via proxy
                     if (q.answerImagePublicIds && q.answerImagePublicIds[key] && _cloudinaryToken) {
                         window.deleteFromCloudinary(q.answerImagePublicIds[key], _cloudinaryToken).catch(() => {});
                     } else if (q.answerImageTokens && q.answerImageTokens[key]) {
@@ -998,7 +2169,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }
 
-
     function parseSSE(text) {
         const events = [];
         const lines = text.split('\n');
@@ -1010,11 +2180,9 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         return events;
     }
 
-
     let _genoTypeQueue = '';
     let _genoTypeTimer = null;
     let _genoTypeEl = null;
-
 
     function startTypewriter() {
         const container = document.getElementById('geno-messages');
@@ -1026,7 +2194,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         container.appendChild(_genoTypeEl);
         _genoTypeTimer = setInterval(_genoTypeTick, 25);
     }
-
 
     function _genoTypeTick() {
         if (_genoTypeQueue.length > 0) {
@@ -1046,12 +2213,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }
 
-
     function pushTypeChunk(text) {
         _genoTypeQueue += text;
         if (!_genoTypeTimer) startTypewriter();
     }
-
 
     function stopTypewriter() {
         if (_genoTypeTimer) {
@@ -1060,7 +2225,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
         _genoTypeQueue = '';
     }
-
 
     function finalizeStreamingMessage(text) {
         stopTypewriter();
@@ -1073,33 +2237,27 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }
 
-
     window.sendGenoMessage = async (text) => {
         if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
         const inputEl = document.getElementById('geno-chat-input');
         const msg = text || inputEl.value.trim();
         if (!msg || genoIsProcessing) return;
 
-
         if (!text) inputEl.value = '';
         inputEl.style.height = 'auto';
         clearQuickActions();
-
 
         addGenoMessage('user', msg);
         showGenoTyping();
         setGenoState('planning', 'A pensar...');
         genoIsProcessing = true;
 
-
         const sendBtn = document.getElementById('geno-send-btn');
         sendBtn.disabled = true;
-
 
         try {
             const systemPrompt = buildGenoSystemPrompt();
             const apiMessages = [...genoChatHistory.map(m => ({ role: m.role, text: m.text }))];
-
 
             const response = await fetch('/api/gemini', {
                 method: 'POST',
@@ -1107,29 +2265,24 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 body: JSON.stringify({ messages: apiMessages, systemPrompt })
             });
 
-
             if (response.status === 429) {
                 showCreditsWarning();
                 throw new Error('Créditos insuficientes.');
             }
             if (!response.ok) throw new Error('Erro no servidor.');
 
-
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let buffer = '';
             let fullText = '';
-
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
                 buffer += decoder.decode(value, { stream: true });
 
-
                 const events = parseSSE(buffer);
                 buffer = buffer.split('\n\n').pop() || '';
-
 
                 for (const event of events) {
                     if (event.credits !== undefined) updateCreditsAfterSpend(event.credits);
@@ -1141,11 +2294,9 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 }
             }
 
-
             let cleanText = fullText;
             if (cleanText.includes('```json')) cleanText = cleanText.split('```json')[1].split('```')[0].trim();
             else if (cleanText.includes('```')) cleanText = cleanText.split('```')[1].split('```')[0].trim();
-
 
             let parsed;
             try {
@@ -1156,9 +2307,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 else throw new Error('Resposta não-JSON do LLM');
             }
 
-
             const reply = parsed.reply || parsed.chat_reply || 'Feito!';
-
 
             if (parsed.tools && parsed.tools.length > 0) {
                 setGenoState('magic', 'A executar...');
@@ -1168,7 +2317,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 saveSnapshot();
             }
 
-
             hideGenoTyping();
             const msgContainer = document.getElementById('geno-messages');
             const streamMsg = document.createElement('div');
@@ -1176,13 +2324,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             streamMsg.id = 'geno-streaming-msg';
             msgContainer.appendChild(streamMsg);
 
-
             finalizeStreamingMessage(reply);
             genoChatHistory.push({ role: 'assistant', text: reply });
 
-
             renderQuickActions(GENO_QUICK_ACTIONS);
-
 
         } catch (error) {
             console.error(error);
@@ -1200,7 +2345,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
     document.addEventListener('DOMContentLoaded', () => {
         const inputEl = document.getElementById('geno-chat-input');
         if (inputEl) {
@@ -1215,7 +2359,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
             });
         }
-
 
         const qa = document.getElementById('geno-quick-actions');
         if (qa) {
@@ -1248,27 +2391,100 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     });
 
+    window.openShortcutsModal = () => {
+        document.getElementById('shortcuts-modal').style.display = 'flex';
+    };
 
+    window.setSaveStatus = (status) => {
+        const container = document.getElementById('save-status-icon');
+        if (!container) return;
+        
+        let iconHtml = '';
+        if (status === 'saving') {
+            iconHtml = '<i class="fa-solid fa-spinner fa-spin" style="color: #F59E0B;" title="A guardar na nuvem..."></i>';
+        } else if (status === 'saved') {
+            iconHtml = '<i class="fa-solid fa-cloud" style="color: #10B981;" title="Guardado na nuvem"></i>';
+        } else if (status === 'dirty') {
+            iconHtml = '<i class="fa-solid fa-cloud-arrow-up" style="color: #9CA3AF;" title="Alterações não guardadas (Clique para guardar)"></i>';
+        } else if (status === 'error') {
+            iconHtml = '<i class="fa-solid fa-triangle-exclamation" style="color: #EF4444;" title="Erro ao guardar! Clique para tentar novamente."></i>';
+        }
+        container.innerHTML = iconHtml;
+    };
+
+    window.updateCharCounter = () => {
+        const input = document.getElementById('qTextInput');
+        const counter = document.getElementById('qCharCounter');
+        if (!input || !counter) return;
+        const len = input.innerText.length;
+        counter.innerText = `${len} / 120`;
+        if (len <= 80) {
+            counter.style.color = '#888888';
+        } else if (len <= 120) {
+            counter.style.color = '#FB923C'; // Orange
+        } else {
+            counter.style.color = '#EF4444'; // Red
+        }
+    };
+
+    // Keyboard shortcuts: Ctrl+Z (undo), Ctrl+Shift+Z or Ctrl+Y (redo), Ctrl+S (save), etc.
     document.addEventListener('keydown', (e) => {
         const tag = e.target.tagName;
         const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable;
+        
         if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
             e.preventDefault();
             undo();
         } else if ((e.key === 'z' && (e.ctrlKey || e.metaKey) && e.shiftKey) || (e.key === 'y' && (e.ctrlKey || e.metaKey))) {
             e.preventDefault();
             redo();
+        } else if ((e.key === 's' && (e.ctrlKey || e.metaKey)) || (e.key === 'Enter' && (e.ctrlKey || e.metaKey))) {
+            e.preventDefault();
+            const btn = document.getElementById('saveQuizBtn');
+            if (btn) btn.click();
+        } else if ((e.key === 'm' && (e.ctrlKey || e.metaKey)) || (e.key === 'n' && e.altKey)) {
+            e.preventDefault();
+            if (typeof window.addNewQuestion === 'function') window.addNewQuestion();
+        } else if (e.key === 'g' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            if (typeof window.toggleGenoPanel === 'function') window.toggleGenoPanel();
+        } else if (e.key === ',' && (e.ctrlKey || e.metaKey)) {
+            e.preventDefault();
+            if (typeof window.openSettingsPage === 'function') window.openSettingsPage();
+        } else if (!isInput) {
+            if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    loadQuestionToCanvas(currentIndex - 1);
+                    renderThumbnailList();
+                }
+            } else if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                e.preventDefault();
+                if (currentIndex < questions.length - 1) {
+                    loadQuestionToCanvas(currentIndex + 1);
+                    renderThumbnailList();
+                }
+            } else if (e.altKey && ['1', '2', '3', '4'].includes(e.key)) {
+                e.preventDefault();
+                const optionKeys = ['A', 'B', 'C', 'D'];
+                const key = optionKeys[parseInt(e.key) - 1];
+                const q = questions[currentIndex];
+                if (q && (q.type === 'quiz' || q.type === 'boolean')) {
+                    if (q.type === 'boolean' && ['C', 'D'].includes(key)) return;
+                    if (typeof window.toggleCorrect === 'function') window.toggleCorrect(key);
+                }
+            }
         }
     });
 
-
+    // Answer text blur → snapshot (event delegation)
     document.addEventListener('focusout', (e) => {
         if (e.target.classList && e.target.classList.contains('ans-input')) {
             saveSnapshot();
         }
     });
 
-
+    // Funções de Cor
     function getContrastTextColor(hex) {
         if (!hex) return '#2D3436';
         let c = hex.replace('#', '');
@@ -1280,7 +2496,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         return luminance > 0.6 ? '#2D3436' : '#FFFFFF';
     }
 
-
     function darkenColor(hex, amount = 40) {
         let c = hex.replace('#', '');
         if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
@@ -1290,10 +2505,9 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
     } 
 
-
     window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
-
+    // --- CONTEXT TOOLBAR (CANVA STYLE) ---
     window.renderContextToolbar = () => {
         const bar = document.getElementById('context-toolbar');
         if (!selectedElementType) {
@@ -1301,27 +2515,22 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             return;
         }
 
-
         bar.classList.add('active');
         let html = '';
-
 
         if (selectedElementType === 'answer') {
             const key = selectedElementKey;
             const q = questions[currentIndex];
             const styles = q.answerStyles?.[key] || {};
 
-
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const defaultHex = isDark ? '#2a2a2a' : '#FFFFFF';
             const customColor = q.answerColors?.[key] || null;
             const activeBg = customColor || defaultHex;
 
-
             const txtColor = styles.textColor || (isDark ? '#ffffff' : getContrastTextColor(activeBg));
             const isBold = styles.bold ? 'active' : '';
             const isItalic = styles.italic ? 'active' : '';
-
 
             html = `
                 <span class="context-label">Opção ${key}</span>
@@ -1353,7 +2562,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             const qTextColor = qStyles.textColor || '';
             const qDefaultColor = document.documentElement.getAttribute('data-theme') === 'dark' ? '#ffffff' : 'var(--dark)';
 
-
             html = `
                 <span class="context-label">Slide</span>
                 <button class="ans-tb-btn" onclick="moveQuestionUp()" ${canMoveUp ? '' : 'disabled'} title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
@@ -1372,10 +2580,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             `;
         }
 
-
         bar.innerHTML = `<div class="context-tools">${html}</div>`;
     };
-
 
     window.moveQuestionUp = () => {
         if (currentIndex > 0) {
@@ -1390,7 +2596,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
     window.moveQuestionDown = () => {
         if (currentIndex < questions.length - 1) {
             const temp = questions[currentIndex];
@@ -1404,7 +2609,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
     document.addEventListener('mousedown', (e) => {
         if (e.target.closest('.answer-box')) return;
         if (e.target.closest('.question-input')) return;
@@ -1412,7 +2616,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         if (e.target.closest('.ans-tb-color')) return;
         if (e.target.closest('.gcp-popover')) return;
         if (e.target.closest('.color-picker-btn')) return;
-
 
         window.closeGeniiColorPicker();
         document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
@@ -1424,7 +2627,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         renderContextToolbar();
     });
 
-
     document.getElementById('qTextInput').addEventListener('focus', () => {
         window.closeGeniiColorPicker();
         document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
@@ -1434,7 +2636,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         renderContextToolbar();
     });
 
-
+    // --- IMAGENS (MANUAL) ---
+    // Slide context menu
     let activeContextMenu = null;
     function showThumbContextMenu(x, y, idx) {
         hideThumbContextMenu();
@@ -1459,7 +2662,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
     }
     window.hideThumbContextMenu = () => { if (activeContextMenu) { activeContextMenu.remove(); activeContextMenu = null; } };
 
-
     window.moveSlideUp = (idx) => {
         if (idx <= 0) return;
         const tmp = questions[idx]; questions[idx] = questions[idx - 1]; questions[idx - 1] = tmp;
@@ -1471,7 +2673,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         currentIndex = idx + 1; renderThumbnailList(); loadQuestionToCanvas(currentIndex); saveSnapshot();
     };
 
-
+    // Mobile settings drawer
     window.toggleMobileSettings = () => {
         const panel = document.querySelector('.settings-panel');
         const backdrop = document.getElementById('settingsBackdrop');
@@ -1507,11 +2709,9 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         document.body.style.overflow = '';
     };
 
-
     window.openImageModal = (type, key = null) => {
         imageModalTargetType = type;
         imageModalTargetKey = key;
-
 
         const currentQuestionText = questions[currentIndex]?.question_text || "";
         const aiPromptEl = document.getElementById('ai-image-prompt');
@@ -1519,11 +2719,9 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         if (aiPromptEl) aiPromptEl.value = currentQuestionText;
         if (unsplashSearchEl) unsplashSearchEl.value = currentQuestionText;
 
-
         document.getElementById('image-modal').style.display = 'flex';
         switchImageTab('upload');
     };
-
 
     window.switchImageTab = (tab) => {
         document.querySelectorAll('.img-tab').forEach(t => t.classList.remove('active'));
@@ -1533,17 +2731,16 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         document.getElementById(`tab-${tab}`).classList.add('active');
     };
 
-
     window.handleModalFileUpload = (e) => {
         const file = e.target.files[0];
         if(!file) return;
         handleImageUpload(file, (url, token) => { applySelectedImage(url, token); closeModal('image-modal'); });
     };
 
-
     function applySelectedImage(url, publicId = '') {
         const q = questions[currentIndex];
         if(imageModalTargetType === 'question') {
+            // ­ƒøí´©Å Apagar imagem anterior via proxy
             if (q.imagePublicId) _deleteStudioImage(q.imagePublicId);
             else if (q.imageDeleteToken) _deleteStudioImage(q.imageDeleteToken);
             q.imageUrl = url; q.imagePublicId = publicId; q.imageDeleteToken = '';
@@ -1558,12 +2755,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             else if (oldToken) _deleteStudioImage(oldToken);
             q.answerImages[imageModalTargetKey] = url;
             q.answerImagePublicIds[imageModalTargetKey] = publicId;
-            if (publicId) q.answerImageTokens[imageModalTargetKey] = '';
+            if (publicId) q.answerImageTokens[imageModalTargetKey] = ''; // limpar token legado
             loadQuestionToCanvas(currentIndex);
         }
         saveSnapshot();
     }
-
 
     window.searchUnsplash = async () => {
         const query = document.getElementById('unsplash-search').value.trim();
@@ -1594,7 +2790,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
     window.generateAiImageSingle = async () => {
         if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
         const promptText = document.getElementById('ai-image-prompt').value.trim();
@@ -1603,14 +2798,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             return;
         }
 
-
         const btn = document.getElementById('btn-generate-ai-single');
         const loading = document.getElementById('ai-gen-loading');
 
-
         btn.style.display = 'none';
         loading.style.display = 'block';
-
 
         try {
             const response = await fetch("/api/generate_image", {
@@ -1618,7 +2810,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 headers: await getAuthHeaders(),
                 body: JSON.stringify({ prompt: promptText })
             });
-
 
             if (response.status === 429) {
                 showCreditsWarning();
@@ -1629,14 +2820,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 throw new Error(errText || "Erro ao gerar imagem.");
             }
 
-
             const remaining = response.headers.get('X-Credits-Remaining');
             if (remaining !== null) updateCreditsAfterSpend(parseInt(remaining));
 
-
             const blob = await response.blob();
             const { url: cloudinaryUrl, publicId: cloudinaryPublicId } = await uploadBlobToCloudinary(blob);
-
 
             if (cloudinaryUrl) {
                 applySelectedImage(cloudinaryUrl, cloudinaryPublicId);
@@ -1656,13 +2844,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
     window.confirmExit = () => {
         showGeniiConfirm('Irá sair da sala, quer prosseguir?', (confirmed) => {
             if (confirmed) window.location.href = 'join.html';
         });
     };
-
 
     window.togglePrivacy = async () => {
         if (!quizData) return;
@@ -1686,9 +2872,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
-    window.openSettingsPage = () => window.location.href = `/edit_quiz?id=${quizId}&source=studio`;
-
+    window.openSettingsPage = () => window.location.href = `edit_quiz.html?id=${quizId}&source=studio`;
 
     async function uploadBlobToCloudinary(blob) {
         try {
@@ -1698,7 +2882,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             return { url: '', publicId: '' };
         }
     }
-
 
     async function generateAIImage(prompt) {
         if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return { url: '', publicId: '' }; }
@@ -1714,7 +2897,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         } catch (error) { return { url: '', publicId: '' }; }
     }
 
-
+    // --- INIT ---
     function hideAIElements() {
         document.querySelectorAll('.studio-credits, .ai-btn, #geno-panel, .mobile-bar-geno').forEach(el => el.style.display = 'none');
         const tabs = document.querySelectorAll('#image-modal .image-modal-tabs .img-tab');
@@ -1747,7 +2930,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
     window.addEventListener('resize', applyMobileLayout);
     setTimeout(applyMobileLayout, 50);
 
-
+    // Swipe gestures for question navigation (mobile) com arrasto visual
     let qSwipeX = 0, qSwipeY = 0, qSwiping = false;
     document.addEventListener('touchstart', (e) => {
         const mc = e.target.closest('.main-canvas');
@@ -1789,7 +2972,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         qSwipeX = 0;
     }, { passive: true });
 
-
+    // Swipe-down to close settings bottom sheet
     let _lastTouchTime = 0;
     let sheetStartY = 0, sheetDragging = false;
     document.addEventListener('touchstart', (e) => {
@@ -1820,7 +3003,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         sheetStartY = 0;
         if (!panel) return;
 
-
         if (sheetDragging) {
             const match = panel.style.transform.match(/translateY\(([\d.]+)px\)/);
             if (match) {
@@ -1839,9 +3021,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }, { passive: true });
 
-
     if(localStorage.getItem('genii_ai_disabled')==='true') setTimeout(hideAIElements, 100);
-
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -1855,7 +3035,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             window.location.href = "login.html";
         }
     });
-
 
     async function loadQuiz() {
         try {
@@ -1873,14 +3052,13 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 renderThumbnailList();
                 loadQuestionToCanvas(0);
 
-
                 saveSnapshot();
 
-
+                // Blur listeners for debounced snapshots on text edits
                 document.getElementById('qTextInput').addEventListener('blur', () => saveSnapshot());
                 document.getElementById('quizTitleInput').addEventListener('blur', () => saveSnapshot());
 
-
+                // AutoGen: geração automática via Geno AI
                 const autoGen = params.get('autoGen');
                 if (autoGen === 'true') {
                     const topic = params.get('topic') || '';
@@ -1888,15 +3066,12 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                     const diff = params.get('diff') || 'Médio';
                     const imgs = params.get('imgs') === 'true';
 
-
                     if (topic) {
                         const cleanUrl = window.location.pathname + '?id=' + quizId;
                         window.history.replaceState({}, '', cleanUrl);
 
-
                         let prompt = `Cria um quiz completo sobre "${topic}" com ${count} perguntas de dificuldade ${diff}.`;
                         if (imgs) prompt += ` Gera também uma imagem para cada pergunta.`;
-
 
                         setTimeout(() => {
                             toggleGenoPanel();
@@ -1908,7 +3083,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         } catch (e) { console.error(e); }
     }
 
-
     document.getElementById('quizTitleInput').addEventListener('change', async (e) => {
         const val = e.target.value.trim();
         if(val) {
@@ -1919,17 +3093,16 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     });
 
-
+    // --- RENDER CANVAS ---
     function loadQuestionToCanvas(index) {
         if (index < 0 || index >= questions.length) return;
         currentIndex = index;
         const q = questions[index];
 
-
         const qInput = document.getElementById('qTextInput');
         qInput.innerText = q.question_text || "";
 
-
+        // Aplicar estilos da pergunta
         const qStyles = q.questionStyles || {};
         if (qStyles.textColor) {
             qInput.style.setProperty('color', qStyles.textColor, 'important');
@@ -1939,18 +3112,15 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         qInput.style.fontWeight = qStyles.bold ? '900' : '600';
         qInput.style.fontStyle = qStyles.italic ? 'italic' : 'normal';
 
-
         qInput.classList.remove('q-selected');
         if (selectedElementType === 'question') {
             qInput.classList.add('q-selected');
         }
 
-
         document.getElementById('timeSelect').value = q.timeLimit || "20";
         document.getElementById('pointsSelect').value = q.points || "1000";
         document.getElementById('typeSelect').value = q.type || "quiz";
         document.getElementById('shuffleOptionsToggle').checked = q.shuffleOptions || false;
-
 
         const mediaContainer = document.getElementById('mediaUploadBtn');
         const mediaPrev = document.getElementById('mediaPreview');
@@ -1961,12 +3131,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             mediaContainer.classList.remove('has-image');
         }
 
-
         renderAnswersByType(q);
         renderThumbnailList();
         renderContextToolbar();
 
-
+        // Hide timer/points/shuffle settings for slides
         const isSlide = (q.type === 'slide');
         const settingGroups = document.querySelectorAll('.settings-panel .setting-group');
         settingGroups.forEach(g => {
@@ -1977,8 +3146,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 g.style.display = isSlide ? 'none' : '';
             }
         });
+        if (typeof window.updateCharCounter === 'function') window.updateCharCounter();
     }
-
 
     function renderAnswersByType(q) {
         const grid = document.getElementById('optionsGrid');
@@ -1986,12 +3155,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         const slideArea = document.getElementById('slideBodyArea');
         const type = q.type || 'quiz';
 
-
         grid.style.display = 'grid';
         typingArea.style.display = 'none';
         slideArea.style.display = 'none';
         grid.innerHTML = '';
-
 
         if (type === 'quiz') {['A', 'B', 'C', 'D'].forEach(opt => {
                 grid.appendChild(createAnswerBox(opt, q, false));
@@ -2013,12 +3180,12 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }
 
-
+    // --- DRAG AND DROP DAS RESPOSTAS ---
     window.handleAnsDragStart = (e, key) => {
+        // NÃO arrastar se clicar na textarea (permite seleção de texto)
         const target = e.target;
         const isTextarea = target.tagName === 'TEXTAREA' || target.closest('textarea') || target.getAttribute('contenteditable') === 'true';
         const isButton = target.closest('.check-btn') || target.closest('.add-ans-img-btn');
-
 
         if (isTextarea || isButton) {
             e.preventDefault();
@@ -2047,57 +3214,48 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         const box = e.target.closest('.answer-box');
         if (box) box.classList.remove('drag-over');
 
-
         if (draggedAnswerKey && draggedAnswerKey !== targetKey) {
             swapAnswers(draggedAnswerKey, targetKey);
         }
     };
 
-
     function swapAnswers(k1, k2) {
         const q = questions[currentIndex];
 
-
+        // Helper para trocar valores e limpar undefined
         function safeSwap(obj, key1, key2) {
             if (!obj) return;
             const v1 = obj[key1];
             const v2 = obj[key2];
+            // Trocar valores
             if (v2 !== undefined) obj[key1] = v2;
             else delete obj[key1];
             if (v1 !== undefined) obj[key2] = v1;
             else delete obj[key2];
         }
 
-
         if (!q.options) q.options = {};
         safeSwap(q.options, k1, k2);
-
 
         safeSwap(q.answerColors, k1, k2);
         safeSwap(q.answerStyles, k1, k2);
         safeSwap(q.answerImages, k1, k2);
 
-
         if (!q.correct_option) q.correct_option =[];
         if (!Array.isArray(q.correct_option)) q.correct_option = [q.correct_option];
-
 
         let c1 = q.correct_option.includes(k1);
         let c2 = q.correct_option.includes(k2);
 
-
         if (c1 && !c2) { q.correct_option = q.correct_option.filter(k=>k!==k1); q.correct_option.push(k2); }
         else if (!c1 && c2) { q.correct_option = q.correct_option.filter(k=>k!==k2); q.correct_option.push(k1); }
-
 
         if (selectedElementKey === k1) selectedElementKey = k2;
         else if (selectedElementKey === k2) selectedElementKey = k1;
 
-
         loadQuestionToCanvas(currentIndex);
         saveSnapshot();
     }
-
 
     function createAnswerBox(key, q, isBoolean = false, forceText = null, forceClass = null) {
         const div = document.createElement('div');
@@ -2107,31 +3265,26 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         if(Array.isArray(q.correct_option)) isCorrect = q.correct_option.includes(key);
         else isCorrect = q.correct_option === key;
 
-
         div.className = `answer-box ${colorClass} ${isCorrect ? 'correct' : ''}`;
         if (selectedElementKey === key) div.classList.add('ans-selected');
-
 
         const customColor = (!isBoolean && q.answerColors && q.answerColors[key]) ? q.answerColors[key] : null;
         const styles = (!isBoolean && q.answerStyles && q.answerStyles[key]) ? q.answerStyles[key] : {};
 
-
+        // Cores por defeito: Branco (conforme SKILL.md)
         const defaultHex = '#FFFFFF';
         const activeBg = customColor || defaultHex;
-
 
         if (customColor) {
             div.style.backgroundColor = customColor;
             div.style.boxShadow = `0 7px 0 ${darkenColor(customColor)}`;
         }
 
-
         const textColor = styles.textColor || getContrastTextColor(activeBg);
         const isDarkText = textColor !== '#FFFFFF';
         
         const imgUrl = q.answerImages ? q.answerImages[key] : null;
         if(imgUrl) div.classList.add('has-ans-img');
-
 
         const iconBg = isDarkText ? '#F1F5F9' : 'rgba(255,255,255,0.22)';
         const iconColor = isDarkText ? '#64748B' : 'white';
@@ -2147,18 +3300,16 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             shapeIcon = `<div class="shape-icon"><i class="fa-solid ${boolIcons[key]}"></i></div>`;
         }
 
-
         const fontWeight = styles.bold ? 'font-weight:900;' : '';
         const fontStyle = styles.italic ? 'font-style:italic;' : '';
+        // Placeholder color smart: escuro se fundo claro, claro se fundo escuro
         const placeholderColor = isDarkText ? 'rgba(45,52,54,0.4)' : 'rgba(255,255,255,0.5)';
         const inputStyle = `color:${textColor}; ${fontWeight} ${fontStyle} --placeholder-color:${placeholderColor};`;
-
 
         div.innerHTML = `
             ${shapeIcon}
             <img src="${imgUrl || ''}" class="ans-img-preview" id="prev-img-${key}">
             ${imgUrl ? `<button class="add-ans-img-btn" onclick="event.stopPropagation(); removeAnsImg('${key}')" title="Remover imagem" style="background:rgba(225,26,60,0.5);"><i class="fa-solid fa-xmark"></i></button>` : `<button class="add-ans-img-btn" onclick="event.stopPropagation(); triggerAnsImg('${key}')" title="Imagem na resposta"${customColor ? ` style="background:${addBtnBg};color:${addBtnColor};"` : ''}><i class="fa-regular fa-image"></i></button>`}
-
 
             <div class="ans-input" id="input${key}" contenteditable="${isBoolean ? 'false' : 'true'}" data-placeholder="${forceText || 'Resposta ' + key}"
                    oninput="updateAnswerText('${key}', this.innerText, this);"
@@ -2170,7 +3321,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             <div class="check-btn" onclick="event.stopPropagation(); toggleCorrect('${key}')" title="Marcar como correta"><i class="fa-solid fa-check"></i></div>
         `;
 
-
         if (!isBoolean) {
             div.dataset.key = key;
             div.draggable = false;
@@ -2180,14 +3330,12 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             div.ondragleave = window.handleAnsDragLeave;
             div.ondrop = (e) => window.handleAnsDrop(e, key);
 
-
             div.onclick = (e) => {
+                // Ignorar cliques nos botões e na textarea (para permitir seleção de texto)
                 if (e.target.closest('.check-btn') || e.target.closest('.add-ans-img-btn') || e.target.closest('.ans-input') || e.target.getAttribute('contenteditable') === 'true') return;
-
 
                 document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
                 document.getElementById('qTextInput').classList.remove('q-selected');
-
 
                 selectedElementType = 'answer';
                 selectedElementKey = key;
@@ -2195,7 +3343,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 renderContextToolbar();
             };
         }
-
 
         setTimeout(() => {
             const ta = div.querySelector('.ans-input');
@@ -2205,10 +3352,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             }
         }, 0);
 
-
         return div;
     }
-
 
     window.fitAnswerText = (el) => {
         el.style.fontSize = '';
@@ -2227,18 +3372,15 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         });
     };
 
-
     window.updateAnswerText = (key, val, el) => {
         if(!questions[currentIndex].options) questions[currentIndex].options = {};
         questions[currentIndex].options[key] = val;
         if (el) window.fitAnswerText(el);
     };
 
-
     window.selectAnswerOnFocus = (key) => {
         const box = document.querySelector(`.answer-box[data-key="${key}"]`);
         const alreadySelected = box && box.classList.contains('ans-selected');
-
 
         if (!alreadySelected) {
             window.closeGeniiColorPicker();
@@ -2251,7 +3393,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     };
 
-
     window.setAnswerBgColor = (key, color) => {
         const q = questions[currentIndex];
         if (!q.answerColors) q.answerColors = {};
@@ -2263,7 +3404,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         loadQuestionToCanvas(currentIndex);
     };
 
-
     window.setAnswerTextColor = (key, color) => {
         const q = questions[currentIndex];
         if (!q.answerStyles) q.answerStyles = {};
@@ -2274,7 +3414,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         if (ta) ta.style.setProperty('color', color, 'important');
     };
 
-
     window.toggleAnswerBold = (key) => {
         const q = questions[currentIndex];
         if (!q.answerStyles) q.answerStyles = {};
@@ -2283,7 +3422,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         loadQuestionToCanvas(currentIndex);
     };
 
-
     window.toggleAnswerItalic = (key) => {
         const q = questions[currentIndex];
         if (!q.answerStyles) q.answerStyles = {};
@@ -2291,7 +3429,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         q.answerStyles[key].italic = !q.answerStyles[key].italic;
         loadQuestionToCanvas(currentIndex);
     };
-
 
     window.resetAnswerStyle = (key) => {
         const q = questions[currentIndex];
@@ -2302,7 +3439,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         if (ta) ta.style.removeProperty('color');
     };
 
-
+    // --- FUNÇÕES DE ESTILO PARA A PERGUNTA ---
     window.setQuestionTextColor = (color) => {
         const q = questions[currentIndex];
         if (!q.questionStyles) q.questionStyles = {};
@@ -2313,7 +3450,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         renderContextToolbar();
     };
 
-
     window.toggleQuestionBold = () => {
         const q = questions[currentIndex];
         if (!q.questionStyles) q.questionStyles = {};
@@ -2322,7 +3458,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         renderContextToolbar();
     };
 
-
     window.toggleQuestionItalic = () => {
         const q = questions[currentIndex];
         if (!q.questionStyles) q.questionStyles = {};
@@ -2330,7 +3465,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         loadQuestionToCanvas(currentIndex);
         renderContextToolbar();
     };
-
 
     window.resetQuestionStyle = () => {
         const q = questions[currentIndex];
@@ -2341,13 +3475,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         renderContextToolbar();
     };
 
-
     document.getElementById('shuffleOptionsToggle').addEventListener('change', (e) => {
         const q = questions[currentIndex];
         if (q) q.shuffleOptions = e.target.checked;
         saveSnapshot();
     });
-
 
     document.getElementById('shuffleToggleRow').addEventListener('click', (e) => {
         if (e.target.tagName === 'INPUT') return;
@@ -2355,7 +3487,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         cb.checked = !cb.checked;
         cb.dispatchEvent(new Event('change'));
     });
-
 
     ['timeSelect', 'pointsSelect', 'typeSelect'].forEach(id => {
         document.getElementById(id).addEventListener('input', (e) => {
@@ -2379,19 +3510,53 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         });
     });
     
+    document.getElementById('qTextInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            return;
+        }
+        const isControlKey = e.key === 'Backspace' || e.key === 'Delete' || e.key.startsWith('Arrow') || e.ctrlKey || e.metaKey;
+        const selection = window.getSelection();
+        const hasSelection = selection && selection.toString().length > 0;
+        if (this.innerText.length >= 120 && !isControlKey && !hasSelection) {
+            e.preventDefault();
+        }
+    });
+
+    document.getElementById('qTextInput').addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+        const selection = window.getSelection();
+        const selectedText = selection.toString();
+        const currentLength = this.innerText.length - selectedText.length;
+        const allowedLength = 120 - currentLength;
+        if (allowedLength > 0) {
+            const truncatedText = text.substring(0, allowedLength);
+            document.execCommand('insertText', false, truncatedText);
+        }
+    });
+
     document.getElementById('qTextInput').addEventListener('input', function() {
+        if (this.innerText.length > 120) {
+            this.innerText = this.innerText.substring(0, 120);
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(this);
+            range.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
         questions[currentIndex].question_text = this.innerText;
         const thumb = document.getElementById(`thumb-text-${currentIndex}`);
         if(thumb) thumb.innerText = this.innerText || '...';
+        if (typeof window.updateCharCounter === 'function') window.updateCharCounter();
     });
-
 
     document.getElementById('slideBodyInput').addEventListener('input', function() {
         if (questions[currentIndex]) {
             questions[currentIndex].body = this.value;
         }
     });
-
 
     window.toggleCorrect = (key) => {
         const q = questions[currentIndex];
@@ -2408,7 +3573,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         saveSnapshot();
     };
 
-
+    // ­ƒøí´©Å Helper para apagar imagem do Cloudinary via proxy (ou legacy deleteToken)
     async function _deleteStudioImage(publicIdOrToken) {
         if (!publicIdOrToken) return;
         if (!_cloudinaryToken) return;
@@ -2421,18 +3586,15 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }
 
-
     async function handleImageUpload(file, callback) {
         if(!file) return;
         if(!file.type.startsWith('image/')) return showGeniiToast("Apenas imagens!", "error");
         if(file.size > 10 * 1024 * 1024) return showGeniiToast("Máximo 10MB", "error");
 
-
         const btn = document.getElementById('saveQuizBtn');
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A enviar...';
         btn.disabled = true;
-
 
         try {
             const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'studio_images');
@@ -2442,7 +3604,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         finally { btn.innerHTML = originalText; btn.disabled = false; }
     }
 
-
     const mediaIn = document.getElementById('mediaInput');
     document.getElementById('mediaUploadBtn').onclick = (e) => {
         if(!e.target.closest('.remove-img-btn')) {
@@ -2451,6 +3612,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
     };
     mediaIn.onchange = (e) => handleImageUpload(e.target.files[0], (url, publicId) => {
         const q = questions[currentIndex];
+        // ­ƒøí´©Å Apagar imagem anterior via proxy
         if (q.imagePublicId) _deleteStudioImage(q.imagePublicId);
         else if (q.imageDeleteToken) _deleteStudioImage(q.imageDeleteToken);
         q.imageUrl = url;
@@ -2467,12 +3629,12 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         saveSnapshot();
     };
 
-
     window.triggerAnsImg = (key) => { openImageModal('answer', key); };
     document.getElementById('ansImgInput').onchange = (e) => handleImageUpload(e.target.files[0], (url, publicId) => {
         const q = questions[currentIndex]; if(!q.answerImages) q.answerImages = {};
         if(!q.answerImagePublicIds) q.answerImagePublicIds = {};
         if(!q.answerImageTokens) q.answerImageTokens = {};
+        // ­ƒøí´©Å Apagar imagem anterior da opção via proxy
         const oldPublicId = q.answerImagePublicIds?.[currentAnsImgTarget];
         const oldToken = q.answerImageTokens?.[currentAnsImgTarget];
         if (oldPublicId) _deleteStudioImage(oldPublicId);
@@ -2483,10 +3645,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         loadQuestionToCanvas(currentIndex);
     });
 
-
     window.removeAnsImg = (key) => {
         const q = questions[currentIndex];
         if (q.answerImages) {
+            // ­ƒøí´©Å Apagar imagem via proxy
             if (q.answerImagePublicIds?.[key]) _deleteStudioImage(q.answerImagePublicIds[key]);
             else if (q.answerImageTokens?.[key]) _deleteStudioImage(q.answerImageTokens[key]);
             delete q.answerImages[key];
@@ -2496,7 +3658,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             saveSnapshot();
         }
     };
-
 
     document.getElementById('typingInput').addEventListener('keydown', (e) => {
         if(e.key === 'Enter') {
@@ -2508,7 +3669,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             }
         }
     });
-
 
     function renderTypingList(q) {
         const list = document.getElementById('acceptedAnswersList');
@@ -2522,9 +3682,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
     }
 
-
     window.removeTypingAns = (idx) => { questions[currentIndex].acceptedAnswers.splice(idx, 1); renderTypingList(questions[currentIndex]); };
-
 
     function renderThumbnailList() {
         const container = document.getElementById('slidesContainer');
@@ -2533,7 +3691,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         const typeLabels = { quiz: 'Quiz', boolean: 'V/F', typing: 'Digitar', slide: 'Apresentação' };
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const neutralColor = isDark ? '#2a2a2a' : '#FFFFFF';
-
 
         questions.forEach((q, idx) => {
             const div = document.createElement('div');
@@ -2552,10 +3709,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             div.ontouchend = () => clearTimeout(longTapTimer);
             div.ontouchmove = () => clearTimeout(longTapTimer);
 
-
             const type = q.type || 'quiz';
             const correctOpts = Array.isArray(q.correct_option) ? q.correct_option : (q.correct_option ? [q.correct_option] : []);
-
 
             let answersHTML = '';
             if (type === 'quiz') {
@@ -2575,9 +3730,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                     const iconBg = isDark && c === neutralColor ? '#333333' : (isDarkText ? '#F1F5F9' : 'rgba(255,255,255,0.22)');
                     const iconColor = isDark && c === neutralColor ? '#b0b0b0' : (isDarkText ? '#64748B' : 'white');
 
-
                     let txt = q.options?.[k] || '';
-                    txt = txt.replace(/<[^>]*>?/gm, '');
+                    txt = txt.replace(/<[^>]*>?/gm, ''); // remove HTML
                     if (!txt.trim()) txt = `Resposta ${k}`;
                     
                     const fontWeight = customStyles.bold ? 'font-weight:900;' : '';
@@ -2587,7 +3741,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                     let ansImgHtml = '';
                     if (q.answerImages && q.answerImages[k]) {
                         ansImgHtml = `<img src="${q.answerImages[k]}" style="width:16px; height:16px; border-radius:3px; object-fit:cover; flex-shrink:0; background:rgba(0,0,0,0.1);">`;
-                        iconHtml = '';
+                        iconHtml = ''; // Hide shape icon if there is an image, to match main layout
                     }
                     
                     return `
@@ -2625,7 +3779,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
                 </div>`;
             }
 
-
             const imgHtml = q.imageUrl
                 ? `<img src="${q.imageUrl}" class="thumb-img-mini" onerror="this.style.display='none'">`
                 : '';
@@ -2635,10 +3788,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             const qItalic = (q.questionStyles && q.questionStyles.italic) ? 'font-style:italic;' : 'font-style:normal;';
             const qStyle = `color:${qTextColor} !important; ${qBold} ${qItalic}`;
 
-
             let rawQText = q.question_text || '';
             rawQText = rawQText.replace(/<[^>]*>?/gm, '');
-
 
             div.innerHTML = `
                 <div class="thumb-header">
@@ -2653,12 +3804,12 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             `;
             container.appendChild(div);
         });
+        // Auto-scroll active thumbnail into view on mobile carousel
         const active = container.querySelector('.slide-thumbnail.active');
         if (active && window.innerWidth <= 768) {
             active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
     }
-
 
     function handleDrop(targetIndex) {
         if (draggedItemIndex === null || draggedItemIndex === targetIndex) return;
@@ -2668,13 +3819,11 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         saveSnapshot();
     }
 
-
     window.duplicateSlide = (idx) => {
         const copy = JSON.parse(JSON.stringify(questions[idx])); copy.id = Date.now().toString();
         questions.splice(idx + 1, 0, copy); renderThumbnailList(); loadQuestionToCanvas(idx + 1); showGeniiToast("Duplicado!", "success");
         saveSnapshot();
     };
-
 
     window.deleteSlide = (idx) => {
         if(questions.length <= 1) return showGeniiToast("Mínimo de 1 slide", "error");
@@ -2686,7 +3835,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             saveSnapshot();
         });
     };
-
 
     window.addNewQuestion = () => {
         questions.push({
@@ -2702,55 +3850,29 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
     }
     document.getElementById('addSlideBtn').onclick = window.addNewQuestion;
 
-
+    // Wire delete button from module scope (fixes currentIndex not defined)
     document.getElementById('deleteCurrentSlideBtn').onclick = () => window.deleteSlide(currentIndex);
-
-
-    function validateQuestions(qs) {
-        for (let i = 0; i < qs.length; i++) {
-            const q = qs[i];
-            if (q.type === 'slide') continue;
-            if (q.type === 'quiz' || q.type === 'boolean') {
-                if (!Array.isArray(q.correct_option) || q.correct_option.length === 0) {
-                    return { valid: false, index: i, message: `Pergunta ${i + 1} não tem resposta correta definida.` };
-                }
-            }
-            if (q.type === 'typing') {
-                if (!Array.isArray(q.acceptedAnswers) || q.acceptedAnswers.length === 0) {
-                    return { valid: false, index: i, message: `Pergunta ${i + 1} (digitação) não tem respostas aceites.` };
-                }
-            }
-        }
-        return { valid: true };
-    }
-
 
     document.getElementById('saveQuizBtn').onclick = async () => {
         const btn = document.getElementById('saveQuizBtn');
-        const validation = validateQuestions(questions);
-        if (!validation.valid) {
-            showGeniiToast(validation.message, "error");
-            const thumb = document.querySelector(`.thumb-item[data-index="${validation.index}"]`);
-            if (thumb) {
-                thumb.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                thumb.style.outline = '3px solid #ff6b6b';
-                setTimeout(() => { if (thumb) thumb.style.outline = ''; }, 3000);
-            }
-            return;
-        }
         const old = btn.innerHTML;
         btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+        if (typeof window.setSaveStatus === 'function') window.setSaveStatus('saving');
         try {
             await updateDoc(doc(db, "quizzes", quizId), { questions, updatedAt: new Date() });
             showGeniiToast("Guardado!");
-        } catch (e) { console.error(e); showGeniiToast("Erro!", "error"); }
+            if (typeof window.setSaveStatus === 'function') window.setSaveStatus('saved');
+        } catch (e) {
+            console.error(e);
+            showGeniiToast("Erro!", "error");
+            if (typeof window.setSaveStatus === 'function') window.setSaveStatus('error');
+        }
         finally { btn.innerHTML = old; }
     };
 
-
+    // --- CUSTOM COLOR PICKER (HSV Canvas) ---
     let _gcpRecent = JSON.parse(localStorage.getItem('gcp_recent') || '[]');
     let _savedSelRange = null;
-
 
     function saveSelection() {
         const sel = window.getSelection();
@@ -2763,19 +3885,15 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         sel.addRange(_savedSelRange);
     }
 
-
     window.openGeniiColorPicker = (btnEl, currentHex, key, mode) => {
         saveSelection();
         window.closeGeniiColorPicker();
-
 
         const initColor = currentHex || '#2D3436';
         const rgb = gcp_hexToRgb(initColor);
         const hsv = gcp_rgbToHsv(rgb.r, rgb.g, rgb.b);
 
-
         let _hue = hsv.h, _sat = hsv.s, _val = hsv.v;
-
 
         const presetColors = [
             '#FFFFFF','#000000','#F87171','#FB923C','#FBBF24','#A3E635','#34D399','#22D3EE','#60A5FA','#A78BFA',
@@ -2784,14 +3902,13 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             '#00cfc1','#1cb0f6','#a270f4','#ff6b6b','#ffce00'
         ];
 
-
         const popover = document.createElement('div');
         popover.className = 'gcp-popover';
         popover.id = 'gcp-popover';
         popover.onclick = (e) => e.stopPropagation();
         popover.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
 
-
+        // SV Canvas
         const canvasWrap = document.createElement('div');
         canvasWrap.className = 'gcp-canvas-wrap';
         const canvas = document.createElement('canvas');
@@ -2804,7 +3921,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         canvasWrap.appendChild(svCursor);
         popover.appendChild(canvasWrap);
 
-
+        // Hue strip
         const hueWrap = document.createElement('div');
         hueWrap.className = 'gcp-hue-wrap';
         const hueThumb = document.createElement('div');
@@ -2812,7 +3929,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         hueWrap.appendChild(hueThumb);
         popover.appendChild(hueWrap);
 
-
+        // Hex + preview row (created early so renderAll can reference them)
         const row = document.createElement('div');
         row.className = 'gcp-row';
         const hexBox = document.createElement('div');
@@ -2835,9 +3952,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         row.appendChild(hexBox);
         row.appendChild(previewBox);
 
-
+        // Canvas rendering functions
         const ctx = canvas.getContext('2d');
-
 
         function drawCanvas() {
             const w = canvas.width, h = canvas.height;
@@ -2855,7 +3971,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             ctx.fillRect(0, 0, w, h);
         }
 
-
         function renderAll() {
             drawCanvas();
             svCursor.style.left = (_sat * 100) + '%';
@@ -2866,7 +3981,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             previewBox.style.background = hex;
         }
 
-
+        // Canvas interaction
         let canvasDrag = false;
         function handleCanvasPos(e) {
             const rect = canvas.getBoundingClientRect();
@@ -2886,7 +4001,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         document.addEventListener('mouseup', () => { canvasDrag = false; });
         document.addEventListener('touchend', () => { canvasDrag = false; });
 
-
+        // Hue interaction
         let hueDrag = false;
         function handleHuePos(e) {
             const rect = hueWrap.getBoundingClientRect();
@@ -2903,7 +4018,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         document.addEventListener('mouseup', () => { hueDrag = false; });
         document.addEventListener('touchend', () => { hueDrag = false; });
 
-
+        // Hex input events
         hexInput.addEventListener('input', (e) => {
             e.stopPropagation();
             const val = e.target.value.replace(/[^0-9a-fA-F]/g, '').substring(0, 6);
@@ -2918,10 +4033,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         hexInput.addEventListener('click', (e) => e.stopPropagation());
         hexInput.addEventListener('mousedown', (e) => e.stopPropagation());
 
-
+        // Append hex row now
         popover.appendChild(row);
 
-
+        // Presets
         const presetsDiv = document.createElement('div');
         presetsDiv.className = 'gcp-presets';
         presetColors.forEach(c => {
@@ -2941,7 +4056,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         });
         popover.appendChild(presetsDiv);
 
-
+        // Recent
         if (_gcpRecent.length > 0) {
             const label = document.createElement('span');
             label.className = 'gcp-label';
@@ -2966,7 +4081,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             popover.appendChild(recentDiv);
         }
 
-
+        // Actions
         const actions = document.createElement('div');
         actions.className = 'gcp-actions';
         const cancelBtn = document.createElement('button');
@@ -2987,32 +4102,30 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         actions.appendChild(applyBtn);
         popover.appendChild(actions);
 
-
+        // Append to body with fixed positioning
         document.body.appendChild(popover);
 
-
+        // Position below the button, centered
         const btnRect = btnEl.getBoundingClientRect();
         const popWidth = 280;
         let left = btnRect.left + btnRect.width / 2 - popWidth / 2;
         let top = btnRect.bottom + 8;
+        // Clamp to viewport
         left = Math.max(8, Math.min(window.innerWidth - popWidth - 8, left));
         if (top + 400 > window.innerHeight) {
-            top = btnRect.top - 8 - 400;
+            top = btnRect.top - 8 - 400; // show above if no space below
         }
         popover.style.left = left + 'px';
         popover.style.top = top + 'px';
-
 
         restoreSelection();
         renderAll();
     };
 
-
     function gcp_getHex(h, s, v) {
         const r = gcp_hsvToRgb(h, s, v);
         return gcp_rgbToHex(r[0], r[1], r[2]);
     }
-
 
     function gcp_applyColor(hex, key, mode) {
         if (mode === 'answer-bg') {
@@ -3039,7 +4152,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         saveSnapshot();
     }
 
-
     function gcp_applyToSelection(hex) {
         if (!_savedSelRange) return;
         try {
@@ -3053,6 +4165,7 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
             range.surroundContents(span);
             sel.removeAllRanges();
         } catch(e) {
+            // Fallback: if surroundContents fails (cross-element selection), apply to whole element
             const active = document.activeElement;
             if (active && active.classList.contains('ans-input')) {
                 active.style.setProperty('color', hex, 'important');
@@ -3060,7 +4173,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
         _savedSelRange = null;
     }
-
 
     function gcp_addRecent(hex) {
         const h = hex.toUpperCase();
@@ -3070,12 +4182,10 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         localStorage.setItem('gcp_recent', JSON.stringify(_gcpRecent));
     }
 
-
     window.closeGeniiColorPicker = () => {
         const el = document.getElementById('gcp-popover');
         if (el) el.remove();
     };
-
 
     function gcp_hexToRgb(hex) {
         let c = hex.replace('#', '');
@@ -3083,11 +4193,9 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         return { r: parseInt(c.substring(0,2), 16), g: parseInt(c.substring(2,4), 16), b: parseInt(c.substring(4,6), 16) };
     }
 
-
     function gcp_rgbToHex(r, g, b) {
         return '#' + [r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
     }
-
 
     function gcp_rgbToHsv(r, g, b) {
         r /= 255; g /= 255; b /= 255;
@@ -3103,7 +4211,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
         return { h: h * 360, s, v };
     }
-
 
     function gcp_hsvToRgb(h, s, v) {
         h /= 360;
@@ -3123,7 +4230,6 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
         }
         return [r * 255, g * 255, b * 255];
     }
-
 
 </script>
 </body>
