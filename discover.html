@@ -1,0 +1,531 @@
+﻿<!doctype html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Descobrir - Genii</title>
+
+        <link
+            rel="icon"
+            href="static/img/favicon.ico?v=2"
+            type="image/x-icon"
+        />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+            rel="stylesheet"
+        />
+
+        <link rel="stylesheet" href="static/css/style.css?v=3" />
+        
+        <script src="static/js/theme.js"></script>
+    </head>
+    <body data-page="discover">
+        <div id="sidebar-container"></div>
+
+        <main class="main-content has-banner">
+            <div class="discover-banner">
+                <div class="deco-circle dc-1"></div>
+                <div class="deco-circle dc-2"></div>
+                <div class="deco-circle dc-3"></div>
+
+                <div class="banner-content">
+                    <h1 class="banner-title">Explorar jogos</h1>
+                    <p class="banner-subtitle">
+                        Descobre o que outros utilizadores criam com o Genii!
+                    </p>
+                </div>
+            </div>
+
+            <div class="discover-container" id="discoverSections">
+                <div class="section-header">
+                    <div class="section-title">Em Alta</div>
+                    <a
+                        href="javascript:void(0)"
+                        onclick="showAllSection('trending', 'Em Alta')"
+                        style="
+                            font-size: 0.9rem;
+                            font-weight: 700;
+                            color: var(--primary);
+                            text-decoration: none;
+                        "
+                        >Ver tudo</a
+                    >
+                </div>
+
+                <div class="quiz-carousel-wrapper">
+                    <button class="nav-btn left trending-left">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="quiz-carousel" id="trendingCarousel">
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:55%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:45%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:65%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:50%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:40%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:80%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:60%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:50%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:70%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:45%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:42%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                    </div>
+                    <button class="nav-btn right trending-right">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="section-header" style="margin-top: 30px">
+                    <div class="section-title">Mais Populares</div>
+                    <a
+                        href="javascript:void(0)"
+                        onclick="showAllSection('popular', 'Mais Populares')"
+                        style="
+                            font-size: 0.9rem;
+                            font-weight: 700;
+                            color: var(--primary);
+                            text-decoration: none;
+                        "
+                        >Ver tudo</a
+                    >
+                </div>
+
+                <div class="quiz-carousel-wrapper">
+                    <button class="nav-btn left" id="arrowLeft">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+
+                    <div class="quiz-carousel" id="quizCarousel">
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:70%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:50%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:45%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:80%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:55%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:40%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:65%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:48%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:42%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:52%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:44%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                    </div>
+
+                    <button class="nav-btn right" id="arrowRight">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <div class="section-header" style="margin-top: 30px">
+                    <div class="section-title">Novos</div>
+                    <a
+                        href="javascript:void(0)"
+                        onclick="showAllSection('new', 'Novos')"
+                        style="
+                            font-size: 0.9rem;
+                            font-weight: 700;
+                            color: var(--primary);
+                            text-decoration: none;
+                        "
+                        >Ver tudo</a
+                    >
+                </div>
+
+                <div class="quiz-carousel-wrapper">
+                    <button class="nav-btn left new-left">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="quiz-carousel" id="newCarousel">
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:50%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:45%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:60%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:48%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:42%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:80%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:55%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:40%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                        <div class="skeleton-card"><div class="skeleton-card-image"></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:70%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:52%;"></div><div class="skeleton-card-footer"><div class="skeleton skeleton-text-sm" style="width:44%; margin:0; background:rgba(255,255,255,0.3);"></div><div class="skeleton skeleton-card-pill"></div></div></div></div>
+                    </div>
+                    <button class="nav-btn right new-right">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div
+                class="discover-container"
+                id="discoverFullView"
+                style="display: none"
+            >
+                <div
+                    style="
+                        display: flex;
+                        align-items: center;
+                        gap: 14px;
+                        margin-bottom: 30px;
+                    "
+                >
+                    <button onclick="hideAllSection()" class="back-link">
+                        <i class="fa-solid fa-arrow-left"></i> Voltar
+                    </button>
+                    <h2
+                        id="fullViewTitle"
+                        style="
+                            font-family: &quot;Fredoka&quot;, sans-serif;
+                            font-size: 1.6rem;
+                            color: var(--dark);
+                            margin: 0;
+                        "
+                    ></h2>
+                </div>
+                <div class="discover-full-grid" id="fullViewGrid"></div>
+            </div>
+        </main>
+
+        <script type="module">
+            import {
+                renderLayout,
+                getCachedUser,
+                saveUserToCache,
+                isCacheFresh,
+            } from "./static/js/components.js";
+            import {
+                onAuthStateChanged,
+                signOut,
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            import {
+                collection,
+                getDocs,
+                limit,
+                query,
+                where,
+                doc,
+                getDoc,
+                orderBy,
+                Timestamp,
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+            import { auth, db } from "./firebase-config.js";
+
+            const cached = getCachedUser();
+            if (cached) {
+                document.body.style.opacity = "1";
+                renderLayout("discover", cached);
+            }
+
+            const popularCarousel = document.getElementById("quizCarousel");
+            const trendingCarousel =
+                document.getElementById("trendingCarousel");
+            const newCarousel = document.getElementById("newCarousel");
+            const leftBtn = document.getElementById("arrowLeft");
+            const rightBtn = document.getElementById("arrowRight");
+
+            const sectionData = { trending: [], popular: [], new: [] };
+
+            function renderFullGridCards(container, quizzes) {
+                container.innerHTML = "";
+                if (quizzes.length === 0) {
+                    container.innerHTML =
+                        '<div style="text-align:center; padding:30px; color:var(--grey); font-weight:600; grid-column:1/-1;">Nenhum set encontrado.</div>';
+                    return;
+                }
+                let html = "";
+                quizzes.forEach((data) => {
+                    let imgHtml = "";
+                    if (
+                        data.cover_image_url &&
+                        data.cover_image_url.trim() !== ""
+                    ) {
+                        imgHtml = `<img src="${data.cover_image_url}" alt="Capa" onerror="this.parentElement.innerHTML='<div class=\\'placeholder-art\\'>Genii</div>'">`;
+                    } else {
+                        imgHtml = '<div class="placeholder-art">Genii</div>';
+                    }
+                    const desc =
+                        data.description || "Sem descrição disponível.";
+                    const qCount = data.questions ? data.questions.length : 0;
+                    const plays = data.playCount || 0;
+                    const favs = data.favoriteCount || 0;
+                    html += `
+                <a href="/quiz?id=${data.id}" class="quiz-card-link">
+                    <div class="quiz-card">
+                        <div class="quiz-image-box">
+                            ${imgHtml}
+                            <div class="q-badge"><i class="fa-solid fa-layer-group"></i> ${qCount}</div>
+                        </div>
+                        <div class="quiz-content">
+                            <h3 class="q-title">${data.title}</h3>
+                            <p class="q-desc">${desc}</p>
+                            <div class="q-footer">
+                                <span style="font-size:0.8rem; font-weight:600; color:var(--grey);">
+                                    <i class="fa-regular fa-user"></i> ${data.creatorName || "Sábio"}
+                                    ${plays > 0 ? `<span style="margin-left:8px;"><i class="fa-solid fa-play" style="font-size:0.65rem;"></i> ${plays}</span>` : ""}
+                                    ${favs > 0 ? `<span style="margin-left:8px;"><i class="fa-solid fa-star" style="font-size:0.65rem; color:#FFAB00;"></i> ${favs}</span>` : ""}
+                                </span>
+                                <div class="btn-play">JOGAR</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>`;
+                });
+                container.innerHTML = html;
+            }
+
+            window.showAllSection = (sectionKey, title) => {
+                document.getElementById("discoverSections").style.display =
+                    "none";
+                document.querySelector(".discover-banner").style.display =
+                    "none";
+                const fullView = document.getElementById("discoverFullView");
+                fullView.style.display = "block";
+                document.getElementById("fullViewTitle").innerText = title;
+                renderFullGridCards(
+                    document.getElementById("fullViewGrid"),
+                    sectionData[sectionKey] || [],
+                );
+                window.scrollTo({ top: 0 });
+            };
+            window.hideAllSection = () => {
+                document.getElementById("discoverFullView").style.display =
+                    "none";
+                document.getElementById("discoverSections").style.display =
+                    "block";
+                document.querySelector(".discover-banner").style.display = "";
+            };
+
+            const CACHE_KEY_DISCOVER = "genii_cached_discover";
+
+            sessionStorage.removeItem(CACHE_KEY_DISCOVER);
+            sessionStorage.removeItem("genii_cached_trending");
+            sessionStorage.removeItem("genii_cached_new");
+
+            function getCachedData(key) {
+                try {
+                    const raw = sessionStorage.getItem(key);
+                    return raw ? JSON.parse(raw) : null;
+                } catch {
+                    return null;
+                }
+            }
+            function saveCachedData(key, data) {
+                try {
+                    sessionStorage.setItem(key, JSON.stringify(data));
+                } catch {}
+            }
+
+            const cachedPopular = getCachedData(CACHE_KEY_DISCOVER);
+            if (cachedPopular && cachedPopular.length > 0)
+                renderCarouselCards(popularCarousel, cachedPopular);
+            const cachedTrending = getCachedData("genii_cached_trending");
+            if (cachedTrending && cachedTrending.length > 0)
+                renderCarouselCards(trendingCarousel, cachedTrending);
+            const cachedNew = getCachedData("genii_cached_new");
+            if (cachedNew && cachedNew.length > 0)
+                renderCarouselCards(newCarousel, cachedNew);
+
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    window.location.href = "login.html";
+                    return;
+                }
+                if (!cached) document.body.style.opacity = "1";
+
+                if (!isCacheFresh(getCachedUser())) {
+                    try {
+                        const docRef = doc(db, "users", user.uid);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            const d = docSnap.data();
+                            const userData = {
+                                ...d,
+                                displayName: d.username || user.email.split("@")[0],
+                            };
+                            saveUserToCache(userData);
+                            renderLayout("discover", userData);
+                        }
+                    } catch (e) {
+                        console.error("Erro ao carregar user:", e);
+                    }
+                }
+
+                loadAllSections();
+            });
+
+            document.addEventListener("app-logout", async () => {
+                await signOut(auth);
+                window.location.href = "login.html";
+            });
+
+            function renderCarouselCards(container, quizzes) {
+                container.innerHTML = "";
+
+                if (quizzes.length === 0) {
+                    container.innerHTML = `
+                <div style="width:100%; text-align:center; padding:30px;">
+                    <p style="color:var(--grey); font-weight:600;">Ainda não há quizzes nesta secção.</p>
+                </div>`;
+                    return;
+                }
+
+                let cardsHtml = "";
+                quizzes.forEach((data) => {
+                    let imgHtml = "";
+                    if (
+                        data.cover_image_url &&
+                        data.cover_image_url.trim() !== ""
+                    ) {
+                        imgHtml = `<img src="${data.cover_image_url}" alt="Capa" onerror="this.parentElement.innerHTML='<div class=\\'placeholder-art\\'>Genii</div>'">`;
+                    } else {
+                        imgHtml = `<div class="placeholder-art">Genii</div>`;
+                    }
+
+                    let desc = data.description || "Sem descrição disponível.";
+                    const qCount = data.questions ? data.questions.length : 0;
+                    const plays = data.playCount || 0;
+                    const favs = data.favoriteCount || 0;
+
+                    cardsHtml += `
+                <a href="/quiz?id=${data.id}" class="quiz-card-link">
+                    <div class="quiz-card">
+                        <div class="quiz-image-box">
+                            ${imgHtml}
+                            <div class="q-badge">
+                                <i class="fa-solid fa-layer-group"></i> ${qCount}
+                            </div>
+                        </div>
+                        <div class="quiz-content">
+                            <h3 class="q-title">${data.title}</h3>
+                            <p class="q-desc">${desc}</p>
+                            <div class="q-footer">
+                                <span style="font-size:0.8rem; font-weight:600; color:var(--grey);">
+                                    <i class="fa-regular fa-user"></i> ${data.creatorName || "Sábio"}
+                                    ${plays > 0 ? `<span style="margin-left:8px;"><i class="fa-solid fa-play" style="font-size:0.65rem;"></i> ${plays}</span>` : ""}
+                                    ${favs > 0 ? `<span style="margin-left:8px;"><i class="fa-solid fa-star" style="font-size:0.65rem; color:#FFAB00;"></i> ${favs}</span>` : ""}
+                                </span>
+                                <div class="btn-play">JOGAR</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            `;
+                });
+                container.innerHTML = cardsHtml;
+            }
+
+            async function loadAllSections() {
+                try {
+                    const q = query(
+                        collection(db, "quizzes"),
+                        where("isPublic", "==", true),
+                        limit(50),
+                    );
+                    const querySnapshot = await getDocs(q);
+
+                    const allQuizzes = [];
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        allQuizzes.push({
+                            id: docSnap.id,
+                            ...data,
+                            _createdMs: data.createdAt?.toDate
+                                ? data.createdAt.toDate().getTime()
+                                : 0,
+                            _playCount: data.playCount || 0,
+                            _weeklyPlays: data.weeklyPlays || 0,
+                        });
+                    });
+
+                    const popular = [...allQuizzes].sort(
+                        (a, b) => b._playCount - a._playCount,
+                    );
+                    sectionData.popular = popular;
+                    saveCachedData(CACHE_KEY_DISCOVER, popular.slice(0, 12));
+                    renderCarouselCards(popularCarousel, popular.slice(0, 12));
+
+                    function getDateStr(offsetDays = 0) {
+                        const d = new Date();
+                        d.setDate(d.getDate() - offsetDays);
+                        return d.toISOString().split("T")[0];
+                    }
+
+                    const todayStr = getDateStr(0);
+                    const threeDaysAgoStr = getDateStr(3);
+
+                    function getTVM(q) {
+                        const daily = q.dailyVisits || {};
+                        if (Object.keys(daily).length === 0) {
+                            return (q.playCount || 0) / 2;
+                        }
+                        const visitsToday = daily[todayStr] || 0;
+                        const visits3DaysAgo = daily[threeDaysAgoStr] || 0;
+                        return (visitsToday - visits3DaysAgo) / 2;
+                    }
+
+                    const trendingFinal = [...allQuizzes]
+                        .map((q) => ({ ...q, _trendScore: getTVM(q) }))
+                        .sort((a, b) => {
+                            if (b._trendScore !== a._trendScore) {
+                                return b._trendScore - a._trendScore;
+                            }
+                            const playsA = a.playCount || 0;
+                            const playsB = b.playCount || 0;
+                            if (playsB !== playsA) return playsB - playsA;
+
+                            const favsA = a.favoriteCount || 0;
+                            const favsB = b.favoriteCount || 0;
+                            return favsB - favsA;
+                        });
+                    sectionData.trending = trendingFinal;
+                    saveCachedData(
+                        "genii_cached_trending",
+                        trendingFinal.slice(0, 12),
+                    );
+                    renderCarouselCards(
+                        trendingCarousel,
+                        trendingFinal.slice(0, 12),
+                    );
+
+                    const newest = [...allQuizzes].sort(
+                        (a, b) => b._createdMs - a._createdMs,
+                    );
+                    sectionData.new = newest;
+                    saveCachedData("genii_cached_new", newest.slice(0, 12));
+                    renderCarouselCards(newCarousel, newest.slice(0, 12));
+                } catch (error) {
+                    console.error("Erro:", error);
+                    [popularCarousel, trendingCarousel, newCarousel].forEach(c => {
+                        if (c && c.querySelector('.skeleton-card')) {
+                            c.innerHTML = '<div style="width:100%; text-align:center; padding:30px;"><p style="color:var(--grey); font-weight:600;">Erro ao carregar jogos.</p></div>';
+                        }
+                    });
+                }
+            }
+
+            function getPageScroll(carousel) {
+                return carousel.clientWidth + 20;
+            }
+
+            function setupCarouselNav(carousel, leftSelector, rightSelector) {
+                const left = document.querySelector(leftSelector);
+                const right = document.querySelector(rightSelector);
+                if (left)
+                    left.addEventListener("click", () => {
+                        carousel.scrollBy({
+                            left: -getPageScroll(carousel),
+                            behavior: "smooth",
+                        });
+                    });
+                if (right)
+                    right.addEventListener("click", () => {
+                        carousel.scrollBy({
+                            left: getPageScroll(carousel),
+                            behavior: "smooth",
+                        });
+                    });
+            }
+
+            leftBtn.addEventListener("click", () =>
+                popularCarousel.scrollBy({
+                    left: -getPageScroll(popularCarousel),
+                    behavior: "smooth",
+                }),
+            );
+            rightBtn.addEventListener("click", () =>
+                popularCarousel.scrollBy({
+                    left: getPageScroll(popularCarousel),
+                    behavior: "smooth",
+                }),
+            );
+
+            setupCarouselNav(
+                trendingCarousel,
+                ".trending-left",
+                ".trending-right",
+            );
+
+            setupCarouselNav(newCarousel, ".new-left", ".new-right");
+        </script>
+    </body>
+</html>

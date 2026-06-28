@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="profile">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content has-banner">
+    
+    <div class="profile-banner">
+        <div class="banner-decoration bd-1"></div>
+        <div class="banner-decoration bd-2"></div>
+    </div>
+
+    <div class="container">
+
+        <div id="loading-state" style="max-width:1000px; margin:0 auto; padding:30px 20px;">
+            <div class="profile-grid">
+                <div class="profile-left">
+                    <div class="profile-left-sticky">
+                        <div class="profile-card profile-card-readonly" style="pointer-events:none;">
+                            <div class="profile-pic-wrapper" style="pointer-events:none;">
+                                <div class="skeleton" style="width:100%;height:100%;"></div>
+                            </div>
+                            <h1 class="user-name" style="visibility:hidden;">Placeholder</h1>
+                            <div class="skeleton" style="width:55%;height:28px;border-radius:8px;"></div>
+                            <div class="level-badge" style="visibility:hidden;"><i class="fa-solid fa-bolt"></i> <span>Nível 1</span></div>
+                            <div class="skeleton" style="width:100%;height:16px;border-radius:8px;margin-bottom:6px;"></div>
+                            <div class="skeleton" style="width:45%;height:14px;border-radius:8px;margin:0 auto 20px;"></div>
+                            <div class="skeleton" style="width:60%;height:50px;border-radius:16px;margin:0 auto;"></div>
+                        </div>
+                        <div class="bio-card" style="pointer-events:none;">
+                            <div class="bio-card-header">
+                                <span>Sobre mim</span>
+                            </div>
+                            <div class="skeleton" style="width:100%;height:14px;border-radius:6px;"></div>
+                            <div class="skeleton" style="width:70%;height:14px;border-radius:6px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-area">
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon"><div class="skeleton" style="width:100%;height:100%;border-radius:12px;"></div></div>
+                            <div class="skeleton" style="width:40%;height:24px;border-radius:8px;margin-bottom:6px;"></div>
+                            <div class="skeleton" style="width:60%;height:14px;border-radius:6px;"></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><div class="skeleton" style="width:100%;height:100%;border-radius:12px;"></div></div>
+                            <div class="skeleton" style="width:40%;height:24px;border-radius:8px;margin-bottom:6px;"></div>
+                            <div class="skeleton" style="width:60%;height:14px;border-radius:6px;"></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><div class="skeleton" style="width:100%;height:100%;border-radius:12px;"></div></div>
+                            <div class="skeleton" style="width:40%;height:24px;border-radius:8px;margin-bottom:6px;"></div>
+                            <div class="skeleton" style="width:60%;height:14px;border-radius:6px;"></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon"><div class="skeleton" style="width:100%;height:100%;border-radius:12px;"></div></div>
+                            <div class="skeleton" style="width:40%;height:24px;border-radius:8px;margin-bottom:6px;"></div>
+                            <div class="skeleton" style="width:60%;height:14px;border-radius:6px;"></div>
+                        </div>
+                    </div>
+                    <div class="dashboard-block showcase-block">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <div class="skeleton" style="width:140px;height:22px;border-radius:8px;"></div>
+                            </div>
+                        </div>
+                        <div class="quiz-carousel" style="display:flex;gap:20px;padding:10px 0;overflow:hidden;">
+                            <div class="skeleton" style="width:320px;aspect-ratio:16/10;border-radius:16px;flex-shrink:0;"></div>
+                            <div class="skeleton" style="width:320px;aspect-ratio:16/10;border-radius:16px;flex-shrink:0;"></div>
+                            <div class="skeleton" style="width:320px;aspect-ratio:16/10;border-radius:16px;flex-shrink:0;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="not-found-state" style="display:none; text-align:center; padding:160px 20px 80px;">
+            <h2 style="font-family:'Fredoka',sans-serif; color:var(--dark); margin-top:16px;">Perfil não encontrado</h2>
+            <p style="font-family:'Nunito',sans-serif; color:var(--grey); margin-top:8px;">Parece que alguém desapareceu da lâmpada mágica...</p>
+            <a href="discover.html" style="display:inline-block; margin-top:20px; padding:12px 28px; background:var(--primary); color:white; border-radius:14px; font-family:'Fredoka',sans-serif; font-weight:700; text-decoration:none; box-shadow:0 4px 0 var(--primary-dark);">
+                <i class="fa-solid fa-compass"></i> Descobrir
+            </a>
+        </div>
+
+        <div id="profile-content" style="display:none;">
+            <div class="profile-grid">
+                
+                <div class="profile-left">
+                  <div class="profile-left-sticky">
+
+                    <div class="profile-card profile-card-readonly">
+                        <div class="profile-pic-wrapper" id="public-avatar">
+                        </div>
+
+                        <h1 class="user-name" id="display-name">...</h1>
+                        
+                        <div class="level-badge">
+                            <i class="fa-solid fa-bolt"></i> <span id="display-level">Nível 1</span>
+                        </div>
+
+                        <div class="xp-container">
+                            <div class="xp-bar" id="xp-bar" style="width: 0%;"></div>
+                        </div>
+                        <div class="xp-text" id="xp-text">0 / 0 XP</div>
+                    </div>
+
+                    <div class="bio-card">
+                        <div class="bio-card-header">
+                            <span>Sobre mim</span>
+                        </div>
+                        <p class="bio-text" id="bio-text">Este utilizador ainda não escreveu nada...</p>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div class="content-area">
+                    
+                    <div class="stats-row">
+                        <div class="stat-card yellow">
+                            <div class="stat-icon"><i class="fa-solid fa-crown"></i></div>
+                            <span class="stat-value" id="stat-mastered">0</span>
+                            <span class="stat-label">Dominados</span>
+                        </div>
+                        <div class="stat-card red">
+                            <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+                            <span class="stat-value" id="stat-streak">0</span>
+                            <span class="stat-label">Streak</span>
+                        </div>
+                        <div class="stat-card green">
+                            <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                            <span class="stat-value" id="stat-days">0</span>
+                            <span class="stat-label">Dias Ativos</span>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="stat-icon"><i class="fa-solid fa-gamepad"></i></div>
+                            <span class="stat-value" id="stat-games">0</span>
+                            <span class="stat-label">Jogos</span>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-block showcase-block">
+                        <div class="section-header">
+                            <div class="section-title">
+                                Jogos Criados
+                            </div>
+                            <a href="javascript:void(0)" id="profileToggleBtn" onclick="toggleProfileView()" style="font-size:0.9rem; font-weight:700; color:var(--primary); text-decoration:none;">Ver todos</a>
+                        </div>
+
+                        <div class="showcase-carousel-wrapper">
+                            <button class="showcase-nav-btn showcase-nav-left" id="showcaseLeft" style="display:none;">
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <div class="quiz-carousel" id="showcase-grid">
+                                <div class="showcase-empty" id="showcase-loading">
+                                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.5rem; color: var(--secondary);"></i>
+                                    <p>A carregar jogos...</p>
+                                </div>
+                            </div>
+                            <button class="showcase-nav-btn showcase-nav-right" id="showcaseRight" style="display:none;">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                        </div>
+
+                        <div id="profileFullView" style="display:none; margin-top:20px;">
+                            <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:16px;" id="profileFullGrid"></div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+    import { renderLayout, getCachedUser } from "./static/js/components.js";
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+    import { getXpProgress } from "./static/js/gamification.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const targetUid = params.get('uid');
+
+    const cached = getCachedUser();
+    if (cached) {
+        renderLayout('', cached);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!cached) {
+            if (user) {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    data.displayName = data.username || user.email.split('@')[0];
+                    renderLayout('', data);
+                }
+            } else {
+                renderLayout('', {});
+            }
+        }
+
+        if (user && targetUid === user.uid) {
+            window.location.href = "my_profile.html";
+            return;
+        }
+
+        loadPublicProfile();
+    });
+
+    document.addEventListener('app-logout', async () => {
+        const { signOut } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js");
+        await signOut(auth);
+        window.location.href = "login.html";
+    });
+
+    async function loadPublicProfile() {
+        const loadingState = document.getElementById('loading-state');
+        const notFoundState = document.getElementById('not-found-state');
+        const profileContent = document.getElementById('profile-content');
+
+        if (!targetUid) {
+            hideSkeleton(document.getElementById('loading-state'));
+            notFoundState.style.display = 'block';
+            return;
+        }
+
+        try {
+            const snap = await getDoc(doc(db, "users", targetUid));
+
+            if (!snap.exists()) {
+                hideSkeleton(document.getElementById('loading-state'));
+                notFoundState.style.display = 'block';
+                return;
+            }
+
+            const data = snap.data();
+            data.displayName = data.username || 'Utilizador Anónimo';
+
+            document.title = `${data.displayName} - Genii`;
+
+            renderPublicAvatar(data);
+
+            document.getElementById('display-name').innerText = data.displayName;
+
+            const totalXp = data.totalXp || data.xp || 0;
+            const progress = getXpProgress(totalXp);
+
+            document.getElementById('display-level').innerText = `Nível ${progress.level}`;
+            document.getElementById('xp-bar').style.width = `${progress.percentage}%`;
+            document.getElementById('xp-text').innerText = `${progress.xpIntoLevel} / ${progress.xpNeeded} XP para Nível ${progress.level + 1}`;
+
+            const bioText = data.bio || '';
+            const bioEl = document.getElementById('bio-text');
+            if (bioEl) {
+                bioEl.innerText = bioText || 'Este utilizador ainda não escreveu nada...';
+                bioEl.classList.toggle('bio-placeholder', !bioText);
+            }
+
+            const stats = data.stats || {};
+            document.getElementById('stat-mastered').innerText = stats.quizzesMastered || 0;
+            document.getElementById('stat-streak').innerText = stats.currentStreak || 0;
+            document.getElementById('stat-days').innerText = stats.activeDays || 0;
+            document.getElementById('stat-games').innerText = stats.gamesPlayed || 0;
+
+            loadShowcaseQuizzes(targetUid);
+
+            hideSkeleton(document.getElementById('loading-state'));
+            profileContent.style.display = 'block';
+            document.body.style.opacity = '1';
+
+        } catch (e) {
+            console.error("Erro ao carregar perfil público:", e);
+            hideSkeleton(document.getElementById('loading-state'));
+            notFoundState.style.display = 'block';
+        }
+    }
+
+    function renderPublicAvatar(data) {
+        const container = document.getElementById('public-avatar');
+        if (!container) return;
+
+        if (data.avatarRenderUrl) {
+            container.innerHTML = `
+                <img src="${data.avatarRenderUrl}" 
+                     style="width:100%; height:100%; object-fit:contain; object-position:center 35%; border-radius:20px;"
+                     onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#a270f4,#00cfc1);border-radius:20px;color:white;font-family:Fredoka,sans-serif;font-weight:700;font-size:3rem;\\'>${(data.displayName || 'G').charAt(0).toUpperCase()}</div>'">
+            `;
+        } else if (data.profileType === 'photo' && data.customPhotoUrl) {
+            container.innerHTML = `
+                <img src="${data.customPhotoUrl}" 
+                     style="width:100%; height:100%; object-fit:cover; border-radius:20px;"
+                     onerror="this.parentElement.innerHTML='<div style=\\'display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:linear-gradient(135deg,#a270f4,#00cfc1);border-radius:20px;color:white;font-family:Fredoka,sans-serif;font-weight:700;font-size:3rem;\\'>${(data.displayName || 'G').charAt(0).toUpperCase()}</div>'">
+            `;
+        } else {
+            const sel = data.avatar || { skin: '001', face: '001', hat: 'none' };
+            const hasHat = sel.hat && sel.hat !== 'none';
+            let hatHTML = hasHat
+                ? `<img src="static/img/avatareditor/hats/${sel.hat}.png" style="z-index:3; position:absolute; inset:0; width:100%; height:100%; object-fit:contain;">`
+                : '';
+            const scaleStyle = hasHat
+                ? 'transform:scale(0.75);transform-origin:center 58%;'
+                : 'transform:scale(0.88);transform-origin:center center;';
+
+            container.innerHTML = `
+                <div style="position:absolute; inset:0; ${scaleStyle}">
+                    <img src="static/img/avatareditor/skins/${sel.skin}.png" style="z-index:1; position:absolute; inset:0; width:100%; height:100%; object-fit:contain;">
+                    <img src="static/img/avatareditor/faces/${sel.face}.png" style="z-index:2; position:absolute; inset:0; width:100%; height:100%; object-fit:contain;">
+                    ${hatHTML}
+                </div>
+            `;
+        }
+    }
+
+    let allProfileQuizzes = [];
+
+    function buildProfileCards(quizzes) {
+        let html = '';
+        quizzes.forEach(docSnap => {
+            const data = docSnap.data ? docSnap.data() : docSnap;
+            const id = docSnap.id || data.id;
+            const qCount = data.questions ? data.questions.length : 0;
+
+            let imgHtml = '';
+            if (data.cover_image_url && data.cover_image_url.trim() !== '') {
+                imgHtml = `<img src="${data.cover_image_url}" alt="Capa" onerror="this.parentElement.innerHTML='<div class=\\'placeholder-art\\'>Genii</div>'">`;
+            } else {
+                imgHtml = `<div class="placeholder-art">Genii</div>`;
+            }
+
+            html += `
+                <a href="/quiz?id=${id}" class="quiz-card-link" style="width:320px; min-width:0; flex-shrink:0;">
+                    <div class="quiz-card">
+                        <div class="quiz-image-box">
+                            ${imgHtml}
+                            <div class="q-badge"><i class="fa-solid fa-layer-group"></i> ${qCount}</div>
+                        </div>
+                        <div class="quiz-content">
+                            <div class="q-footer" style="justify-content:space-between;">
+                                <h3 class="q-title" style="flex:1; margin:0;">${data.title || 'Sem título'}</h3>
+                                <div class="btn-play">JOGAR</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>`;
+        });
+        return html;
+    }
+
+    let profileViewMode = 'carousel';
+
+    window.toggleProfileView = () => {
+        if (profileViewMode === 'carousel') {
+            document.querySelector('.showcase-carousel-wrapper').style.display = 'none';
+            document.getElementById('profileFullView').style.display = 'block';
+            document.getElementById('profileFullGrid').innerHTML = buildProfileCards(allProfileQuizzes);
+            document.querySelectorAll('#profileFullGrid .quiz-card-link').forEach(el => {
+                el.style.width = '100%';
+                el.style.minWidth = '0';
+            });
+            document.getElementById('profileToggleBtn').textContent = 'Voltar';
+            profileViewMode = 'grid';
+        } else {
+            document.getElementById('profileFullView').style.display = 'none';
+            document.querySelector('.showcase-carousel-wrapper').style.display = '';
+            document.getElementById('profileToggleBtn').textContent = 'Ver todos';
+            profileViewMode = 'carousel';
+        }
+    };
+
+    async function loadShowcaseQuizzes(uid) {
+        const grid = document.getElementById('showcase-grid');
+        if (!grid) return;
+
+        try {
+            const q = query(
+                collection(db, "quizzes"),
+                where("creatorId", "==", uid),
+                where("isPublic", "==", true)
+            );
+            const snap = await getDocs(q);
+
+            if (snap.empty) {
+                grid.innerHTML = `
+                    <div class="showcase-empty">
+                        <i class="fa-solid fa-exclamation" style="font-size: 2.5rem; color: var(--secondary); opacity: 0.3;"></i>
+                        <p>Este utilizador ainda não publicou jogos.</p>
+                    </div>`;
+                document.getElementById('profileToggleBtn').style.display = 'none';
+                return;
+            }
+
+            allProfileQuizzes = [];
+            snap.forEach(docSnap => allProfileQuizzes.push(docSnap));
+
+            grid.innerHTML = buildProfileCards(allProfileQuizzes);
+
+            initShowcaseCarousel();
+
+        } catch (e) {
+            console.error("Erro vitrine pública:", e);
+            grid.innerHTML = `
+                <div class="showcase-empty">
+                    <p>Erro ao carregar jogos.</p>
+                </div>`;
+        }
+    }
+
+    function initShowcaseCarousel() {
+        const carousel = document.getElementById('showcase-grid');
+        const leftBtn = document.getElementById('showcaseLeft');
+        const rightBtn = document.getElementById('showcaseRight');
+        if (!carousel || !leftBtn || !rightBtn) return;
+
+        function updateArrows() {
+            const { scrollLeft, scrollWidth, clientWidth } = carousel;
+            leftBtn.style.display = scrollLeft > 10 ? 'flex' : 'none';
+            rightBtn.style.display = scrollLeft + clientWidth < scrollWidth - 10 ? 'flex' : 'none';
+        }
+
+        leftBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: -280, behavior: 'smooth' });
+        });
+        rightBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: 280, behavior: 'smooth' });
+        });
+
+        carousel.addEventListener('scroll', updateArrows);
+        requestAnimationFrame(updateArrows);
+        carousel.querySelectorAll('img').forEach(img => {
+            img.addEventListener('load', updateArrows);
+        });
+    }
+
+</script>
+</body>
+</html>

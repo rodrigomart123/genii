@@ -1,0 +1,616 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estás dentro! - Genii</title>
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css?v=3" />`n    <script src="static/js/theme.js"></script>
+    
+</head>
+<body data-page="player-lobby">
+
+
+    <header class="lobby-header">
+        <a class="header-logo" href="javascript:void(0)" id="logoLeaveBtn">
+            <img src="static/img/geniilogo.png" alt="Genii">
+            <span>Genii</span>
+        </a>
+        <div class="header-pin">
+            PIN: <span id="displayPin">---</span>
+            <div class="header-menu-wrap">
+                <button class="header-menu-btn" id="headerMenuBtn" aria-label="Opções">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="header-dropdown" id="headerDropdown">
+                    <button class="dropdown-item" id="copyPinBtn"><i class="fa-solid fa-copy"></i> Copiar PIN</button>
+                    <button class="dropdown-item danger" id="leaveGameBtn"><i class="fa-solid fa-right-from-bracket"></i> Sair da sala</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="lobby-main">
+        <div id="lobbySkeleton" style="display:flex; flex-direction:column; align-items:center; gap:28px; width:100%;">
+            <div class="avatar-zone">
+                <div class="skeleton skeleton-lobby-avatar"></div>
+            </div>
+            <div class="player-info" style="gap:14px;">
+                <div class="skeleton skeleton-lobby-name"></div>
+                <div class="skeleton skeleton-lobby-status"></div>
+            </div>
+        </div>
+
+
+        <div id="lobbyContent" style="display:none; flex-direction:column; align-items:center; gap:28px; width:100%;">
+            <div class="avatar-zone">
+                <div class="avatar-container">
+                    <div class="avatar-ring">
+                        <div class="avatar-inner" id="avatarDisplay">
+                            <i class="fa-solid fa-user avatar-placeholder-icon"></i>
+                        </div>
+                    </div>
+                    <button class="edit-avatar-btn" id="openAvatarModal" aria-label="Editar avatar">
+                        <i class="fa-solid fa-pencil"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="player-info">
+                <div class="player-nickname" id="playerName">...</div>
+                <div class="player-status" id="statusArea">
+                    <span class="status-dot"></span>
+                    <span>Está dentro! Vê o seu nome no ecrã?</span>
+                </div>
+            </div>
+
+
+            <div class="lobby-stats" id="gameInfo" style="display:none;">
+                <div class="lobby-chip">
+                    <i class="fa-solid fa-users"></i>
+                    <strong id="displayPlayerCount">0</strong>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="error-zone" id="errorZone">
+            <div class="err-icon"></div>
+            <div class="err-title"></div>
+            <div class="err-sub"></div>
+        </div>
+    </main>
+
+
+    <div class="avatar-modal-overlay" id="avatarModalOverlay">
+        <div class="avatar-modal" id="avatarModal">
+            <div class="modal-top-bar">
+                <h3><i class="fa-solid fa-palette" style="color:var(--genii-purple);margin-right:8px;"></i>Personalizar Avatar</h3>
+                <button class="modal-close-btn" id="closeAvatarModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+
+            <div class="segmented-control" id="profileToggle">
+                <button class="seg-btn active" data-mode="avatar">Avatar</button>
+                <button class="seg-btn" data-mode="photo">Foto</button>
+                <div class="seg-slider"></div>
+            </div>
+
+
+            <div id="avatarModeArea">
+                <div class="avatar-preview-floating" id="avatarPreviewModal">
+                    <img id="preview-skin" src="" style="z-index: 1;">
+                    <img id="preview-face" src="" style="z-index: 2;">
+                    <img id="preview-hat" src="" style="z-index: 3;">
+                </div>
+
+
+                <div class="avatar-options-panel">
+                    <div class="sub-tabs" id="catTabs">
+                        <button class="sub-tab active" data-cat="skins"><i class="fa-solid fa-palette"></i> Pele</button>
+                        <button class="sub-tab" data-cat="faces"><i class="fa-solid fa-face-smile"></i> Cara</button>
+                        <button class="sub-tab" data-cat="hats"><i class="fa-solid fa-hat-wizard"></i> Chapéu</button>
+                    </div>
+                    <div class="options-grid" id="optionsGrid"></div>
+                </div>
+            </div>
+
+
+            <div class="photo-upload-area" id="photoModeArea">
+                <div class="photo-preview-frame" id="photoPreviewFrame">
+                    <img id="photo-preview-img" src="static/img/default-genii.png">
+                    <div class="photo-overlay-hint" id="photoOverlayHint">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Clique para alterar</span>
+                    </div>
+                </div>
+                <label for="photoFileInput" class="btn-upload-photo" id="btnUploadPhoto">
+                    <i class="fa-solid fa-image"></i> Escolher Foto
+                </label>
+                <input type="file" id="photoFileInput" accept="image/*" style="display:none;">
+                <p class="upload-hint">Foto quadrada &bull; Máx 5MB</p>
+            </div>
+
+
+            <div class="modal-save-bar">
+                <button class="save-btn secondary" id="cancelAvatarModal">Cancelar</button>
+                <button class="save-btn primary" id="saveAvatarBtn">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { ref, onValue, get as rtdbGet, update as rtdbUpdateRef, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { rtdb, auth, db } from "./firebase-config.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { saveUserToCache } from "./static/js/components.js";
+        import { hideSkeleton } from "./static/js/skeleton.js";
+        import "./static/js/components.js";
+
+
+        let _cloudinaryToken = null;
+
+
+        const AVATAR_BASE = "static/img/avatareditor";
+        const SKINS = ['001','002','003','004'];
+        const FACES = ['001','002','003'];
+        const HATS = ['none','001','002','003','004','005'];
+
+
+        const params = new URLSearchParams(window.location.search);
+        const gameId = params.get('gameId');
+        if (!gameId) window.location.href = "join.html";
+
+
+        let currentUser = null;
+        let currentUserData = null;
+        let currentProfileType = 'avatar';
+        let currentSelection = { skin: '001', face: '001', hat: 'none' };
+        let uploadedPhotoUrl = null;
+        let activeCat = 'skins';
+        let isUploading = false;
+
+
+        function renderLobbyAvatar(userData) {
+            const display = document.getElementById('avatarDisplay');
+            if (!display) return;
+            if (userData && window.renderGeniiAvatar) {
+                const html = window.renderGeniiAvatar(userData, '100%');
+                display.innerHTML = html;
+                const wrapper = display.firstElementChild;
+                if (wrapper) {
+                    wrapper.style.width = '100%';
+                    wrapper.style.height = '100%';
+                }
+            }
+        }
+
+
+        function renderModalPreview() {
+            const display = document.getElementById('avatarDisplay');
+            const previewData = {};
+            if (currentProfileType === 'avatar') {
+                previewData.avatar = currentSelection;
+            } else if (currentProfileType === 'photo' && uploadedPhotoUrl) {
+                previewData.profileType = 'photo';
+                previewData.customPhotoUrl = uploadedPhotoUrl;
+            }
+            renderLobbyAvatar(previewData);
+        }
+
+
+        function updatePreview() {
+            document.getElementById('preview-skin').src = `${AVATAR_BASE}/skins/${currentSelection.skin}.png`;
+            document.getElementById('preview-face').src = `${AVATAR_BASE}/faces/${currentSelection.face}.png`;
+            const hatEl = document.getElementById('preview-hat');
+            if (currentSelection.hat === 'none') hatEl.style.display = 'none';
+            else {
+                hatEl.style.display = 'block';
+                hatEl.src = `${AVATAR_BASE}/hats/${currentSelection.hat}.png`;
+            }
+        }
+
+
+        function buildOptionsGrid(category) {
+            const grid = document.getElementById('optionsGrid');
+            const items = category === 'skins' ? SKINS : category === 'faces' ? FACES : HATS;
+            let html = '';
+            items.forEach(item => {
+                const isNone = item === 'none';
+                const currentVal = category === 'skins' ? currentSelection.skin
+                    : category === 'faces' ? currentSelection.face
+                    : currentSelection.hat;
+                const selected = currentVal === item ? 'selected' : '';
+
+
+                if (isNone) {
+                    html += `<div class="opt-item opt-none-item ${selected}" data-cat="${category}" data-val="${item}"><i class="fa-solid fa-ban"></i><span>Remover</span></div>`;
+                } else {
+                    html += `<div class="opt-item ${selected}" data-cat="${category}" data-val="${item}"><img src="${AVATAR_BASE}/${category}/${item}.png" alt="${item}"></div>`;
+                }
+            });
+            grid.innerHTML = html;
+
+
+            grid.querySelectorAll('.opt-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const cat = el.dataset.cat;
+                    const val = el.dataset.val;
+                    if (cat === 'skins') currentSelection.skin = val;
+                    else if (cat === 'faces') currentSelection.face = val;
+                    else currentSelection.hat = val;
+                    buildOptionsGrid(cat);
+                    updatePreview();
+                });
+            });
+        }
+
+
+        function openModal() {
+            if (currentUserData) {
+                const av = currentUserData.avatar || {};
+                currentSelection = {
+                    skin: av.skin || '001',
+                    face: av.face || '001',
+                    hat: av.hat || 'none'
+                };
+                currentProfileType = currentUserData.profileType || 'avatar';
+                uploadedPhotoUrl = currentUserData.customPhotoUrl || null;
+            }
+            activeCat = 'skins';
+
+
+            document.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === currentProfileType));
+            const slider = document.querySelector('.seg-slider');
+            slider.style.transform = currentProfileType === 'photo' ? 'translateX(100%)' : 'translateX(0)';
+
+
+            switchModeUI(currentProfileType);
+            buildOptionsGrid('skins');
+            document.querySelectorAll('.sub-tab').forEach(t => t.classList.toggle('active', t.dataset.cat === 'skins'));
+
+
+            const overlay = document.getElementById('avatarModalOverlay');
+            overlay.classList.add('open');
+            document.getElementById('photoFileInput').value = '';
+
+
+            if (currentProfileType === 'photo') {
+                const previewImg = document.getElementById('photo-preview-img');
+                const hint = document.getElementById('photoOverlayHint');
+                if (uploadedPhotoUrl) {
+                    previewImg.src = uploadedPhotoUrl;
+                    if (hint) hint.style.display = 'none';
+                } else {
+                    previewImg.src = 'static/img/default-genii.png';
+                    if (hint) hint.style.display = 'flex';
+                }
+            }
+        }
+
+
+        function closeModal() {
+            document.getElementById('avatarModalOverlay').classList.remove('open');
+        }
+
+
+        function switchModeUI(mode) {
+            currentProfileType = mode;
+            const avatarArea = document.getElementById('avatarModeArea');
+            const photoArea = document.getElementById('photoModeArea');
+            if (mode === 'avatar') {
+                avatarArea.style.display = 'grid';
+                photoArea.classList.remove('visible');
+                updatePreview();
+            } else {
+                avatarArea.style.display = 'none';
+                photoArea.classList.add('visible');
+            }
+        }
+
+
+        function showErrorState(icon, title, subtitle) {
+            const wf = document.getElementById('waitingFooter');
+            if (wf) wf.style.display = 'none';
+            document.getElementById('gameInfo').style.display = 'none';
+            const ez = document.getElementById('errorZone');
+            ez.style.display = 'flex';
+            ez.querySelector('.err-icon').innerHTML = `<i class="fa-solid ${icon}"></i>`;
+            ez.querySelector('.err-title').textContent = title;
+            ez.querySelector('.err-sub').textContent = subtitle;
+            setTimeout(() => window.location.href = "join.html", 3000);
+        }
+
+
+        function closeDropdown() {
+            document.getElementById('headerDropdown').classList.remove('open');
+        }
+        document.getElementById('headerMenuBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('headerDropdown').classList.toggle('open');
+        });
+        document.addEventListener('click', closeDropdown);
+
+
+        document.getElementById('copyPinBtn').addEventListener('click', () => {
+            const pin = document.getElementById('displayPin').innerText;
+            navigator.clipboard.writeText(pin).then(() => {
+                if (window.showGeniiToast) window.showGeniiToast("PIN copiado!", "success");
+            }).catch(() => {
+                if (window.showGeniiToast) window.showGeniiToast("Erro ao copiar PIN.", "error");
+            });
+            closeDropdown();
+        });
+
+
+        document.getElementById('leaveGameBtn').addEventListener('click', async () => {
+            closeDropdown();
+            if (!window.showGeniiConfirm) {
+                await doLeaveGame();
+                return;
+            }
+            window.showGeniiConfirm("Tem a certeza que quer sair da sala?", async (confirmed) => {
+                if (confirmed) await doLeaveGame();
+            });
+        });
+
+
+        document.getElementById('logoLeaveBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!window.showGeniiConfirm) { doLeaveGame(); return; }
+            window.showGeniiConfirm("Irá sair da sala, quer prosseguir?", async (confirmed) => {
+                if (confirmed) await doLeaveGame();
+            });
+        });
+
+
+        async function doLeaveGame() {
+            if (!currentUser || !gameId) return;
+            try {
+                await remove(ref(rtdb, `live_games/${gameId}/players/${currentUser.uid}`));
+                if (window.showGeniiToast) window.showGeniiToast("Saíste da sala.", "success");
+            } catch (err) {
+                console.error("Leave game error:", err);
+            }
+            window.location.href = "join.html";
+        }
+
+
+        document.getElementById('openAvatarModal').addEventListener('click', openModal);
+        document.getElementById('closeAvatarModal').addEventListener('click', closeModal);
+        document.getElementById('cancelAvatarModal').addEventListener('click', closeModal);
+        document.getElementById('avatarModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeModal();
+        });
+
+
+        document.querySelectorAll('.seg-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const slider = document.querySelector('.seg-slider');
+                slider.style.transform = btn.dataset.mode === 'photo' ? 'translateX(100%)' : 'translateX(0)';
+                switchModeUI(btn.dataset.mode);
+            });
+        });
+
+
+        document.querySelectorAll('.sub-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeCat = tab.dataset.cat;
+                buildOptionsGrid(activeCat);
+            });
+        });
+
+
+        document.getElementById('photoPreviewFrame').addEventListener('click', () => {
+            document.getElementById('photoFileInput').click();
+        });
+        document.getElementById('btnUploadPhoto').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('photoFileInput').click();
+        });
+        document.getElementById('photoFileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                if (window.showGeniiToast) window.showGeniiToast("Ficheiro demasiado grande (máx. 5MB)", "error");
+                return;
+            }
+            const previewImg = document.getElementById('photo-preview-img');
+            const hint = document.getElementById('photoOverlayHint');
+            const btnUpload = document.getElementById('btnUploadPhoto');
+
+
+            previewImg.src = URL.createObjectURL(file);
+            if (hint) hint.style.display = 'none';
+            btnUpload.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A enviar...';
+
+
+            try {
+                const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'profile_photos');
+                if (result.url) {
+                    uploadedPhotoUrl = result.url;
+                    window._photoPublicId = result.publicId || null;
+                    previewImg.src = uploadedPhotoUrl;
+                    btnUpload.innerHTML = '<i class="fa-solid fa-image"></i> Escolher Outra';
+                } else {
+                    btnUpload.innerHTML = '<i class="fa-solid fa-image"></i> Erro. Tenta novamente';
+                }
+            } catch {
+                btnUpload.innerHTML = '<i class="fa-solid fa-image"></i> Erro. Tenta novamente';
+            }
+        });
+
+
+        document.getElementById('saveAvatarBtn').addEventListener('click', async () => {
+            if (!currentUser || isUploading) return;
+            isUploading = true;
+            const btn = document.getElementById('saveAvatarBtn');
+            btn.textContent = "A guardar...";
+
+
+            try {
+                const updateData = { profileType: currentProfileType };
+
+
+                if (currentProfileType === 'avatar') {
+                    updateData.avatar = currentSelection;
+                    try {
+                        const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+                        const oldPublicId = userSnap.exists() ? userSnap.data().avatarPublicId : null;
+                        if (oldPublicId && _cloudinaryToken) {
+                            await window.deleteFromCloudinary(oldPublicId, _cloudinaryToken).catch(() => {});
+                        }
+                    } catch (e) {}
+                    try {
+                        btn.textContent = "A renderizar...";
+                        const blob = await window.renderAvatarToCanvas(
+                            currentSelection.skin, currentSelection.face, currentSelection.hat, AVATAR_BASE
+                        );
+                        btn.textContent = "A enviar...";
+                        const result = await window.uploadToCloudinary(blob, _cloudinaryToken, 'avatars');
+                        if (result.url) {
+                            updateData.avatarRenderUrl = result.url;
+                            updateData.avatarPublicId = result.publicId || '';
+                        }
+                    } catch (err) {
+                        console.warn("Avatar render/upload failed:", err);
+                    }
+                } else if (currentProfileType === 'photo' && uploadedPhotoUrl) {
+                    updateData.customPhotoUrl = uploadedPhotoUrl;
+                    try {
+                        const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+                        const oldPublicId = userSnap.exists() ? userSnap.data().photoPublicId : null;
+                        if (oldPublicId && _cloudinaryToken) {
+                            await window.deleteFromCloudinary(oldPublicId, _cloudinaryToken).catch(() => {});
+                        }
+                    } catch (e) {}
+                    if (window._photoPublicId) {
+                        updateData.photoPublicId = window._photoPublicId;
+                        window._photoPublicId = null;
+                    }
+                    updateData.avatarPublicId = '';
+                    updateData.avatarRenderUrl = '';
+                }
+
+
+                await updateDoc(doc(db, "users", currentUser.uid), updateData);
+
+
+                const freshSnap = await getDoc(doc(db, "users", currentUser.uid));
+                const freshData = freshSnap.exists() ? freshSnap.data() : {};
+                freshData.displayName = freshData.username || currentUser.email?.split('@')[0] || "Jogador";
+                saveUserToCache(freshData);
+
+
+                currentUserData = { ...currentUserData, ...freshData };
+                renderLobbyAvatar(freshData);
+
+
+                const playerRef = ref(rtdb, `live_games/${gameId}/players/${currentUser.uid}`);
+                const playerSnap = await rtdbGet(playerRef);
+                if (playerSnap.exists()) {
+                    const rtdbData = {};
+                    if (freshData.avatarRenderUrl) rtdbData.avatarRenderUrl = freshData.avatarRenderUrl;
+                    if (freshData.avatar) rtdbData.avatar = freshData.avatar;
+                    if (freshData.profileType) rtdbData.profileType = freshData.profileType;
+                    if (freshData.customPhotoUrl) rtdbData.customPhotoUrl = freshData.customPhotoUrl;
+                    await rtdbUpdateRef(playerRef, rtdbData);
+                }
+
+
+                if (window.showGeniiToast) window.showGeniiToast("Avatar atualizado!", "success");
+                closeModal();
+            } catch (err) {
+                console.error("Save error:", err);
+                if (window.showGeniiToast) window.showGeniiToast("Erro ao guardar avatar.", "error");
+            } finally {
+                isUploading = false;
+                btn.textContent = "Guardar";
+            }
+        });
+
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "login.html"; return; }
+            currentUser = user;
+            user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+
+
+            const myPlayerRef = ref(rtdb, `live_games/${gameId}/players/${user.uid}`);
+            const myPlayerSnap = await rtdbGet(myPlayerRef);
+
+
+            if (!myPlayerSnap.exists()) {
+                if (window.showGeniiToast) window.showGeniiToast("Não está registado nesta sala.", "error");
+                setTimeout(() => window.location.href = "join.html", 200);
+                return;
+            }
+
+
+            const playerData = myPlayerSnap.val();
+            const userDocSnap = await getDoc(doc(db, "users", user.uid));
+            const userDoc = userDocSnap.exists() ? userDocSnap.data() : {};
+            currentUserData = { ...userDoc, ...playerData };
+
+
+            document.getElementById('playerName').innerText = playerData.name || user.displayName || "Jogador";
+            renderLobbyAvatar(currentUserData);
+
+
+            const skel = document.getElementById('lobbySkeleton');
+            if(skel) {
+                hideSkeleton(skel);
+                setTimeout(() => { skel.style.display = 'none'; }, 300);
+            }
+            document.getElementById('lobbyContent').style.display = 'flex';
+
+
+            const gameRef = ref(rtdb, `live_games/${gameId}`);
+            onValue(gameRef, (snap) => {
+                if (!snap.exists()) {
+                    showErrorState('fa-door-closed', 'Sala Encerrada', 'O anfitrião fechou a sala.');
+                    return;
+                }
+                const data = snap.val();
+                const pinEl = document.getElementById('displayPin');
+                if (pinEl) pinEl.innerText = data.pin || '---';
+                document.getElementById('gameInfo').style.display = 'flex';
+
+
+                if (data.status === 'active' || data.status === 'question_active') {
+                    window.location.href = `/player_game?pin=${data.pin}`;
+                } else if (data.status === 'cancelled') {
+                    showErrorState('fa-door-closed', 'Sala Encerrada', 'O anfitrião fechou a sala.');
+                }
+            });
+
+
+            const playersRef = ref(rtdb, `live_games/${gameId}/players`);
+            onValue(playersRef, (snap) => {
+                const countEl = document.getElementById('displayPlayerCount');
+                if (countEl) countEl.innerText = snap.exists() ? Object.keys(snap.val()).length : 0;
+            });
+
+
+            let hasSeenMyDoc = false;
+            onValue(myPlayerRef, (snap) => {
+                if (snap.exists()) {
+                    hasSeenMyDoc = true;
+                } else if (hasSeenMyDoc) {
+                    showErrorState('fa-ban', 'Foi removido', 'O anfitrião removeu-o da sala.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

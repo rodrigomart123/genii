@@ -1,0 +1,100 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Host - Genii</title>
+  
+    <script src="static/js/theme.js"></script>
+</head>
+<body data-page="host-game">
+
+  <audio id="bg-music" src="static/audio/background.mp3" loop></audio>
+  <audio id="sfx-correct" src="static/audio/correct.mp3"></audio>
+  <audio id="sfx-wrong" src="static/audio/incorrect.mp3"></audio>
+
+  <div class="start-overlay-transparent" id="start-screen">
+      <div id="loading-spinner">
+          <i class="fa-solid fa-circle-notch fa-spin fa-4x" style="color:var(--primary); margin-bottom:20px;"></i>
+          <h2 style="font-family: 'Fredoka', sans-serif; font-size: 2rem;">A preparar o jogo...</h2>
+      </div>
+      <div id="start-title-container" class="start-title-container" style="display: none;">
+          <div id="loading-media-area" class="loading-media-area" style="display: none;"></div>
+          <h1 id="start-quiz-title" class="start-quiz-title">Slide...</h1>
+          <div class="question-loading-bar">
+              <div class="question-loading-fill" id="question-loading-fill"></div>
+          </div>
+          <span class="loading-text">A preparar...</span>
+      </div>
+      <div id="countdown-container" class="countdown-container" style="display: none;"></div>
+  </div>
+
+  <div class="game-header" id="main-header">
+      <div class="header-left">
+          <div class="score-badge" style="cursor:pointer;" id="qNavBtn" title="Saltar para slide">
+              <i class="fa-solid fa-list-ol"></i> <span id="q-counter">1 / 10</span> <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:4px;"></i>
+          </div>
+          <select id="qNavSelect" style="display:none;position:absolute;top:70px;left:30px;z-index:100;padding:10px 16px;border-radius:12px;border:2px solid #EAEAF4;font-family:'Fredoka',sans-serif;font-weight:600;font-size:1rem;background:white;color:var(--genii-dark);max-height:300px;overflow-y:auto;"></select>
+      </div>
+      <div class="brand-logo" id="header-title">Genii</div>
+      <div class="header-right">
+          <button class="sound-btn" id="pauseBtn" onclick="window.togglePause()" title="Pausar/Continuar">
+              <i class="fa-solid fa-pause" id="pauseIcon"></i>
+          </button>
+          <button class="sound-btn" id="muteBtn" onclick="window.toggleAudio()">
+              <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+          </button>
+          <div class="answers-info"><i class="fa-solid fa-reply"></i> <span id="answers-received">0</span>/<span id="total-players">0</span></div>
+          <div class="score-badge"><i class="fa-solid fa-users"></i> <span id="player-count-display">0</span></div>
+      </div>
+  </div>
+
+  <div class="floating-pin-badge">
+      PIN: <span id="game-pin">---</span>
+  </div>
+
+  <div class="stage-container" id="stage">
+  </div>
+
+  <div class="fullscreen-layer" id="pause-screen" style="z-index:900;background:rgba(244,246,248,0.92);">
+      <div style="text-align:center;animation:popIn 0.4s; display: flex; flex-direction: column; align-items: center;">
+          <i class="fa-solid fa-pause" style="font-size:6rem;color:#6C5CE7;margin-bottom:20px;"></i>
+          <h1 style="font-family:'Fredoka';font-size:3rem;color:var(--genii-dark);margin:0 0 10px;">Jogo Pausado</h1>
+          <p style="font-size:1.3rem;color:#636e72;margin-bottom:30px;">Os jogadores estão à espera...</p>
+          <button class="btn-leaderboard-action" id="btn-resume" style="font-size:1.5rem;padding:18px 50px;">
+              <i class="fa-solid fa-play"></i> Continuar
+          </button>
+      </div>
+  </div>
+
+  <div class="fullscreen-layer" id="leaderboard-screen">
+  </div>
+
+  <div class="fullscreen-layer" id="end-screen">
+  </div>
+
+  <div class="footer-feedback-bar" id="footer-feedback">
+      <div class="feedback-left">
+          <div class="feedback-icon" id="feedback-icon-container">
+              <i class="fa-solid" id="feedback-icon-i"></i>
+          </div>
+          <div class="feedback-text-container">
+              <div class="feedback-title" id="feedback-title"></div>
+              <div class="feedback-subtitle" id="feedback-subtitle"></div>
+          </div>
+      </div>
+      <button class="feedback-btn btn-correct" id="feedback-btn">
+          <span id="feedback-btn-text">Ver Ranking</span>
+          <i class="fa-solid fa-chevron-right"></i>
+      </button>
+  </div>
+
+  <div class="lightbox-overlay" id="lightbox" onclick="window.closeLightbox()">
+      <button class="lightbox-close" onclick="event.stopPropagation(); window.closeLightbox();">&times;</button>
+      <img id="lightbox-img" src="" alt="Zoom">
+  </div>
+
+  <script src="static/js/components.js" type="module"></script>
+  <script type="module" src="host_game.js"></script>
+</body>
+</html>

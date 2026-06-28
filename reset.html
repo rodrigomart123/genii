@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Senha - Genii</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+
+
+    
+<link rel="stylesheet" href="static/css/style.css?v=3" />`n    <script src="static/js/theme.js"></script>
+    </head>
+<body data-page="reset">
+
+
+    <div class="auth-card">
+        <div class="logo-area">
+            <img src="static/img/geniilogo.png" alt="Genii Logo">
+        </div>
+
+
+        <div id="loading-screen">
+            <div class="spinner"></div>
+            <p>A verificar o seu link mágico...</p>
+        </div>
+
+
+        <div id="reset-form-container">
+            <h2>Nova Senha</h2>
+            <p class="subtitle">Escolha uma nova palavra-passe para a sua conta (<span id="user-email-display"></span>).</p>
+
+
+            <div id="msg-error" class="msg-error"></div>
+
+
+            <form id="resetForm">
+                <div class="form-group">
+                    <i class="fa-solid fa-lock input-icon"></i>
+                    <input type="password" id="newPassword" placeholder="Nova palavra-passe" required minlength="6">
+                    <button type="button" class="toggle-password" onclick="togglePasswordStyle()">
+                        <i class="fa-solid fa-eye" id="eye-icon"></i>
+                    </button>
+                </div>
+                
+                <button class="btn" type="submit">GUARDAR SENHA</button>
+            </form>
+            
+            <a href="login.html" class="back-link">Cancelar</a>
+        </div>
+
+
+        <div id="success-container">
+            <h2 style="color: var(--genii-teal);">Sucesso! <i class="fa-solid fa-check-circle"></i></h2>
+            <p class="subtitle">A sua senha foi atualizada. Já pode entrar.</p>
+            <a href="login.html" class="btn">IR PARA LOGIN</a>
+        </div>
+    </div>
+
+
+    <script>
+        function togglePasswordStyle() {
+            const input = document.getElementById('newPassword');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === "password") {
+                input.type = "text"; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password"; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye');
+            }
+        }
+    </script>
+
+
+    <script type="module">
+        import { verifyPasswordResetCode, confirmPasswordReset } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { auth } from "./firebase-config.js";
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const actionCode = urlParams.get('oobCode');
+        const mode = urlParams.get('mode');
+
+
+        const loadingScreen = document.getElementById('loading-screen');
+        const formContainer = document.getElementById('reset-form-container');
+        const successContainer = document.getElementById('success-container');
+        const errorMsg = document.getElementById('msg-error');
+        const emailDisplay = document.getElementById('user-email-display');
+
+
+        if (!actionCode || mode !== 'resetPassword') {
+            window.location.href = 'login.html';
+        } else {
+            verifyPasswordResetCode(auth, actionCode)
+                .then((email) => {
+                    loadingScreen.style.display = 'none';
+                    formContainer.style.display = 'block';
+                    emailDisplay.innerText = email;
+                })
+                .catch((error) => {
+                    loadingScreen.innerHTML = `
+                        <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; color: #ff6b6b; margin-bottom: 15px;"></i>
+                        <h3>Link Expirado ou Inválido</h3>
+                        <p>Este link já foi usado ou não existe.</p>
+                        <a href="forgot.html" class="btn" style="margin-top: 10px;">PEDIR NOVO LINK</a>
+                    `;
+                });
+        }
+
+
+        document.getElementById('resetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('newPassword').value;
+            const btn = e.target.querySelector('button[type="submit"]');
+            
+            btn.innerText = "A GUARDAR...";
+            btn.style.opacity = "0.7";
+            errorMsg.style.display = 'none';
+
+
+            try {
+                await confirmPasswordReset(auth, actionCode, newPassword);
+                formContainer.style.display = 'none';
+                successContainer.style.display = 'block';
+            } catch (error) {
+                btn.innerText = "GUARDAR SENHA";
+                btn.style.opacity = "1";
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "Erro: " + error.message;
+            }
+        });
+    </script>
+</body>
+</html>

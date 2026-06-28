@@ -1,0 +1,3430 @@
+﻿<!doctype html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Turma - Genii</title>
+
+
+        <link
+            rel="icon"
+            href="static/img/favicon.ico?v=2"
+            type="image/x-icon"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="static/css/style.css?v=3" />
+        <script src="static/js/theme.js"></script>
+
+
+        
+    </head>
+    <body data-page="class">
+        <div id="sidebar-container"></div>
+
+
+        <div id="toast" class="custom-toast">
+            <i class="fa-solid fa-info-circle"></i>
+            <span id="toastMsg">Mensagem</span>
+        </div>
+
+
+        <main class="main-content has-banner">
+            <div class="class-container">
+                <div class="hero-banner" id="heroBanner">
+                    <div class="hero-overlay"></div>
+
+
+                    <div class="header-btn-group" id="headerBtnGroup">
+                        <button
+                            class="header-icon-btn"
+                            title="Notificações"
+                            onclick="openNotifModal()"
+                        >
+                            <i class="fa-solid fa-bell"></i>
+                        </button>
+                        <button
+                            class="header-icon-btn teacher-only-btn"
+                            title="Alterar Capa"
+                            onclick="openSettingsModal('image')"
+                            style="display: none"
+                        >
+                            <i class="fa-solid fa-camera"></i>
+                        </button>
+                        <button
+                            class="header-icon-btn teacher-only-btn"
+                            title="Definições"
+                            onclick="openSettingsModal()"
+                            style="display: none"
+                        >
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </div>
+
+
+                    <input
+                        type="file"
+                        id="bannerInput"
+                        accept="image/*"
+                        style="display: none"
+                    />
+
+
+                    <div class="hero-content">
+                        <div id="hero-skeleton" class="skeleton-hero-text">
+                            <div class="skeleton" style="width:240px; height:36px; border-radius:12px; background:rgba(255,255,255,0.3);"></div>
+                            <div class="skeleton" style="width:120px; height:18px; border-radius:8px; background:rgba(255,255,255,0.2); margin-top:8px;"></div>
+                        </div>
+                        <h1 class="hero-title" id="className" style="display:none;"></h1>
+                        <div class="hero-sub" id="classSubject" style="display:none;"></div>
+                    </div>
+
+
+                    <div
+                        class="hero-teacher-avatar"
+                        id="heroTeacherAvatar"
+                    ></div>
+                </div>
+
+
+                <div class="class-tabs" id="classTabs">
+                    <button
+                        class="class-tab-btn active"
+                        data-tab="inicio"
+                        onclick="switchClassTab('inicio')"
+                    >
+                        <i class="fa-solid fa-house"></i> <span>Início</span>
+                    </button>
+                    <button
+                        class="class-tab-btn"
+                        data-tab="trabalhos"
+                        onclick="switchClassTab('trabalhos')"
+                    >
+                        <i class="fa-solid fa-briefcase"></i> <span>Trabalhos</span>
+                    </button>
+                    <button
+                        class="class-tab-btn"
+                        data-tab="calendario"
+                        onclick="switchClassTab('calendario')"
+                    >
+                        <i class="fa-regular fa-calendar"></i> <span>Calendário</span>
+                    </button>
+                </div>
+
+
+                <div class="tab-content active" id="tabInicio">
+                    <div class="feed-column">
+                        <div class="post-creator">
+                            <div class="creator-top">
+                                <div
+                                    class="avatar-circle"
+                                    id="currentUserAvatar"
+                                    style="width: 50px; height: 50px"
+                                ></div>
+                                <textarea
+                                    id="postInput"
+                                    class="post-input"
+                                    placeholder="Partilhe algo com a turma..."
+                                ></textarea>
+                            </div>
+
+
+                            <div id="quizAttachment" class="quiz-attachment">
+                                <div>
+                                    <i
+                                        class="fa-solid fa-paperclip"
+                                        style="color: var(--primary)"
+                                    ></i>
+                                    <span
+                                        id="attachedQuizTitle"
+                                        style="
+                                            font-weight: 700;
+                                            margin-left: 5px;
+                                        "
+                                        >Set</span
+                                    >
+                                </div>
+                                <i
+                                    class="fa-solid fa-xmark"
+                                    style="cursor: pointer; color: var(--text-faint)"
+                                    onclick="removeAttachment()"
+                                ></i>
+                            </div>
+
+
+                            <div
+                                id="assignmentOptions"
+                                class="assignment-options"
+                            >
+                                <div
+                                    style="
+                                        font-weight: 700;
+                                        color: #d97706;
+                                        font-size: 0.9rem;
+                                    "
+                                >
+                                    <i class="fa-solid fa-briefcase"></i>
+                                    Definir como Trabalho
+                                </div>
+                                <label style="font-size: 0.85rem"
+                                    >Data de Entrega:</label
+                                >
+                                <input
+                                    type="date"
+                                    id="dueDate"
+                                    class="date-picker"
+                                />
+                            </div>
+
+
+                            <div class="creator-actions">
+                                <div class="action-group">
+                                    <div
+                                        class="attach-btn"
+                                        onclick="openQuizModal()"
+                                    >
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>Adicionar Set</span>
+                                    </div>
+                                    <div
+                                        class="attach-btn"
+                                        id="btnToggleAssignment"
+                                        style="display: none"
+                                        onclick="toggleAssignmentMode()"
+                                    >
+                                        <i
+                                            class="fa-solid fa-calendar-check"
+                                        ></i>
+                                        <span>Trabalho</span>
+                                    </div>
+                                </div>
+                                <button
+                                    class="btn-post"
+                                    onclick="publishPost()"
+                                >
+                                    Publicar
+                                </button>
+                            </div>
+                        </div>
+
+
+                        <div id="feedList" class="feed-list">
+                            <div id="feed-skeleton">
+                                <div class="skeleton-post-card">
+                                    <div class="skeleton-post-header">
+                                        <div class="skeleton skeleton-circle" style="width:42px; height:42px; flex-shrink:0;"></div>
+                                        <div style="flex:1;">
+                                            <div class="skeleton skeleton-text" style="width:120px; height:14px;"></div>
+                                            <div class="skeleton skeleton-text-sm" style="width:80px; height:10px; margin:0;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="skeleton-post-body">
+                                        <div class="skeleton skeleton-text" style="width:100%;"></div>
+                                        <div class="skeleton skeleton-text" style="width:75%;"></div>
+                                        <div class="skeleton skeleton-text-sm" style="width:40%; margin:0;"></div>
+                                    </div>
+                                </div>
+                                <div class="skeleton-post-card" style="margin-top:16px;">
+                                    <div class="skeleton-post-header">
+                                        <div class="skeleton skeleton-circle" style="width:42px; height:42px; flex-shrink:0;"></div>
+                                        <div style="flex:1;">
+                                            <div class="skeleton skeleton-text" style="width:100px; height:14px;"></div>
+                                            <div class="skeleton skeleton-text-sm" style="width:70px; height:10px; margin:0;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="skeleton-post-body">
+                                        <div class="skeleton skeleton-text" style="width:90%;"></div>
+                                        <div class="skeleton skeleton-text" style="width:60%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="class-sidebar">
+                        <div
+                            class="sidebar-box"
+                            id="codeBox"
+                            style="display: none"
+                        >
+                            <div class="sb-title">Código da Turma</div>
+                            <div
+                                class="code-display spoiler"
+                                id="classCode"
+                                onclick="toggleCode(this)"
+                                title="Clique para ver"
+                            >
+                                ...
+                            </div>
+                            <p
+                                style="
+                                    font-size: 0.8rem;
+                                    color: var(--text-faint);
+                                    margin-top: 10px;
+                                    text-align: center;
+                                "
+                            >
+                                Partilhe com os seus alunos
+                            </p>
+                        </div>
+
+
+                        <div class="sidebar-box">
+                            <div class="sb-title">
+                                Membros (<span id="memberCount">0</span>)
+                            </div>
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    gap: 10px;
+                                    max-height: 300px;
+                                    overflow-y: auto;
+                                "
+                                id="membersListSide"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="tab-content" id="tabTrabalhos">
+                    <div class="assignments-header">
+                        <h2>Trabalhos</h2>
+                        <div class="assignment-filters">
+                            <button
+                                class="filter-pill active"
+                                data-filter="all"
+                                onclick="filterAssignments('all')"
+                            >
+                                Todos
+                            </button>
+                            <button
+                                class="filter-pill"
+                                data-filter="todo"
+                                onclick="filterAssignments('todo')"
+                            >
+                                Por Fazer
+                            </button>
+                            <button
+                                class="filter-pill"
+                                data-filter="done"
+                                onclick="filterAssignments('done')"
+                            >
+                                Entregues
+                            </button>
+                            <button
+                                class="filter-pill"
+                                data-filter="late"
+                                onclick="filterAssignments('late')"
+                            >
+                                Atrasados
+                            </button>
+                        </div>
+                    </div>
+                    <div id="assignmentsList">
+                        <div id="assignments-skeleton" style="display:flex; flex-direction:column; gap:12px;">
+                            <div class="skeleton-assignment-card">
+                                <div class="skeleton-assignment-left">
+                                    <div class="skeleton skeleton-circle" style="width:40px; height:40px;"></div>
+                                </div>
+                                <div class="skeleton-assignment-body">
+                                    <div class="skeleton skeleton-text" style="width:60%; height:16px;"></div>
+                                    <div class="skeleton skeleton-text-sm" style="width:40%; height:12px;"></div>
+                                    <div class="skeleton skeleton-text-sm" style="width:30%; height:10px; margin:0;"></div>
+                                </div>
+                                <div class="skeleton-assignment-right">
+                                    <div class="skeleton" style="width:80px; height:32px; border-radius:12px;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-assignment-card">
+                                <div class="skeleton-assignment-left">
+                                    <div class="skeleton skeleton-circle" style="width:40px; height:40px;"></div>
+                                </div>
+                                <div class="skeleton-assignment-body">
+                                    <div class="skeleton skeleton-text" style="width:55%; height:16px;"></div>
+                                    <div class="skeleton skeleton-text-sm" style="width:35%; height:12px;"></div>
+                                    <div class="skeleton skeleton-text-sm" style="width:25%; height:10px; margin:0;"></div>
+                                </div>
+                                <div class="skeleton-assignment-right">
+                                    <div class="skeleton" style="width:80px; height:32px; border-radius:12px;"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-assignment-card">
+                                <div class="skeleton-assignment-left">
+                                    <div class="skeleton skeleton-circle" style="width:40px; height:40px;"></div>
+                                </div>
+                                <div class="skeleton-assignment-body">
+                                    <div class="skeleton skeleton-text" style="width:65%; height:16px;"></div>
+                                    <div class="skeleton skeleton-text-sm" style="width:45%; height:12px;"></div>
+                                    <div class="skeleton skeleton-text-sm" style="width:28%; height:10px; margin:0;"></div>
+                                </div>
+                                <div class="skeleton-assignment-right">
+                                    <div class="skeleton" style="width:80px; height:32px; border-radius:12px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="tab-content" id="tabCalendario">
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <button
+                                class="calendar-nav-btn"
+                                onclick="calendarPrev()"
+                            >
+                                <i class="fa-solid fa-chevron-left"></i>
+                            </button>
+                            <span
+                                class="calendar-title"
+                                id="calendarTitle"
+                            ></span>
+                            <button
+                                class="calendar-nav-btn"
+                                onclick="calendarNext()"
+                            >
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </button>
+                            <button class="modal-close-x calendar-close-x" onclick="switchClassTab('inicio')">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+
+        <div id="notifModal" class="modal">
+            <div class="modal-content" style="max-width: 440px">
+                <h3
+                    style="
+                        margin: 0 0 5px 0;
+                        font-family: &quot;Fredoka&quot;
+                        font-size: 1.3rem;
+                        color: var(--dark);
+                    "
+                >
+                    <i
+                        class="fa-solid fa-bell"
+                        style="color: var(--primary); margin-right: 8px"
+                    ></i
+                    >Notificações
+                </h3>
+                <p style="margin: 0 0 15px 0; font-size: 0.85rem; color: var(--text-faint)">
+                    Escolha o que quer receber desta turma.
+                </p>
+                <div>
+                    <div class="notif-toggle">
+                        <div>
+                            <div class="notif-label">
+                                Novos posts do professor
+                            </div>
+                            <div class="notif-desc">
+                                Receba um alerta quando o professor publicar
+                                algo.
+                            </div>
+                        </div>
+                        <div
+                            class="toggle-switch active"
+                            id="togglePosts"
+                            onclick="toggleNotifPref('posts')"
+                        ></div>
+                    </div>
+                    <div class="notif-toggle">
+                        <div>
+                            <div class="notif-label">
+                                Respostas aos meus comentários
+                            </div>
+                            <div class="notif-desc">
+                                Seja notificado quando respondem ao seu
+                                comentário.
+                            </div>
+                        </div>
+                        <div
+                            class="toggle-switch active"
+                            id="toggleReplies"
+                            onclick="toggleNotifPref('replies')"
+                        ></div>
+                    </div>
+                </div>
+                <button
+                    onclick="
+                        document.getElementById('notifModal').style.display =
+                            'none'
+                    "
+                    style="
+                        margin-top: 20px;
+                        padding: 12px;
+                        background: var(--bg-elevated);
+                        color: var(--dark);
+                        border: none;
+                        border-radius: 16px;
+                        cursor: pointer;
+                        font-family: &quot;Fredoka&quot;, sans-serif;
+                        font-weight: 700;
+                        box-shadow: 0 4px 0 var(--cancel-shadow);
+                        text-transform: uppercase;
+                        transition: transform 0.1s;
+                        width: 100%;
+                    "
+                >
+                    Fechar
+                </button>
+            </div>
+        </div>
+
+
+        <div id="scoreModal" class="modal">
+            <div class="modal-content" style="max-width: 380px">
+                <h3
+                    style="
+                        margin: 0 0 20px 0;
+                        font-family: &quot;Fredoka&quot;
+                        font-size: 1.3rem;
+                        color: var(--dark);
+                        text-align: center;
+                    "
+                >
+                    <i
+                        class="fa-solid fa-trophy"
+                        style="color: #ffce00; margin-right: 8px"
+                    ></i
+                    >Resultado
+                </h3>
+                <div class="score-card">
+                    <div class="score-value" id="scoreModalValue">0</div>
+                    <div class="score-detail" id="scoreModalDetail">
+                        0 / 0 corretas
+                    </div>
+                    <div
+                        class="score-detail"
+                        id="scoreModalDate"
+                        style="font-size: 0.8rem; color: var(--text-aaa)"
+                    ></div>
+                </div>
+                <button
+                    onclick="
+                        document.getElementById('scoreModal').style.display =
+                            'none'
+                    "
+                    style="
+                        margin-top: 15px;
+                        padding: 12px;
+                        background: var(--bg-elevated);
+                        color: var(--dark);
+                        border: none;
+                        border-radius: 16px;
+                        cursor: pointer;
+                        font-family: &quot;Fredoka&quot;, sans-serif;
+                        font-weight: 700;
+                        box-shadow: 0 4px 0 var(--cancel-shadow);
+                        text-transform: uppercase;
+                        transition: transform 0.1s;
+                        width: 100%;
+                    "
+                >
+                    Fechar
+                </button>
+            </div>
+        </div>
+
+
+        <div id="dayModal" class="modal">
+            <div class="modal-content" style="max-width: 520px;padding:36px;">
+                <div class="day-modal-header">
+                    <div class="day-modal-header-left">
+                        <div class="day-modal-header-icon" style="background:var(--primary)15;color:var(--primary);">
+                            <i class="fa-solid fa-calendar-day"></i>
+                        </div>
+                        <div>
+                            <div class="day-modal-title" id="dayModalTitle">Entregas do dia</div>
+                            <div class="day-modal-subtitle" id="dayModalSubtitle"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="day-modal-close" onclick="document.getElementById('dayModal').style.display='none'">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <div class="day-modal-list" id="dayModalList"></div>
+                <button class="btn btn-ghost btn-block" onclick="document.getElementById('dayModal').style.display='none'" style="margin-top:24px;">
+                    <i class="fa-solid fa-chevron-down"></i> Fechar
+                </button>
+            </div>
+        </div>
+
+
+        <div id="quizModal" class="modal">
+            <div
+                class="modal-content"
+                style="
+                    max-width: 560px;
+                    max-height: 85vh;
+                    display: flex;
+                    flex-direction: column;
+                "
+            >
+                <h3
+                    style="
+                        margin: 0 0 15px 0;
+                        font-family: &quot;Fredoka&quot;
+                        font-size: 1.4rem;
+                        color: var(--dark);
+                    "
+                >
+                    Anexar Set
+                </h3>
+
+
+                <div
+                    style="
+                        display: flex;
+                        background: var(--bg-light);
+                        border-radius: 14px;
+                        padding: 4px;
+                        margin-bottom: 15px;
+                    "
+                >
+                    <button
+                        type="button"
+                        id="tabMyQuizzes"
+                        onclick="switchQuizTab('mine')"
+                        style="
+                            flex: 1;
+                            padding: 10px;
+                            border: none;
+                            border-radius: 10px;
+                            font-family: &quot;Fredoka&quot;, sans-serif;
+                            font-weight: 700;
+                            cursor: pointer;
+                            transition: 0.2s;
+                            font-size: 0.9rem;
+                            background: var(--surface, white);
+                            color: var(--primary, var(--primary));
+                        "
+                    >
+                        <i class="fa-solid fa-book-open"></i> Meus Sets
+                    </button>
+                    <button
+                        type="button"
+                        id="tabSearchQuizzes"
+                        onclick="switchQuizTab('search')"
+                        style="
+                            flex: 1;
+                            padding: 10px;
+                            border: none;
+                            border-radius: 10px;
+                            font-family: &quot;Fredoka&quot;, sans-serif;
+                            font-weight: 700;
+                            cursor: pointer;
+                            transition: 0.2s;
+                            font-size: 0.9rem;
+                            background: transparent;
+                            color: var(--text-faint);
+                        "
+                    >
+                        <i class="fa-solid fa-magnifying-glass"></i> Pesquisar
+                    </button>
+                </div>
+
+
+                <div
+                    id="quizSearchBar"
+                    style="display: none; margin-bottom: 12px"
+                >
+                    <div style="display: flex; gap: 8px">
+                        <input
+                            type="text"
+                            id="quizSearchInput"
+                            class="genii-input"
+                            placeholder="Nome do set..."
+                            style="margin: 0; flex: 1; padding: 12px"
+                            onkeypress="
+                                if (event.key === 'Enter')
+                                    searchPublicQuizzes();
+                            "
+                        />
+                        <button
+                            onclick="searchPublicQuizzes()"
+                            style="
+                                padding: 12px 18px;
+                                background: var(--primary);
+                                color: white;
+                                border: none;
+                                border-radius: 14px;
+                                cursor: pointer;
+                                font-family: &quot;Fredoka&quot;
+                                font-weight: 700;
+                                box-shadow: 0 4px 0 var(--primary-dark, #00a89c);
+                            "
+                        >
+                            <i class="fa-solid fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div
+                    class="quiz-list-select"
+                    id="quizSelectContainer"
+                    style="flex: 1; min-height: 200px"
+                ></div>
+
+
+                <button
+                    onclick="
+                        document.getElementById('quizModal').style.display =
+                            'none'
+                    "
+                    style="
+                        margin-top: 15px;
+                        padding: 12px;
+                        background: var(--bg-elevated);
+                        color: var(--dark);
+                        border: none;
+                        border-radius: 16px;
+                        cursor: pointer;
+                        font-family: &quot;Fredoka&quot;, sans-serif;
+                        font-weight: 700;
+                        box-shadow: 0 4px 0 var(--cancel-shadow);
+                        text-transform: uppercase;
+                        transition: transform 0.1s;
+                        width: 100%;
+                    "
+                >
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+
+        <div id="settingsModal" class="modal">
+            <div class="modal-content settings-modal-content">
+                <button class="modal-close-x" onclick="document.getElementById('settingsModal').style.display='none'">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+                <h3 class="settings-modal-title">Definições da Turma</h3>
+
+
+                <div class="settings-grid">
+                    <div class="settings-col-left">
+                        <label class="settings-label">Nome da Turma</label>
+                        <input type="text" id="editClassName" class="genii-input" />
+                        <label class="settings-label">Disciplina</label>
+                        <input type="text" id="editClassSubject" class="genii-input" />
+                        <button type="button" class="settings-banner-btn settings-banner-btn--mobile-only" onclick="openSettingsBannerAction(this)">
+                            <span class="settings-banner-btn-mobile-label">Personalizar Banner</span>
+                        </button>
+                        <div class="settings-actions-row">
+                            <button class="btn-modal btn-cancel" onclick="document.getElementById('settingsModal').style.display='none'">
+                                Cancelar
+                            </button>
+                            <button class="btn-modal btn-confirm-settings" onclick="saveSettings()">
+                                Guardar
+                            </button>
+                        </div>
+                        <button class="btn-delete-class" onclick="deleteClass()">
+                            <i class="fa-solid fa-trash"></i> Apagar Turma
+                        </button>
+                    </div>
+
+
+                    <div class="settings-col-right" id="bannerCustomView">
+                        <div class="banner-custom-header">
+                            <button class="settings-back-btn" id="settingsBackBtn" onclick="closeBannerCustom()">
+                                <i class="fa-solid fa-arrow-left"></i> Voltar
+                            </button>
+                            <button class="modal-close-x" onclick="document.getElementById('settingsModal').style.display='none'">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <label class="settings-label" style="margin-bottom: 8px"
+                            >Aparência do Banner</label
+                        >
+
+
+                        <div class="settings-tabs">
+                            <button type="button" class="settings-tab-btn active" data-tab="color" onclick="switchSettingsTab('color')">
+                                Cor
+                            </button>
+                            <button type="button" class="settings-tab-btn" data-tab="image" onclick="switchSettingsTab('image')">
+                                Imagem
+                            </button>
+                        </div>
+
+
+                        <div
+                            id="settingsTabColor"
+                            class="settings-tab-content"
+                            style="display: block"
+                        >
+                            <div
+                                style="
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    gap: 12px;
+                                "
+                            >
+                                <div
+                                    id="colorPreview"
+                                    style="
+                                        width: 100%;
+                                        height: 80px;
+                                        border-radius: 14px;
+                                        background: linear-gradient(
+                                            135deg,
+                                            var(--primary),
+                                            #6c5ce7
+                                        );
+                                        transition: background 0.3s;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                    "
+                                >
+                                    <span
+                                        id="colorHexDisplay"
+                                        style="
+                                            font-family:
+                                                &quot;Fredoka&quot;, sans-serif;
+                                            font-weight: 700;
+                                            font-size: 1rem;
+                                            color: white;
+                                            background: rgba(0, 0, 0, 0.2);
+                                            padding: 5px 12px;
+                                            border-radius: 8px;
+                                        "
+                                        >#00D2BA</span
+                                    >
+                                </div>
+                                <div
+                                    style="
+                                        width: 100%;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 10px;
+                                    "
+                                >
+                                    <button
+                                        type="button"
+                                        class="color-picker-btn"
+                                        id="bannerColorPickerBtn"
+                                        onclick="openBannerColorPicker(this)"
+                                        title="Escolher cor"
+                                    >
+                                        <span class="cp-swatch" id="colorPickerSwatch" style="background: var(--primary);"></span>
+                                        <span class="cp-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                                    </button>
+                                    <div
+                                        style="
+                                            display: flex;
+                                            gap: 6px;
+                                            flex-wrap: wrap;
+                                            flex: 1;
+                                        "
+                                    >
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#00D2BA')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: var(--primary);
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#6C5CE7')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: #6c5ce7;
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#FF6680')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: #ff6680;
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#FFCE00')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: #ffce00;
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#0FBD8C')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: #0fbd8c;
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#2F80ED')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: #2f80ed;
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#E84393')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: #e84393;
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                        <div
+                                            class="color-preset"
+                                            onclick="
+                                                selectColorPreset('#2D3436')
+                                            "
+                                            style="
+                                                width: 30px;
+                                                height: 30px;
+                                                border-radius: 8px;
+                                                background: var(--dark);
+                                                cursor: pointer;
+                                                border: 3px solid transparent;
+                                                transition: 0.2s;
+                                            "
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div
+                            id="settingsTabImage"
+                            class="settings-tab-content"
+                            style="display: none"
+                        >
+                            <div
+                                id="currentBannerPreview"
+                                style="
+                                    width: 100%;
+                                    height: 80px;
+                                    border-radius: 14px;
+                                    background: var(--bg-light);
+                                    margin-bottom: 12px;
+                                    overflow: hidden;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    border: 2px dashed var(--border);
+                                "
+                            >
+                                <span
+                                    style="
+                                        color: var(--text-aaa);
+                                        font-weight: 600;
+                                        font-size: 0.85rem;
+                                    "
+                                    ><i
+                                        class="fa-solid fa-image"
+                                        style="margin-right: 6px"
+                                    ></i
+                                    >Sem imagem</span
+                                >
+                            </div>
+                            <div class="banner-source-tabs">
+                                <button
+                                    type="button"
+                                    class="banner-source-btn active"
+                                    data-source="upload"
+                                    onclick="switchBannerSource('upload')"
+                                >
+                                    Computador
+                                </button>
+                                <button
+                                    type="button"
+                                    class="banner-source-btn"
+                                    data-source="unsplash"
+                                    onclick="switchBannerSource('unsplash')"
+                                >
+                                    Unsplash
+                                </button>
+                            </div>
+
+
+                            <div
+                                id="bannerSourceUpload"
+                                class="banner-source-content active"
+                            >
+                                <label
+                                    for="settingsBannerUpload"
+                                    style="
+                                        display: block;
+                                        padding: 20px;
+                                        border: 2px dashed var(--border);
+                                        border-radius: 14px;
+                                        cursor: pointer;
+                                        color: var(--grey);
+                                        transition: 0.2s;
+                                        background: var(--surface);
+                                        text-align: center;
+                                        font-weight: 600;
+                                        font-size: 0.85rem;
+                                    "
+                                >
+                                    <i
+                                        class="fa-solid fa-cloud-arrow-up"
+                                        style="
+                                            font-size: 1.2rem;
+                                            display: block;
+                                            margin-bottom: 6px;
+                                            color: var(--primary);
+                                        "
+                                    ></i>
+                                    Escolher imagem<br />
+                                    <span
+                                        style="font-size: 0.75rem; color: var(--text-aaa)"
+                                        >Max 2MB</span
+                                    >
+                                    <input
+                                        type="file"
+                                        id="settingsBannerUpload"
+                                        accept="image/*"
+                                        style="display: none"
+                                    />
+                                </label>
+                            </div>
+
+
+                            <div
+                                id="bannerSourceUnsplash"
+                                class="banner-source-content"
+                            >
+                                <div class="unsplash-banner-search">
+                                    <input
+                                        type="text"
+                                        id="bannerUnsplashInput"
+                                        placeholder="Pesquisar no Unsplash..."
+                                        onkeypress="
+                                            if (event.key === 'Enter')
+                                                searchUnsplashBanner();
+                                        "
+                                    />
+                                    <button
+                                        type="button"
+                                        onclick="searchUnsplashBanner()"
+                                    >
+                                        <i
+                                            class="fa-solid fa-magnifying-glass"
+                                        ></i>
+                                    </button>
+                                </div>
+                                <div
+                                    id="bannerUnsplashStatus"
+                                    class="unsplash-banner-status"
+                                >
+                                    Procure uma imagem para o banner.
+                                </div>
+                                <div
+                                    id="bannerUnsplashGrid"
+                                    class="unsplash-banner-grid"
+                                ></div>
+                            </div>
+
+
+                            <button
+                                type="button"
+                                id="btnRemoveBanner"
+                                onclick="removeBannerImage()"
+                                style="
+                                    width: 100%;
+                                    margin-top: 8px;
+                                    padding: 8px;
+                                    background: var(--delete-class-bg);
+                                    color: var(--danger);
+                                    border: 1px solid var(--delete-class-border);
+                                    border-radius: 10px;
+                                    cursor: pointer;
+                                    font-family:
+                                        &quot;Fredoka&quot;, sans-serif;
+                                    font-weight: 600;
+                                    font-size: 0.8rem;
+                                    display: none;
+                                "
+                            >
+                                <i class="fa-solid fa-trash"></i> Remover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <script type="module">
+            import {
+                renderLayout,
+                getCachedUser,
+                saveUserToCache,
+                isCacheFresh,
+            } from "./static/js/components.js";
+            import { hideSkeleton } from "./static/js/skeleton.js";
+            import {
+                onAuthStateChanged,
+                signOut,
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            import {
+                doc,
+                getDoc,
+                setDoc,
+                collection,
+                addDoc,
+                query,
+                where,
+                orderBy,
+                onSnapshot,
+                serverTimestamp,
+                getDocs,
+                deleteDoc,
+                updateDoc,
+                arrayRemove,
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+            import { auth, db } from "./firebase-config.js";
+
+
+            const params = new URLSearchParams(window.location.search);
+            const classId = params.get("id");
+            const highlightPostId = params.get("post");
+
+
+                         function showToast(msg, type = "success") {
+                showGeniiToast(msg, type);
+            }
+
+
+            if (!classId) window.location.href = "classes.html";
+
+
+            let currentUser = null;
+            let _cloudinaryToken = null;
+            let isTeacher = false;
+            let selectedQuiz = null;
+            let currentTheme = "#00D2BA";
+                         let membersCache = {};
+
+
+                         const bannerInput = document.getElementById("bannerInput");
+            bannerInput.addEventListener("change", async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                if (file.size > 2 * 1024 * 1024)
+                    return showToast("Imagem muito grande (Max 2MB)", "error");
+
+
+                showToast("A carregar imagem...", "success");
+
+
+                try {
+                    const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'banners');
+                    if (result.url) {
+                        await updateDoc(doc(db, "classrooms", classId), {
+                            bannerUrl: result.url,
+                        });
+                        document.getElementById(
+                            "heroBanner",
+                        ).style.backgroundImage = `url('${result.url}')`;
+                        showToast("Capa atualizada!");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast("Erro no upload", "error");
+                }
+            });
+
+
+                         window.removeAttachment = () => {
+                selectedQuiz = null;
+                document
+                    .getElementById("quizAttachment")
+                    .classList.remove("visible");
+                document
+                    .getElementById("assignmentOptions")
+                    .classList.remove("visible");
+                const btnToggle = document.getElementById(
+                    "btnToggleAssignment",
+                );
+                if (btnToggle) btnToggle.classList.remove("active");
+            };
+
+
+                         window.deleteClass = () => {
+                if (!isTeacher) return showToast("Sem permissão.", "error");
+                showGeniiConfirm(
+                    "Tem a certeza que quer apagar esta turma? Esta ação é irreversível.",
+                    async (confirmed) => {
+                        if (!confirmed) return;
+                        try {
+                                                         const postsSnap = await getDocs(
+                                collection(db, `classrooms/${classId}/posts`),
+                            );
+                            const postDeletePromises = [];
+                            postsSnap.forEach((postDoc) => {
+                                const deletePostComments = async () => {
+                                    const commentsSnap = await getDocs(
+                                        collection(
+                                            db,
+                                            `classrooms/${classId}/posts/${postDoc.id}/comments`,
+                                        ),
+                                    );
+                                    const commentsDeletePromises =
+                                        commentsSnap.docs.map((cDoc) =>
+                                            deleteDoc(cDoc.ref),
+                                        );
+                                    await Promise.all(commentsDeletePromises);
+                                    await deleteDoc(postDoc.ref);
+                                };
+                                postDeletePromises.push(deletePostComments());
+                            });
+                            await Promise.all(postDeletePromises);
+
+
+                            const submissionsSnap = await getDocs(
+                                collection(
+                                    db,
+                                    `classrooms/${classId}/submissions`,
+                                ),
+                            );
+                            const submissionsDeletePromises =
+                                submissionsSnap.docs.map((sDoc) =>
+                                    deleteDoc(sDoc.ref),
+                                );
+                            await Promise.all(submissionsDeletePromises);
+
+
+                                                         await deleteDoc(doc(db, "classrooms", classId));
+                            showToast("Turma apagada com sucesso.");
+                            sessionStorage.removeItem("genii_cached_classes");
+                            setTimeout(
+                                () => (window.location.href = "classes.html"),
+                                1200,
+                            );
+                        } catch (e) {
+                            console.error(e);
+                            showToast("Erro ao apagar turma.", "error");
+                        }
+                    },
+                );
+            };
+
+
+                         window.kickStudent = (uid, name) => {
+                if (!isTeacher) return;
+                showGeniiConfirm(
+                    `Remover ${name || "este aluno"} da turma?`,
+                    async (confirmed) => {
+                        if (!confirmed) return;
+                        try {
+                            await updateDoc(doc(db, "classrooms", classId), {
+                                members: arrayRemove(uid),
+                            });
+                            showToast("Aluno removido.");
+                            loadClassDetails();                          } catch (e) {
+                            console.error(e);
+                            showToast("Erro ao remover aluno.", "error");
+                        }
+                    },
+                );
+            };
+
+
+                         let currentQuizTab = "mine";
+
+
+            window.switchQuizTab = (tab) => {
+                currentQuizTab = tab;
+                const tabMine = document.getElementById("tabMyQuizzes");
+                const tabSearch = document.getElementById("tabSearchQuizzes");
+                const searchBar = document.getElementById("quizSearchBar");
+
+
+                if (tab === "mine") {
+                    tabMine.style.background = "white";
+                    tabMine.style.color = "#00D2BA";
+                    tabMine.style.boxShadow = "0 2px 5px rgba(0,0,0,0.05)";
+                    tabSearch.style.background = "transparent";
+                    tabSearch.style.color = "#999";
+                    tabSearch.style.boxShadow = "none";
+                    searchBar.style.display = "none";
+                    loadMyQuizzes();
+                } else {
+                    tabSearch.style.background = "white";
+                    tabSearch.style.color = "#00D2BA";
+                    tabSearch.style.boxShadow = "0 2px 5px rgba(0,0,0,0.05)";
+                    tabMine.style.background = "transparent";
+                    tabMine.style.color = "#999";
+                    tabMine.style.boxShadow = "none";
+                    searchBar.style.display = "block";
+                    document.getElementById("quizSelectContainer").innerHTML =
+                        '<div style="text-align:center; padding:30px; color:var(--text-aaa);"><i class="fa-solid fa-search" style="font-size:1.5rem; margin-bottom:10px; display:block;"></i>Pesquisa sets públicos pelo nome</div>';
+                    document.getElementById("quizSearchInput").focus();
+                }
+            };
+
+
+            function selectQuizFromModal(quizDoc) {
+                selectedQuiz = {
+                    id: quizDoc.id,
+                    title: quizDoc.title || "Set",
+                    cover:
+                        quizDoc.coverImage || quizDoc.cover_image_url || null,
+                };
+                document.getElementById("attachedQuizTitle").textContent =
+                    selectedQuiz.title;
+                document
+                    .getElementById("quizAttachment")
+                    .classList.add("visible");
+                if (isTeacher)
+                    document.getElementById(
+                        "btnToggleAssignment",
+                    ).style.display = "flex";
+                document.getElementById("quizModal").style.display = "none";
+                showToast("Set anexado!");
+            }
+
+
+            function renderQuizItem(d, quizData) {
+                const coverImg =
+                    quizData.coverImage || quizData.cover_image_url
+                        ? `<img src="${quizData.coverImage || quizData.cover_image_url}" style="width:50px;height:50px;border-radius:10px;object-fit:cover;flex-shrink:0;">`
+                        : '<div style="width:50px;height:50px;border-radius:10px;background:var(--hover-light);display:flex;align-items:center;justify-content:center;color:#00D2BA;flex-shrink:0;"><i class="fa-solid fa-gamepad"></i></div>';
+                const item = document.createElement("div");
+                item.className = "select-item";
+                item.innerHTML = `${coverImg}<div style="flex:1;min-width:0;"><div style="font-weight:700;color:var(--dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${quizData.title || "Sem título"}</div><div style="font-size:0.8rem;color:var(--text-faint);">${(quizData.questions || []).length} slides${quizData.creatorName ? " • " + quizData.creatorName : ""}</div></div>`;
+                item.onclick = () =>
+                    selectQuizFromModal({
+                        id: d,
+                        title: quizData.title,
+                        coverImage:
+                            quizData.coverImage || quizData.cover_image_url,
+                    });
+                return item;
+            }
+
+
+            async function loadMyQuizzes() {
+                const container = document.getElementById(
+                    "quizSelectContainer",
+                );
+                container.innerHTML =
+                    '<div style="text-align:center; padding:30px; color:var(--text-aaa);"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i></div>';
+                try {
+                    const q = query(
+                        collection(db, "quizzes"),
+                        where("ownerId", "==", currentUser.uid),
+                    );
+                    const snap = await getDocs(q);
+                    if (snap.empty) {
+                        container.innerHTML =
+                            '<div style="text-align:center; padding:30px; color:var(--text-aaa);"><i class="fa-solid fa-folder-open" style="font-size:1.5rem; margin-bottom:10px; display:block;"></i>Não tem sets criados.</div>';
+                        return;
+                    }
+                    container.innerHTML = "";
+                    snap.forEach((d) =>
+                        container.appendChild(renderQuizItem(d.id, d.data())),
+                    );
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML =
+                        '<div style="text-align:center; padding:30px; color:var(--danger);">Erro ao carregar.</div>';
+                }
+            }
+
+
+            window.searchPublicQuizzes = async () => {
+                const term = document
+                    .getElementById("quizSearchInput")
+                    .value.trim()
+                    .toLowerCase();
+                if (!term || term.length < 2)
+                    return showToast(
+                        "Escreve pelo menos 2 caracteres.",
+                        "error",
+                    );
+                const container = document.getElementById(
+                    "quizSelectContainer",
+                );
+                container.innerHTML =
+                    '<div style="text-align:center; padding:30px; color:var(--text-aaa);"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i></div>';
+                try {
+                                         const q = query(
+                        collection(db, "quizzes"),
+                        where("isPublic", "==", true),
+                    );
+                    const snap = await getDocs(q);
+                    container.innerHTML = "";
+                    let count = 0;
+                    snap.forEach((d) => {
+                        const data = d.data();
+                        const title = (data.title || "").toLowerCase();
+                        if (title.includes(term) && count < 20) {
+                            container.appendChild(renderQuizItem(d.id, data));
+                            count++;
+                        }
+                    });
+                    if (count === 0)
+                        container.innerHTML =
+                            '<div style="text-align:center; padding:30px; color:var(--text-aaa);">Nenhum set encontrado.</div>';
+                } catch (e) {
+                    console.error(e);
+                    container.innerHTML =
+                        '<div style="text-align:center; padding:30px; color:var(--danger);">Erro na pesquisa.</div>';
+                }
+            };
+
+
+            window.openQuizModal = async () => {
+                const modal = document.getElementById("quizModal");
+                modal.style.display = "flex";
+                currentQuizTab = "mine";
+                                 switchQuizTab("mine");
+                loadMyQuizzes();
+            };
+
+
+            window.toggleAssignmentMode = () => {
+                if (!selectedQuiz)
+                    return showToast("Anexa um set primeiro!", "error");
+                const panel = document.getElementById("assignmentOptions");
+                const btn = document.getElementById("btnToggleAssignment");
+                panel.classList.toggle("visible");
+                btn.classList.toggle("active");
+            };
+
+
+            window.toggleCode = (element) => {
+                if (element.classList.contains("spoiler")) {
+                    element.classList.remove("spoiler");
+                    navigator.clipboard.writeText(element.innerText);
+                } else {
+                    navigator.clipboard.writeText(element.innerText);
+                    showToast("Código copiado!");
+                }
+            };
+
+
+                         window.toggleMenu = (id) => {
+                document.querySelectorAll(".custom-dropdown").forEach((d) => {
+                    if (d.id !== id) d.classList.remove("show");
+                });
+                const menu = document.getElementById(id);
+                if (menu) menu.classList.toggle("show");
+            };
+
+
+            document.addEventListener("click", (e) => {
+                if (!e.target.closest(".menu-container"))
+                    document
+                        .querySelectorAll(".custom-dropdown")
+                        .forEach((d) => d.classList.remove("show"));
+                if (e.target.classList.contains("modal"))
+                    e.target.style.display = "none";
+            });
+
+
+                         window.switchSettingsTab = (tab) => {
+                document
+                    .querySelectorAll(".settings-tab-content")
+                    .forEach((el) => (el.style.display = "none"));
+                document
+                    .querySelectorAll(".settings-tab-btn")
+                    .forEach((btn) => {
+                        btn.style.background = "var(--class-tab-inactive-bg)";
+                        btn.style.color = "var(--text-light)";
+                        btn.style.boxShadow = "none";
+                        btn.classList.remove("active");
+                    });
+                const activeBtn = document.querySelector(
+                    `.settings-tab-btn[data-tab="${tab}"]`,
+                );
+                if (activeBtn) {
+                    activeBtn.style.removeProperty("background");
+                    activeBtn.style.removeProperty("color");
+                    activeBtn.style.removeProperty("box-shadow");
+                    activeBtn.classList.add("active");
+                }
+                if (tab === "color")
+                    document.getElementById("settingsTabColor").style.display =
+                        "block";
+                else
+                    document.getElementById("settingsTabImage").style.display =
+                        "block";
+            };
+
+
+            window.openBannerCustom = () => {
+                document.querySelector(".settings-modal-content").classList.add("show-banner-custom");
+            };
+
+
+            window.closeBannerCustom = () => {
+                document.querySelector(".settings-modal-content").classList.remove("show-banner-custom");
+                switchSettingsTab("color");
+            };
+
+
+                         let selectedBannerColor = "#00D2BA";
+            let settingsBannerFile = null;              let settingsBannerUrl = "";              let existingBannerUrl = "";              let settingsImageSource = "upload";              let settingsBannerMode = "color";  
+            function syncSettingsBannerButton(color = selectedBannerColor) {
+                const swatch = document.getElementById("settingsBannerBtnSwatch");
+                if (swatch) swatch.style.background = color;
+            }
+
+
+            window.openSettingsBannerAction = (btnEl) => {
+                openBannerCustom();
+            };
+
+
+            window.selectColorPreset = (color) => {
+                selectedBannerColor = color;
+                settingsBannerMode = "color";
+                document.getElementById("colorPreview").style.background =
+                    color;
+                document.getElementById("colorHexDisplay").textContent =
+                    color.toUpperCase();
+                document.getElementById("colorPickerSwatch").style.background =
+                    color;
+                syncSettingsBannerButton(color);
+
+
+                document.querySelectorAll(".color-preset").forEach((p) => {
+                    p.style.borderColor =
+                        p.style.background === color ||
+                        p.onclick.toString().includes(color)
+                            ? "var(--dark)"
+                            : "transparent";
+                });
+
+
+                document.querySelectorAll(".color-preset").forEach((p) => {
+                    const match = p.getAttribute("onclick")?.includes(color);
+                    p.style.borderColor = match ? "var(--dark)" : "transparent";
+                });
+            };
+
+
+            document
+                .getElementById("settingsBannerUpload")
+                .addEventListener("change", (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 2 * 1024 * 1024)
+                        return showToast(
+                            "Imagem muito grande (Max 2MB)",
+                            "error",
+                        );
+                    settingsBannerFile = file;
+                    settingsBannerUrl = "";
+                    settingsImageSource = "upload";
+                    settingsBannerMode = "image";
+                                         const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        document.getElementById(
+                            "currentBannerPreview",
+                        ).innerHTML =
+                            `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
+                        document.getElementById(
+                            "btnRemoveBanner",
+                        ).style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+
+            window.switchBannerSource = (source) => {
+                settingsImageSource = source;
+                document
+                    .querySelectorAll(".banner-source-btn")
+                    .forEach((btn) => {
+                        const active = btn.dataset.source === source;
+                        btn.classList.toggle("active", active);
+                    });
+                document
+                    .getElementById("bannerSourceUpload")
+                    .classList.toggle("active", source === "upload");
+                document
+                    .getElementById("bannerSourceUnsplash")
+                    .classList.toggle("active", source === "unsplash");
+            };
+
+
+            window.searchUnsplashBanner = async () => {
+                const input = document.getElementById("bannerUnsplashInput");
+                const status = document.getElementById("bannerUnsplashStatus");
+                const grid = document.getElementById("bannerUnsplashGrid");
+                const query = input.value.trim();
+
+
+                if (!query) {
+                    status.textContent =
+                        "Escreve algo para pesquisar no Unsplash.";
+                    return;
+                }
+
+
+                status.textContent = "A procurar imagens...";
+                grid.innerHTML = "";
+
+
+                try {
+                    const res = await fetch(
+                        `/api/unsplash?query=${encodeURIComponent(query)}`,
+                    );
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        throw new Error(
+                            errText || "Erro ao procurar no Unsplash.",
+                        );
+                    }
+                    const data = await res.json();
+                    const results = Array.isArray(data.results)
+                        ? data.results
+                        : [];
+
+
+                    if (!results.length) {
+                        status.textContent = "Nenhuma imagem encontrada.";
+                        return;
+                    }
+
+
+                    status.textContent =
+                        "Escolha uma imagem para aplicar no banner.";
+                    results.slice(0, 18).forEach((imgData) => {
+                        const imageUrl = imgData.urls?.regular;
+                        if (!imageUrl) return;
+                        const btn = document.createElement("button");
+                        btn.type = "button";
+                        btn.className = "unsplash-banner-item";
+                        btn.innerHTML = `<img src="${imageUrl}" alt="Unsplash">`;
+                        btn.onclick = () => {
+                            settingsBannerFile = null;
+                            settingsBannerUrl = imageUrl;
+                            settingsBannerMode = "image";
+                            settingsImageSource = "unsplash";
+                            document
+                                .querySelectorAll(".unsplash-banner-item")
+                                .forEach((el) =>
+                                    el.classList.remove("selected"),
+                                );
+                            btn.classList.add("selected");
+                            document.getElementById(
+                                "currentBannerPreview",
+                            ).innerHTML =
+                                `<img src="${imageUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+                            document.getElementById(
+                                "btnRemoveBanner",
+                            ).style.display = "block";
+                        };
+                        grid.appendChild(btn);
+                    });
+                } catch (err) {
+                    console.error(err);
+                    status.textContent = "Erro ao pesquisar no Unsplash.";
+                    showToast("Erro ao procurar imagens no Unsplash.", "error");
+                }
+            };
+
+
+            window.removeBannerImage = async () => {
+                settingsBannerFile = null;
+                settingsBannerUrl = "";
+                existingBannerUrl = "";
+                settingsBannerMode = "color";
+                document.getElementById("currentBannerPreview").innerHTML =
+                    `<span style="color:var(--text-aaa); font-weight:600; font-size:0.9rem;"><i class="fa-solid fa-image" style="margin-right:8px;"></i>Sem imagem de capa</span>`;
+                document.getElementById("btnRemoveBanner").style.display =
+                    "none";
+                document
+                    .querySelectorAll(".unsplash-banner-item")
+                    .forEach((el) => el.classList.remove("selected"));
+                                 try {
+                    await updateDoc(doc(db, "classrooms", classId), {
+                        bannerUrl: "",
+                    });
+                    const banner = document.getElementById("heroBanner");
+                    banner.style.backgroundImage = "none";
+                    banner.style.background = selectedBannerColor;
+                    showToast("Imagem removida!");
+                } catch (e) {
+                    showToast("Erro ao remover.", "error");
+                }
+            };
+
+
+            window.openSettingsModal = (startTab = "color") => {
+                document.getElementById("settingsModal").style.display = "flex";
+                document.querySelector(".settings-modal-content").classList.remove("show-banner-custom");
+                document.getElementById("editClassName").value =
+                    document.getElementById("className").innerText;
+                document.getElementById("editClassSubject").value =
+                    document.getElementById("classSubject").innerText;
+
+
+                                 const banner = document.getElementById("heroBanner");
+                                 if (currentTheme && !currentTheme.includes("gradient")) {
+                    selectedBannerColor = currentTheme;
+                }
+                document.getElementById("colorPreview").style.background =
+                    selectedBannerColor;
+                document.getElementById("colorHexDisplay").textContent =
+                    selectedBannerColor.toUpperCase();
+                document.getElementById("colorPickerSwatch").style.background =
+                    selectedBannerColor;
+                syncSettingsBannerButton(selectedBannerColor);
+
+
+                                 const currentBgImage = banner.style.backgroundImage;
+                if (
+                    currentBgImage &&
+                    currentBgImage !== "none" &&
+                    currentBgImage.includes("url")
+                ) {
+                    const url = currentBgImage
+                        .replace(/url\(['"]?/, "")
+                        .replace(/['"]?\)/, "");
+                    existingBannerUrl = url;
+                    document.getElementById("currentBannerPreview").innerHTML =
+                        `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+                    document.getElementById("btnRemoveBanner").style.display =
+                        "block";
+                } else {
+                    existingBannerUrl = "";
+                    document.getElementById("currentBannerPreview").innerHTML =
+                        `<span style="color:var(--text-aaa); font-weight:600; font-size:0.9rem;"><i class="fa-solid fa-image" style="margin-right:8px;"></i>Sem imagem de capa</span>`;
+                    document.getElementById("btnRemoveBanner").style.display =
+                        "none";
+                }
+
+
+                                 switchSettingsTab(startTab === "image" ? "image" : "color");
+                switchBannerSource("upload");
+                settingsBannerFile = null;
+                settingsBannerUrl = "";
+                settingsBannerMode = existingBannerUrl ? "image" : "color";
+            };
+
+
+            window.saveSettings = async () => {
+                try {
+                    const updates = {
+                        name: document.getElementById("editClassName").value,
+                        subject:
+                            document.getElementById("editClassSubject").value,
+                    };
+
+
+                    if (
+                        settingsBannerMode === "image" &&
+                        (settingsBannerFile || settingsBannerUrl)
+                    ) {
+                        let finalBannerUrl = settingsBannerUrl;
+
+
+                        if (settingsBannerFile) {
+                            showToast("A carregar imagem...", "success");
+                            const result = await window.uploadToCloudinary(settingsBannerFile, _cloudinaryToken, 'banners');
+                            finalBannerUrl = result.url || "";
+                        }
+
+
+                        if (finalBannerUrl) {
+                            updates.bannerUrl = finalBannerUrl;
+                            updates.theme = selectedBannerColor;                              const banner =
+                                document.getElementById("heroBanner");
+                            banner.style.backgroundImage = `url('${finalBannerUrl}')`;
+                        }
+                    } else if (
+                        settingsBannerMode === "image" &&
+                        existingBannerUrl
+                    ) {
+                        updates.bannerUrl = existingBannerUrl;
+                        updates.theme = selectedBannerColor;
+                        const banner = document.getElementById("heroBanner");
+                        banner.style.backgroundImage = `url('${existingBannerUrl}')`;
+                    } else {
+                                                 updates.theme = selectedBannerColor;
+                        updates.bannerUrl = "";
+                        currentTheme = selectedBannerColor;
+                        const banner = document.getElementById("heroBanner");
+                        banner.style.backgroundImage = "none";
+                        banner.style.background = selectedBannerColor;
+                    }
+
+
+                    await updateDoc(doc(db, "classrooms", classId), updates);
+                    document.getElementById("settingsModal").style.display =
+                        "none";
+                                         document.getElementById("className").innerText =
+                        updates.name;
+                    document.getElementById("classSubject").innerText =
+                        updates.subject;
+                    showToast("Guardado!");
+                } catch (e) {
+                    console.error(e);
+                    showToast("Erro ao guardar.", "error");
+                }
+            };
+
+
+                         const cached = getCachedUser();
+            if (cached) {
+                document.body.style.opacity = "1";
+                renderLayout("", {
+                    ...cached,
+                    displayName: cached.username || cached.displayName,
+                });
+            }
+
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+                    if (!cached) document.body.style.opacity = "1";
+
+
+                    const freshCached = getCachedUser();
+                    if (!isCacheFresh(freshCached)) {
+                        const uDoc = await getDoc(doc(db, "users", user.uid));
+                        if (uDoc.exists()) {
+                            const d = uDoc.data();
+                            saveUserToCache(d);
+                            currentUser.avatar = d.avatar || {
+                                skin: "001",
+                                face: "001",
+                                hat: "none",
+                            };
+                            currentUser.profileType = d.profileType || "avatar";
+                            currentUser.customPhotoUrl = d.customPhotoUrl || null;
+                            currentUser.photoURL =
+                                d.customPhotoUrl || d.photoURL || null;
+                            currentUser.displayName =
+                                d.username || user.displayName || "Utilizador";
+                            renderLayout("", {
+                                ...d,
+                                displayName: currentUser.displayName,
+                            });
+                            renderMiniAvatar(
+                                d,
+                                document.getElementById("currentUserAvatar"),
+                            );
+                        }
+                    } else {
+                                                 const d = freshCached;
+                        currentUser.avatar = d.avatar || {
+                            skin: "001",
+                            face: "001",
+                            hat: "none",
+                        };
+                        currentUser.profileType = d.profileType || "avatar";
+                        currentUser.customPhotoUrl = d.customPhotoUrl || null;
+                        currentUser.photoURL =
+                            d.customPhotoUrl || d.photoURL || null;
+                        currentUser.displayName =
+                            d.username || user.displayName || "Utilizador";
+                        renderMiniAvatar(
+                            d,
+                            document.getElementById("currentUserAvatar"),
+                        );
+                    }
+                    await loadClassDetails();
+                    loadFeed();
+                    loadNotifPrefs();
+                } else {
+                    window.location.href = "login.html";
+                }
+            });
+
+
+            document.addEventListener("app-logout", async () => {
+                await signOut(auth);
+                window.location.href = "login.html";
+            });
+
+
+                         async function loadClassDetails() {
+                try {
+                    const snap = await getDoc(doc(db, "classrooms", classId));
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        document.getElementById("className").innerText =
+                            data.name;
+                        document.getElementById("classSubject").innerText =
+                            data.subject || "Geral";
+                        
+                                                 hideSkeleton(document.getElementById("hero-skeleton"));
+                        document.getElementById("className").style.display = '';
+                        document.getElementById("classSubject").style.display = '';
+
+
+                        const banner = document.getElementById("heroBanner");
+                        if (data.bannerUrl)
+                            banner.style.backgroundImage = `url('${data.bannerUrl}')`;
+                        else if (data.theme) {
+                            currentTheme = data.theme;
+                            banner.style.background = data.theme;
+                            banner.style.backgroundImage = "none";
+                        }
+
+
+                                                 applyThemeToTabs(currentTheme);
+
+
+                        isTeacher = data.ownerId === currentUser.uid;
+
+
+                        if (isTeacher) {
+                            document.getElementById("codeBox").style.display =
+                                "block";
+                            document.getElementById("classCode").innerText =
+                                data.code;
+                            document.getElementById(
+                                "btnToggleAssignment",
+                            ).style.display = "flex";
+                            document
+                                .querySelectorAll(".teacher-only-btn")
+                                .forEach((b) => (b.style.display = "flex"));
+                        } else if (
+                            !data.members ||
+                            !data.members.includes(currentUser.uid)
+                        ) {
+                            showToast("Não é membro.", "error");
+                            setTimeout(
+                                () => (window.location.href = "classes.html"),
+                                2000,
+                            );
+                            return;
+                        }
+
+
+                        loadMembers(data.members, data.ownerId);
+
+
+                                                 const heroAvatarEl =
+                            document.getElementById("heroTeacherAvatar");
+                        if (heroAvatarEl) {
+                                                         const fallbackName = data.ownerName || "Professor";
+                            heroAvatarEl.innerHTML = getAvatarImgTag({
+                                displayName: fallbackName,
+                            });
+                            try {
+                                if (data.ownerId) {
+                                    const ownerSnap = await getDoc(
+                                        doc(db, "users", data.ownerId),
+                                    );
+                                    if (ownerSnap.exists()) {
+                                        const ownerData =
+                                            ownerSnap.data() || {};
+                                        heroAvatarEl.innerHTML =
+                                            getAvatarImgTag(ownerData);
+                                    }
+                                }
+                            } catch (e) {
+                                console.log("Erro avatar professor banner", e);
+                            }
+                        }
+                    } else {
+                        hideSkeleton(document.getElementById("hero-skeleton"));
+                        showToast("Turma não encontrada.", "error");
+                        setTimeout(
+                            () => (window.location.href = "classes.html"),
+                            2000,
+                        );
+                    }
+                } catch (e) {
+                    console.error(e);
+                    hideSkeleton(document.getElementById("hero-skeleton"));
+                }
+            }
+
+
+            async function loadMembers(memberIds, ownerId) {
+                if (!memberIds) return;
+                const container = document.getElementById("membersListSide");
+                container.innerHTML = "";
+
+
+                                 const fetchPromises = memberIds.map((uid) =>
+                    getDoc(doc(db, "users", uid)),
+                );
+                const userDocs = await Promise.all(fetchPromises);
+
+
+                                 const orphanIds = [];
+
+
+                userDocs.forEach((uSnap) => {
+                    if (uSnap.exists()) {
+                        const u = uSnap.data();
+                        membersCache[uSnap.id] = u;  
+                                                 if (container.children.length < 20) {
+                            const isOwner = uSnap.id === ownerId;
+                            const isSelf = uSnap.id === currentUser.uid;
+                                                         const kickBtn =
+                                isTeacher && !isOwner && !isSelf
+                                    ? `<button class="kick-btn" title="Remover" onclick="event.stopPropagation(); kickStudent('${uSnap.id}', '${(u.username || "Membro").replace(/'/g, "\\'")}')"><i class="fa-solid fa-xmark"></i></button>`
+                                    : "";
+                            const badge = isOwner
+                                ? '<span style="font-size:0.7rem;background:var(--hover-light);color:var(--primary);padding:2px 8px;border-radius:6px;font-weight:700;margin-left:auto;">Prof</span>'
+                                : "";
+
+
+                            container.innerHTML += `
+                        <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="window.location.href='/profile?uid=${uSnap.id}'">
+                            <div class="avatar-circle">${getAvatarImgTag(u)}</div>
+                            <span style="font-size:0.9rem; font-weight:700; color:var(--text-muted);">${u.username || "Membro"}</span>
+                            ${badge}
+                            ${kickBtn}
+                        </div>
+                    `;
+                        }
+                    } else {
+                        orphanIds.push(uSnap.id);
+                    }
+                });
+
+
+                                 const realCount = memberIds.length - orphanIds.length;
+                document.getElementById("memberCount").innerText = realCount;
+
+
+                                 if (orphanIds.length > 0) {
+                    try {
+                        await updateDoc(doc(db, "classrooms", classId), {
+                            members: arrayRemove(...orphanIds),
+                        });
+                    } catch (e) {
+                        console.warn(
+                            "Lazy cleanup membros falhou (não crítico):",
+                            e,
+                        );
+                    }
+                }
+            }
+
+
+                         async function getAuthorData(authorId, fallbackData) {
+                                 if (membersCache[authorId]) return membersCache[authorId];
+
+
+                                 try {
+                    const snap = await getDoc(doc(db, "users", authorId));
+                    if (snap.exists()) {
+                        const userData = snap.data();
+                        membersCache[authorId] = userData;                          return userData;
+                    }
+                } catch (e) {
+                    console.log("Erro fetch user", authorId);
+                }
+
+
+                                 return {
+                    profileType: fallbackData.authorProfileType,
+                    photoURL: fallbackData.authorPhoto,
+                    avatar: {
+                        skin: fallbackData.authorSkin,
+                        face: fallbackData.authorFace,
+                        hat: fallbackData.authorHat,
+                    },
+                };
+            }
+
+
+                         window.deletePost = (postId) => {
+                showGeniiConfirm("Apagar post?", async (confirmed) => {
+                    if (!confirmed) return;
+                    try {
+                        await deleteDoc(
+                            doc(db, `classrooms/${classId}/posts`, postId),
+                        );
+                        showToast("Apagado.");
+                    } catch (e) {
+                        showToast("Erro.", "error");
+                    }
+                });
+            };
+            window.copyPostLink = (postId) => {
+                navigator.clipboard.writeText(
+                    `${window.location.origin}${window.location.pathname}?id=${classId}&post=${postId}`,
+                );
+                showToast("Link copiado!");
+            };
+
+
+            window.publishPost = async () => {
+                const text = document.getElementById("postInput").value.trim();
+                if (!text && !selectedQuiz)
+                    return showToast("Escreve algo...", "error");
+                const isAssignment = document
+                    .getElementById("assignmentOptions")
+                    .classList.contains("visible");
+
+
+                try {
+                    await addDoc(
+                        collection(db, `classrooms/${classId}/posts`),
+                        {
+                            content: text,
+                            authorId: currentUser.uid,
+                            authorName: currentUser.displayName || "Utilizador",
+                                                         authorProfileType:
+                                currentUser.profileType || "avatar",
+                            authorPhoto: currentUser.photoURL || null,
+                            authorSkin: currentUser.avatar?.skin,
+                            authorFace: currentUser.avatar?.face,
+                            authorHat: currentUser.avatar?.hat,
+                            createdAt: serverTimestamp(),
+                            quizId: selectedQuiz ? selectedQuiz.id : null,
+                            quizTitle: selectedQuiz ? selectedQuiz.title : null,
+                            quizCover: selectedQuiz ? selectedQuiz.cover : null,
+                            type: isAssignment ? "assignment" : "post",
+                            dueDate: isAssignment
+                                ? document.getElementById("dueDate").value
+                                : null,
+                        },
+                    );
+                    document.getElementById("postInput").value = "";
+                    window.removeAttachment();
+                    cachedAssignments = null;                      showToast("Publicado!");
+                } catch (e) {
+                    showToast("Erro ao publicar.", "error");
+                }
+            };
+
+
+                         window.handleCommentKey = (event, postId, inputId) => {
+                if (event.key === "Enter") sendComment(postId, inputId);
+            };
+
+
+            window.sendComment = async (postId, inputId) => {
+                const input = document.getElementById(inputId);
+                const text = input.value.trim();
+                if (!text) return;
+                try {
+                    await addDoc(
+                        collection(
+                            db,
+                            "classrooms",
+                            classId,
+                            "posts",
+                            postId,
+                            "comments",
+                        ),
+                        {
+                            text: text,
+                            authorId: currentUser.uid,
+                            authorName: currentUser.displayName || "Utilizador",
+                                                         authorProfileType:
+                                currentUser.profileType || "avatar",
+                            authorPhoto: currentUser.photoURL || null,
+                            authorSkin: currentUser.avatar?.skin,
+                            authorFace: currentUser.avatar?.face,
+                            authorHat: currentUser.avatar?.hat,
+                            createdAt: serverTimestamp(),
+                        },
+                    );
+                    input.value = "";
+                } catch (e) {
+                    showToast("Erro ao comentar.", "error");
+                }
+            };
+
+
+            window.deleteComment = (postId, commentId) => {
+                showGeniiConfirm("Apagar comentário?", async (confirmed) => {
+                    if (!confirmed) return;
+                    try {
+                        await deleteDoc(
+                            doc(
+                                db,
+                                `classrooms/${classId}/posts/${postId}/comments`,
+                                commentId,
+                            ),
+                        );
+                        showToast("Apagado.");
+                    } catch (e) {
+                        showToast("Erro.", "error");
+                    }
+                });
+            };
+
+
+            function loadCommentsForPost(postId, containerId) {
+                if (!currentUser) return;
+                const q = query(
+                    collection(
+                        db,
+                        "classrooms",
+                        classId,
+                        "posts",
+                        postId,
+                        "comments",
+                    ),
+                    orderBy("createdAt", "asc"),
+                );
+
+
+                onSnapshot(q, async (snapshot) => {
+                    const container = document.getElementById(containerId);
+                    if (!container) return;
+                    container.innerHTML = "";
+
+
+                    for (const doc of snapshot.docs) {
+                        const c = doc.data();
+                        const commentId = doc.id;
+                        const canDelete =
+                            isTeacher || c.authorId === currentUser.uid;
+
+
+                                                 const authorData = await getAuthorData(c.authorId, c);
+                        const avatarHTML = getAvatarImgTag(authorData);  
+                        let menuHtml = "";
+                        if (canDelete) {
+                            menuHtml = `<div class="menu-container" style="align-self:flex-start; margin-left:auto;"><i class="fa-solid fa-ellipsis menu-trigger" onclick="toggleMenu('cm-${commentId}')"></i><div class="custom-dropdown" id="cm-${commentId}"><div class="menu-item danger" onclick="deleteComment('${postId}', '${commentId}')"><i class="fa-solid fa-trash"></i> Apagar</div></div></div>`;
+                        }
+
+
+                        container.innerHTML += `
+                    <div class="comment-item">
+                        <div class="avatar-circle" style="width:30px; height:30px; border:none; box-shadow:none;">${avatarHTML}</div>
+                        <div class="comment-bubble">
+                            <div class="comment-header"><span class="comment-author">${c.authorName}</span></div>
+                            <div class="comment-text">${c.text}</div>
+                        </div>
+                        ${menuHtml}
+                    </div>
+                `;
+                    }
+                });
+            }
+
+
+            function loadFeed() {
+                if (!currentUser) return;
+                const q = query(
+                    collection(db, `classrooms/${classId}/posts`),
+                    orderBy("createdAt", "desc"),
+                );
+
+
+                onSnapshot(q, async (snapshot) => {
+                    const feedList = document.getElementById("feedList");
+                                         const feedSkeleton = document.getElementById("feed-skeleton");
+                    if (feedSkeleton) feedSkeleton.remove();
+                    feedList.innerHTML = "";
+                    if (snapshot.empty) {
+                        feedList.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-aaa);">Nada por aqui...</div>`;
+                        return;
+                    }
+
+
+                                         for (const doc of snapshot.docs) {
+                        const post = doc.data();
+                        const postId = doc.id;
+                        const canDelete =
+                            isTeacher || post.authorId === currentUser.uid;
+
+
+                                                 const authorData = await getAuthorData(
+                            post.authorId,
+                            post,
+                        );
+                        const avatarHTML = getAvatarImgTag(authorData);
+
+
+                        let quizHTML = "";
+                        if (post.quizId) {
+                            const icon =
+                                post.type === "assignment"
+                                    ? "briefcase"
+                                    : "gamepad";
+                            const label =
+                                post.type === "assignment"
+                                    ? "TRABALHO"
+                                    : "SET";
+                            const typeClass =
+                                post.type === "assignment"
+                                    ? "pqc-type work"
+                                    : "pqc-type";
+                            let img = post.quizCover
+                                ? `<img src="${post.quizCover}" style="width:100%;height:100%;object-fit:cover;">`
+                                : '<div style="width:100%;height:100%;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;color:var(--text-ghost);"><i class="fa-solid fa-gamepad"></i></div>';
+
+
+                            const quizUrl =
+                                post.type === "assignment"
+                                    ? `/play_quiz?id=${post.quizId}&mode=assignment&classId=${classId}&postId=${postId}`
+                                    : `/play_quiz?id=${post.quizId}`;
+                            quizHTML = `<div class="post-quiz-card" onclick="window.location.href='${quizUrl}'"><div class="pqc-img">${img}</div><div class="pqc-info"><div class="${typeClass}"><i class="fa-solid fa-${icon}"></i> ${label}</div><div class="pqc-title">${post.quizTitle}</div>${post.dueDate ? `<div style="font-size:0.8rem; color:#d63031;"><i class="fa-regular fa-clock"></i> ${post.dueDate}</div>` : ""}</div></div>`;
+                        }
+
+
+                        const menuHtml = `<div class="menu-container"><i class="fa-solid fa-ellipsis menu-trigger" onclick="toggleMenu('pm-${postId}')"></i><div class="custom-dropdown" id="pm-${postId}"><div class="menu-item" onclick="copyPostLink('${postId}')"><i class="fa-solid fa-link"></i> Copiar Link</div>${canDelete ? `<div class="menu-item danger" onclick="deletePost('${postId}')"><i class="fa-solid fa-trash"></i> Apagar</div>` : ""}</div></div>`;
+
+
+                        const div = document.createElement("div");
+                        div.className = "post-card";
+                        div.id = `post-${postId}`;
+                        div.innerHTML = `
+                    <div class="post-header">
+                        <div class="avatar-circle" onclick="window.location.href='/profile?uid=${post.authorId}'" style="cursor:pointer;">${avatarHTML}</div>
+                        <div class="post-meta"><h4>${post.authorName}</h4><span>${post.createdAt?.toDate ? post.createdAt.toDate().toLocaleDateString() : "Agora"}</span></div>
+                        ${menuHtml}
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                    ${quizHTML}
+                    <div class="comments-section">
+                        <div id="comments-${postId}" class="comments-list"></div>
+                        <div class="comment-input-area">
+                            <div id="commentAvatar-${postId}" class="avatar-circle" style="width:30px; height:30px; border:none; box-shadow:none;"></div>
+                            <input type="text" id="input-${postId}" class="comment-input" placeholder="Escreve uma resposta..." onkeypress="handleCommentKey(event, '${postId}', 'input-${postId}')">
+                            <button class="btn-send-comment" onclick="sendComment('${postId}', 'input-${postId}')"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                `;
+                        feedList.appendChild(div);
+
+
+                        if (currentUser)
+                            renderMiniAvatar(
+                                {
+                                    customPhotoUrl: currentUser.customPhotoUrl,
+                                    photoURL: currentUser.photoURL,
+                                    avatar: currentUser.avatar,
+                                    profileType: currentUser.profileType,
+                                },
+                                document.getElementById(
+                                    `commentAvatar-${postId}`,
+                                ),
+                            );
+                        loadCommentsForPost(postId, `comments-${postId}`);
+                    }
+
+
+                    if (highlightPostId)
+                        setTimeout(() => {
+                            const t = document.getElementById(
+                                `post-${highlightPostId}`,
+                            );
+                            if (t) {
+                                t.scrollIntoView({
+                                    behavior: "smooth",
+                                    block: "center",
+                                });
+                                t.classList.add("highlight");
+                            }
+                        }, 500);
+                });
+            }
+
+
+                         function renderMiniAvatar(data, container) {
+                container.innerHTML = getAvatarImgTag(data);
+            }
+
+
+            function getAvatarImgTag(data) {
+                                 if (data.avatarRenderUrl)
+                    return `<img src="${data.avatarRenderUrl}" style="width:100%;height:100%;object-fit:contain;object-position:center 35%;">`;
+
+
+                                 const type =
+                    data.profileType || data.authorProfileType || "avatar";
+                const photo =
+                    data.customPhotoUrl || data.photoURL || data.authorPhoto;
+
+
+                if (type === "photo" && photo)
+                    return `<img src="${photo}" style="transform:none; object-fit:cover;">`;
+
+
+                const skin = data.avatar?.skin || data.authorSkin || "001";
+                const face = data.avatar?.face || data.authorFace || "001";
+                const hat = data.avatar?.hat || data.authorHat || "none";
+                const hasHat = hat && hat !== "none";
+                                 const scaleStyle = hasHat
+                    ? "transform:scale(0.75);transform-origin:center 58%;"
+                    : "transform:scale(0.88);transform-origin:center center;";
+
+
+                let imgs = `<img src="static/img/avatareditor/skins/${skin}.png"><img src="static/img/avatareditor/faces/${face}.png">`;
+                if (hasHat)
+                    imgs += `<img src="static/img/avatareditor/hats/${hat}.png">`;
+                return `<div style="position:absolute;inset:0;${scaleStyle}">${imgs}</div>`;
+            }
+
+
+            
+            function applyThemeToTabs(color) {
+                const c = color || "#00D2BA";
+                document.documentElement.style.setProperty(
+                    "--tab-active-color",
+                    c,
+                );
+                document.documentElement.style.setProperty(
+                    "--tab-active-bg",
+                    c + "18",
+                );
+            }
+
+
+            window.switchClassTab = (tab) => {
+                document
+                    .querySelectorAll(".class-tab-btn")
+                    .forEach((b) => b.classList.remove("active"));
+                document
+                    .querySelector(`.class-tab-btn[data-tab="${tab}"]`)
+                    ?.classList.add("active");
+                document
+                    .querySelectorAll(".tab-content")
+                    .forEach((c) => c.classList.remove("active"));
+                const id = "tab" + tab.charAt(0).toUpperCase() + tab.slice(1);
+                document.getElementById(id)?.classList.add("active");
+                if (tab === "trabalhos") loadAssignments();
+                if (tab === "calendario") renderCalendar();
+            };
+
+
+            
+            let calMonth = new Date().getMonth();
+            let calYear = new Date().getFullYear();
+            let cachedAssignments = null;  
+            const ptMonths = [
+                "Janeiro",
+                "Fevereiro",
+                "Março",
+                "Abril",
+                "Maio",
+                "Junho",
+                "Julho",
+                "Agosto",
+                "Setembro",
+                "Outubro",
+                "Novembro",
+                "Dezembro",
+            ];
+            const ptWeekdays = [
+                "Seg",
+                "Ter",
+                "Qua",
+                "Qui",
+                "Sex",
+                "Sáb",
+                "Dom",
+            ];
+
+
+            async function fetchAssignments() {
+                if (cachedAssignments) return cachedAssignments;
+                const q2 = query(
+                    collection(db, `classrooms/${classId}/posts`),
+                    where("type", "==", "assignment"),
+                    orderBy("createdAt", "desc"),
+                );
+                const snap = await getDocs(q2);
+                cachedAssignments = snap.docs.map((d) => ({
+                    id: d.id,
+                    ...d.data(),
+                }));
+                return cachedAssignments;
+            }
+
+
+            async function renderCalendar() {
+                const titleEl = document.getElementById("calendarTitle");
+                const gridEl = document.getElementById("calendarGrid");
+                titleEl.textContent = `${ptMonths[calMonth]} ${calYear}`;
+
+
+                const assignments = await fetchAssignments();
+
+
+                                 const dateMap = {};
+                assignments.forEach((a) => {
+                    if (a.dueDate) {
+                        if (!dateMap[a.dueDate]) dateMap[a.dueDate] = [];
+                        dateMap[a.dueDate].push(a);
+                    }
+                });
+
+
+                const firstDay = new Date(calYear, calMonth, 1);
+                const daysInMonth = new Date(
+                    calYear,
+                    calMonth + 1,
+                    0,
+                ).getDate();
+                let startDay = firstDay.getDay();                  startDay = startDay === 0 ? 6 : startDay - 1;  
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+
+                const themeColor = currentTheme || "#00D2BA";
+
+
+                let html = ptWeekdays
+                    .map((w) => `<div class="calendar-weekday">${w}</div>`)
+                    .join("");
+
+
+                                 for (let i = 0; i < startDay; i++)
+                    html += `<div class="calendar-day empty"></div>`;
+
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${calYear}-${String(calMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+                    const hasAss = dateMap[dateStr];
+                    const isToday = dateStr === todayStr;
+                    let cls = "calendar-day";
+                    if (isToday && !hasAss) cls += " today";
+                    if (hasAss) cls += " has-assignment";
+                                         const cellStyle = hasAss
+                        ? `style="background:${themeColor}22;color:${themeColor};font-weight:800;"`
+                        : "";
+                    const onclick = hasAss
+                        ? `onclick="showDayAssignments('${dateStr}')"`
+                        : "";
+                    html += `<div class="${cls}" ${cellStyle} ${onclick}>${d}</div>`;
+                }
+
+
+                gridEl.innerHTML = html;
+            }
+
+
+            window.calendarPrev = () => {
+                calMonth--;
+                if (calMonth < 0) {
+                    calMonth = 11;
+                    calYear--;
+                }
+                renderCalendar();
+            };
+            window.calendarNext = () => {
+                calMonth++;
+                if (calMonth > 11) {
+                    calMonth = 0;
+                    calYear++;
+                }
+                renderCalendar();
+            };
+
+
+            window.showDayAssignments = async (dateStr) => {
+                const assignments = await fetchAssignments();
+                const dayAssignments = assignments.filter(
+                    (a) => a.dueDate === dateStr,
+                );
+                if (!dayAssignments.length) return;
+
+
+                const parts = dateStr.split("-");
+                const dayNum = parseInt(parts[2]);
+                const monthName = ptMonths[parseInt(parts[1]) - 1];
+                document.getElementById("dayModalTitle").textContent =
+                    `${dayNum} de ${monthName}`;
+
+
+                                 const count = dayAssignments.length;
+                document.getElementById("dayModalSubtitle").textContent =
+                    `${count} trabalho${count > 1 ? "s" : ""} para este dia`;
+
+
+                const listEl = document.getElementById("dayModalList");
+                listEl.innerHTML = "";
+                const themeColor = currentTheme || "#00D2BA";
+
+
+                                 if (!isTeacher) {
+                    await loadSubmissions();
+                }
+
+
+                const now = new Date();
+
+
+                for (const a of dayAssignments) {
+                    if (!a.quizId) continue;
+
+
+                    const sub = submissionsCache[a.id];
+                    const dueDate = a.dueDate
+                        ? new Date(a.dueDate + "T23:59:59")
+                        : null;
+                    const isPastDue = dueDate && dueDate < now;
+
+
+                    let status, statusLabel;
+                    if (sub) {
+                        status = "done";
+                        statusLabel = "Entregue";
+                    } else if (isPastDue) {
+                        status = "late";
+                        statusLabel = "Atrasado";
+                    } else {
+                        status = "todo";
+                        statusLabel = "Por Fazer";
+                    }
+
+
+                    const statusIcons = { done: "fa-check-circle", late: "fa-exclamation-circle", todo: "fa-clock" };
+                    const statusIcon = statusIcons[status] || "fa-circle";
+
+
+                    let actionBtn = "";
+                    if (isTeacher) {
+                        actionBtn = `<button onclick="event.stopPropagation(); document.getElementById('dayModal').style.display='none'; switchClassTab('trabalhos');" class="btn btn-sm" style="background:${themeColor};color:white;box-shadow:0 3px 0 ${themeColor}cc;border:none;white-space:nowrap;">Gradebook</button>`;
+                    } else if (sub) {
+                        actionBtn = `<button onclick="event.stopPropagation(); showScore('${a.id}');" class="btn btn-sm btn-ghost" style="white-space:nowrap;">Ver Nota</button>`;
+                    } else {
+                        actionBtn = `<button onclick="event.stopPropagation(); playAssignment('${a.quizId}','${a.id}');" class="btn btn-sm" style="background:${themeColor};color:white;box-shadow:0 3px 0 ${themeColor}cc;border:none;white-space:nowrap;">Jogar</button>`;
+                    }
+
+
+                    listEl.innerHTML += `
+                <div class="day-assignment-card">
+                    <div class="day-assignment-icon" style="background:${themeColor}15;color:${themeColor};">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div class="day-assignment-info">
+                        <div class="day-assignment-title">${a.quizTitle || "Trabalho"}</div>
+                        <div class="day-assignment-meta">
+                            <span>${a.authorName || "Professor"}</span>
+                            ${!isTeacher ? `<span style="width:3px;height:3px;border-radius:50%;background:var(--text-aaa);display:inline-block;"></span><span class="status-badge ${status}"><i class="fa-solid ${statusIcon}"></i> ${statusLabel}</span>` : ''}
+                        </div>
+                    </div>
+                    ${actionBtn}
+                </div>`;
+                }
+
+
+                                 if (!listEl.innerHTML) {
+                    listEl.innerHTML = `<div class="day-modal-empty"><i class="fa-solid fa-clipboard"></i><p>Sem trabalhos com set para este dia.</p></div>`;
+                }
+
+
+                document.getElementById("dayModal").style.display = "flex";
+            };
+
+
+            let currentAssignmentFilter = "all";
+            let submissionsCache = {};
+
+
+            async function loadSubmissions() {
+                if (!currentUser) return {};
+                try {
+                    const q2 = query(
+                        collection(db, `classrooms/${classId}/submissions`),
+                        where("userId", "==", currentUser.uid),
+                    );
+                    const snap = await getDocs(q2);
+                    const map = {};
+                    snap.forEach((d) => {
+                        const data = d.data();
+                        map[data.postId] = data;
+                    });
+                    submissionsCache = map;
+                    return map;
+                } catch (e) {
+                    console.error("Erro submissions:", e);
+                    return {};
+                }
+            }
+
+
+            window.filterAssignments = (filter) => {
+                currentAssignmentFilter = filter;
+                document
+                    .querySelectorAll(".filter-pill")
+                    .forEach((p) => p.classList.remove("active"));
+                document
+                    .querySelector(`.filter-pill[data-filter="${filter}"]`)
+                    ?.classList.add("active");
+                renderAssignmentCards();
+            };
+
+
+            let allAssignmentCards = [];  
+            async function loadAssignments() {
+                const container = document.getElementById("assignmentsList");
+
+
+                try {
+                    cachedAssignments = null;                      const assignments = await fetchAssignments();
+
+
+                                         const assignSkeleton = document.getElementById("assignments-skeleton");
+                    if (assignSkeleton) assignSkeleton.remove();
+
+
+                    if (isTeacher) {
+                        await loadAssignmentsTeacher(assignments);
+                    } else {
+                        await loadAssignmentsStudent(assignments);
+                    }
+                } catch (e) {
+                    console.error("Erro loadAssignments:", e);
+                                         const assignSkeleton = document.getElementById("assignments-skeleton");
+                    if (assignSkeleton) assignSkeleton.remove();
+                    container.innerHTML =
+                        '<div class="empty-assignments"><i class="fa-solid fa-exclamation-circle"></i> Erro ao carregar trabalhos.</div>';
+                }
+            }
+
+
+                         async function loadAssignmentsStudent(assignments) {
+                const container = document.getElementById("assignmentsList");
+                const submissions = await loadSubmissions();
+
+
+                allAssignmentCards = [];
+                const now = new Date();
+                const themeColor = currentTheme || "#00D2BA";
+
+
+                for (const a of assignments) {
+                    if (!a.quizId) continue;
+                    const sub = submissions[a.id];
+                    const dueDate = a.dueDate
+                        ? new Date(a.dueDate + "T23:59:59")
+                        : null;
+                    const isPastDue = dueDate && dueDate < now;
+
+
+                    let status, statusLabel;
+                    if (sub) {
+                        status = "done";
+                        statusLabel = "Entregue";
+                    } else if (isPastDue) {
+                        status = "late";
+                        statusLabel = "Atrasado";
+                    } else {
+                        status = "todo";
+                        statusLabel = "Por Fazer";
+                    }
+
+
+                    const dueDateStr = a.dueDate
+                        ? new Date(a.dueDate).toLocaleDateString("pt-PT", {
+                              day: "numeric",
+                              month: "short",
+                          })
+                        : "";
+
+
+                    allAssignmentCards.push({
+                        ...a,
+                        status,
+                        statusLabel,
+                        dueDateStr,
+                        submission: sub,
+                        themeColor,
+                    });
+                }
+
+
+                renderAssignmentCards();
+            }
+
+
+            function renderAssignmentCards() {
+                const container = document.getElementById("assignmentsList");
+                let cards = allAssignmentCards;
+
+
+                if (currentAssignmentFilter !== "all") {
+                    cards = cards.filter(
+                        (c) => c.status === currentAssignmentFilter,
+                    );
+                }
+
+
+                if (!cards.length) {
+                    const msgs = {
+                        all: "Sem trabalhos atribuídos.",
+                        todo: "Tudo em dia! 🎉",
+                        done: "Nenhum trabalho entregue.",
+                        late: "Sem atrasos! 👏",
+                    };
+                    container.innerHTML = `<div class="empty-assignments"><i class="fa-solid fa-clipboard-check"></i> ${msgs[currentAssignmentFilter] || msgs.all}</div>`;
+                    return;
+                }
+
+
+                container.innerHTML = "";
+                for (const c of cards) {
+                    let actionBtn;
+                    if (c.submission) {
+                        actionBtn = `<button class="assignment-action-btn view" onclick="showScore('${c.id}')"><i class="fa-solid fa-eye"></i> Ver Nota</button>`;
+                    } else {
+                        actionBtn = `<button class="assignment-action-btn play" onclick="playAssignment('${c.quizId}','${c.id}')"><i class="fa-solid fa-play"></i> Jogar</button>`;
+                    }
+
+
+                    container.innerHTML += `
+                <div class="assignment-card" data-status="${c.status}">
+                    <div class="assignment-icon" style="background:${c.themeColor}15;color:${c.themeColor};">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div class="assignment-info">
+                        <div class="assignment-title">${c.quizTitle || "Trabalho"}</div>
+                        <div class="assignment-due">
+                            ${c.dueDateStr ? `<i class="fa-regular fa-clock"></i> ${c.dueDateStr}` : '<span style="color:var(--text-ghost);">Sem prazo</span>'}
+                            <span style="margin-left:5px;">• ${c.authorName || ""}</span>
+                        </div>
+                    </div>
+                    <span class="status-badge ${c.status}">${c.statusLabel}</span>
+                    ${actionBtn}
+                </div>`;
+                }
+            }
+
+
+                         async function loadAssignmentsTeacher(assignments) {
+                const container = document.getElementById("assignmentsList");
+                                 const filtersEl = document.querySelector(".assignment-filters");
+                if (filtersEl) filtersEl.style.display = "none";
+
+
+                if (!assignments.length || !assignments.some((a) => a.quizId)) {
+                    container.innerHTML =
+                        '<div class="empty-assignments"><i class="fa-solid fa-clipboard-check"></i> Nenhum trabalho publicado.</div>';
+                    return;
+                }
+
+
+                const themeColor = currentTheme || "#00D2BA";
+                container.innerHTML = "";
+
+
+                                 const classSnap = await getDoc(doc(db, "classrooms", classId));
+                const classData = classSnap.data();
+                const memberIds = (classData.members || []).filter(
+                    (uid) => uid !== currentUser.uid,
+                );
+
+
+                for (const a of assignments) {
+                    if (!a.quizId) continue;
+                    const dueDateStr = a.dueDate
+                        ? new Date(a.dueDate).toLocaleDateString("pt-PT", {
+                              day: "numeric",
+                              month: "short",
+                          })
+                        : "Sem prazo";
+
+
+                    const card = document.createElement("div");
+                    card.className = "gradebook-card";
+                    card.innerHTML = `
+                <div class="gradebook-card-header">
+                    <div class="assignment-icon" style="background:${themeColor}15;color:${themeColor};">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div class="assignment-info">
+                        <div class="assignment-title">${a.quizTitle || "Trabalho"}</div>
+                        <div class="assignment-due"><i class="fa-regular fa-clock"></i> ${dueDateStr}</div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down gradebook-chevron"></i>
+                </div>
+                <div class="gradebook-card-body" id="gb-body-${a.id}"></div>
+            `;
+                    card.addEventListener("click", function handler(e) {
+                                                 if (card.classList.contains("open")) return;
+                        card.classList.add("open");
+                        loadGradebookDetail(a, memberIds, themeColor);
+                    });
+                    container.appendChild(card);
+                }
+            }
+
+
+            async function loadGradebookDetail(
+                assignment,
+                memberIds,
+                themeColor,
+            ) {
+                const body = document.getElementById(
+                    `gb-body-${assignment.id}`,
+                );
+                if (!body) return;
+                body.innerHTML =
+                    '<div style="padding:15px;text-align:center;color:var(--text-aaa);"><i class="fa-solid fa-spinner fa-spin"></i></div>';
+
+
+                try {
+                                         const q2 = query(
+                        collection(db, `classrooms/${classId}/submissions`),
+                        where("postId", "==", assignment.id),
+                    );
+                    const snap = await getDocs(q2);
+                    const subsMap = {};
+                    snap.forEach((d) => {
+                        const data = d.data();
+                        subsMap[data.userId] = data;
+                    });
+
+
+                    const delivered = Object.keys(subsMap).length;
+                    const total = memberIds.length;
+                    const pending = total - delivered;
+                    const avgScore =
+                        delivered > 0
+                            ? Math.round(
+                                  snap.docs.reduce(
+                                      (sum, d) => sum + (d.data().score || 0),
+                                      0,
+                                  ) / delivered,
+                              )
+                            : 0;
+
+
+                    let html = `
+                <div class="gradebook-stats">
+                    <div class="gradebook-stat">
+                        <div class="gradebook-stat-value" style="color:${themeColor};">${delivered}</div>
+                        <div class="gradebook-stat-label">Entregues</div>
+                    </div>
+                    <div class="gradebook-stat">
+                        <div class="gradebook-stat-value" style="color:var(--accent);">${pending}</div>
+                        <div class="gradebook-stat-label">Em falta</div>
+                    </div>
+                    <div class="gradebook-stat">
+                        <div class="gradebook-stat-value" style="color:var(--dark);">${avgScore}</div>
+                        <div class="gradebook-stat-label">Média</div>
+                    </div>
+                </div>
+                <div class="gradebook-student-list">
+            `;
+
+
+                    for (const uid of memberIds) {
+                        const memberData = membersCache[uid] || {};
+                        const name = memberData.username || "Aluno";
+                        const avatarHTML = getAvatarImgTag(memberData);
+                        const sub = subsMap[uid];
+
+
+                        let statusHtml;
+                        if (sub) {
+                            const score = sub.score || 0;
+                            const correct = sub.correctCount || 0;
+                            const totalQ = sub.totalQuestions || 0;
+                            const dateStr = sub.submittedAt?.toDate
+                                ? sub.submittedAt
+                                      .toDate()
+                                      .toLocaleDateString("pt-PT", {
+                                          day: "numeric",
+                                          month: "short",
+                                      })
+                                : "";
+                            statusHtml = `
+                        <span class="gradebook-student-status" style="color:#2E7D32;">${correct}/${totalQ}</span>
+                        <span class="gradebook-student-status" style="color:${themeColor}; margin-left:6px; font-size:1rem;">${score}</span>
+                    `;
+                        } else {
+                            statusHtml =
+                                '<span class="gradebook-student-status" style="color:var(--accent);"><i class="fa-solid fa-hourglass-half" style="margin-right:4px;"></i>Em falta</span>';
+                        }
+
+
+                        html += `
+                    <div class="gradebook-student">
+                        <div class="avatar-circle" style="width:32px;height:32px;border:none;box-shadow:none;">${avatarHTML}</div>
+                        <span class="gradebook-student-name">${name}</span>
+                        ${statusHtml}
+                    </div>
+                `;
+                    }
+
+
+                    html += "</div>";
+                    body.innerHTML = html;
+                } catch (e) {
+                    console.error("Erro gradebook:", e);
+                    body.innerHTML =
+                        '<div style="padding:15px;text-align:center;color:var(--danger);">Erro ao carregar.</div>';
+                }
+            }
+
+
+            window.playAssignment = (quizId, postId) => {
+                window.location.href = `/play_quiz?id=${quizId}&mode=assignment&classId=${classId}&postId=${postId}`;
+            };
+
+
+            window.showScore = async (postId) => {
+                const sub = submissionsCache[postId];
+                if (!sub) return showToast("Nota não encontrada.", "error");
+                document.getElementById("scoreModalValue").textContent =
+                    sub.score || 0;
+                document.getElementById("scoreModalDetail").textContent =
+                    `${sub.correctCount || 0} / ${sub.totalQuestions || 0} corretas`;
+                const dateStr = sub.submittedAt?.toDate
+                    ? sub.submittedAt.toDate().toLocaleDateString("pt-PT", {
+                          day: "numeric",
+                          month: "long",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                      })
+                    : "";
+                document.getElementById("scoreModalDate").textContent = dateStr
+                    ? `Entregue a ${dateStr}`
+                    : "";
+                document.getElementById("scoreModal").style.display = "flex";
+            };
+
+
+            let notifPrefs = { posts: true, replies: true };
+
+
+            async function loadNotifPrefs() {
+                if (!currentUser) return;
+                try {
+                    const uDoc = await getDoc(
+                        doc(db, "users", currentUser.uid),
+                    );
+                    if (uDoc.exists()) {
+                        const settings = uDoc.data().notificationSettings;
+                        if (settings && settings[classId]) {
+                            notifPrefs = {
+                                posts: settings[classId].posts !== false,
+                                replies: settings[classId].replies !== false,
+                            };
+                        }
+                    }
+                } catch (e) {
+                    console.log("Erro notif prefs:", e);
+                }
+                syncNotifUI();
+            }
+
+
+            function syncNotifUI() {
+                const tPosts = document.getElementById("togglePosts");
+                const tReplies = document.getElementById("toggleReplies");
+                if (tPosts) tPosts.classList.toggle("active", notifPrefs.posts);
+                if (tReplies)
+                    tReplies.classList.toggle("active", notifPrefs.replies);
+            }
+
+
+            window.openNotifModal = () => {
+                syncNotifUI();
+                document.getElementById("notifModal").style.display = "flex";
+            };
+
+
+            window.toggleNotifPref = async (key) => {
+                notifPrefs[key] = !notifPrefs[key];
+                syncNotifUI();
+                if (!currentUser) return;
+                try {
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        [`notificationSettings.${classId}.${key}`]:
+                            notifPrefs[key],
+                    });
+                    showToast("Preferência guardada!");
+                } catch (e) {
+                    console.error("Erro guardar notif:", e);
+                    showToast("Erro ao guardar.", "error");
+                }
+            };
+
+
+                         const origLoadDetails = loadClassDetails;
+            const patchedLoad = async () => {
+                await origLoadDetails();
+                loadNotifPrefs();
+            };
+            let _gcpRecent = JSON.parse(localStorage.getItem('gcp_banner_recent') || '[]');
+
+
+            function gcp_hexToRgb(hex) {
+                let c = hex.replace('#', '');
+                if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+                return { r: parseInt(c.substring(0,2), 16), g: parseInt(c.substring(2,4), 16), b: parseInt(c.substring(4,6), 16) };
+            }
+
+
+            function gcp_rgbToHex(r, g, b) {
+                return '#' + [r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
+            }
+
+
+            function gcp_rgbToHsv(r, g, b) {
+                r /= 255; g /= 255; b /= 255;
+                const max = Math.max(r, g, b), min = Math.min(r, g, b);
+                const d = max - min;
+                let h = 0, s = max === 0 ? 0 : d / max, v = max;
+                if (d !== 0) {
+                    switch (max) {
+                        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                        case g: h = ((b - r) / d + 2) / 6; break;
+                        case b: h = ((r - g) / d + 4) / 6; break;
+                    }
+                }
+                return { h: h * 360, s, v };
+            }
+
+
+            function gcp_hsvToRgb(h, s, v) {
+                h /= 360;
+                let r, g, b;
+                const i = Math.floor(h * 6);
+                const f = h * 6 - i;
+                const p = v * (1 - s);
+                const q = v * (1 - f * s);
+                const t = v * (1 - (1 - f) * s);
+                switch (i % 6) {
+                    case 0: r = v; g = t; b = p; break;
+                    case 1: r = q; g = v; b = p; break;
+                    case 2: r = p; g = v; b = t; break;
+                    case 3: r = p; g = q; b = v; break;
+                    case 4: r = t; g = p; b = v; break;
+                    case 5: r = v; g = p; b = q; break;
+                }
+                return [r * 255, g * 255, b * 255];
+            }
+
+
+            function gcp_getHex(h, s, v) {
+                const r = gcp_hsvToRgb(h, s, v);
+                return gcp_rgbToHex(r[0], r[1], r[2]);
+            }
+
+
+            function gcp_addRecent(hex) {
+                const h = hex.toUpperCase();
+                _gcpRecent = _gcpRecent.filter(c => c.toUpperCase() !== h);
+                _gcpRecent.unshift(hex);
+                if (_gcpRecent.length > 10) _gcpRecent.pop();
+                localStorage.setItem('gcp_banner_recent', JSON.stringify(_gcpRecent));
+            }
+
+
+            window.closeBannerColorPicker = () => {
+                const el = document.getElementById('gcp-popover');
+                if (el) el.remove();
+            };
+
+
+            window.openBannerColorPicker = (btnEl) => {
+                                 if (document.getElementById('gcp-popover')) {
+                    window.closeBannerColorPicker();
+                    return;
+                }
+                window.closeBannerColorPicker();
+
+
+                const initColor = selectedBannerColor || '#00D2BA';
+                const rgb = gcp_hexToRgb(initColor);
+                const hsv = gcp_rgbToHsv(rgb.r, rgb.g, rgb.b);
+
+
+                let _hue = hsv.h, _sat = hsv.s, _val = hsv.v;
+
+
+                const presetColors = [
+                    '#00D2BA','#6C5CE7','#FF6680','#FFCE00','#0FBD8C','#2F80ED','#E84393','#2D3436',
+                    '#FFFFFF','#000000','#F87171','#FB923C','#FBBF24','#A3E635','#34D399','#22D3EE',
+                    '#60A5FA','#A78BFA','#EF4444','#F97316','#EAB308','#84CC16','#10B981','#06B6D4',
+                    '#3B82F6','#8B5CF6','#EC4899','#6B7280','#991B1B','#1F2937'
+                ];
+
+
+                const popover = document.createElement('div');
+                popover.className = 'gcp-popover';
+                popover.id = 'gcp-popover';
+                popover.onclick = (e) => e.stopPropagation();
+                popover.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
+
+
+                                 const canvasWrap = document.createElement('div');
+                canvasWrap.className = 'gcp-canvas-wrap';
+                const canvas = document.createElement('canvas');
+                canvas.width = 248; canvas.height = 150;
+                canvas.style.width = '100%';
+                canvas.style.height = '150px';
+                canvasWrap.appendChild(canvas);
+                const svCursor = document.createElement('div');
+                svCursor.className = 'gcp-cursor';
+                canvasWrap.appendChild(svCursor);
+                popover.appendChild(canvasWrap);
+
+
+                                 const hueWrap = document.createElement('div');
+                hueWrap.className = 'gcp-hue-wrap';
+                const hueThumb = document.createElement('div');
+                hueThumb.className = 'gcp-hue-thumb';
+                hueWrap.appendChild(hueThumb);
+                popover.appendChild(hueWrap);
+
+
+                                 const row = document.createElement('div');
+                row.className = 'gcp-row';
+                const hexBox = document.createElement('div');
+                hexBox.className = 'gcp-hex-box';
+                const hashSpan = document.createElement('span');
+                hashSpan.className = 'gcp-hash';
+                hashSpan.textContent = '#';
+                const hexInput = document.createElement('input');
+                hexInput.type = 'text';
+                hexInput.className = 'gcp-hex';
+                hexInput.value = initColor.replace('#','').toUpperCase();
+                hexInput.maxLength = 6;
+                hexInput.spellcheck = false;
+                hexBox.appendChild(hashSpan);
+                hexBox.appendChild(hexInput);
+                const previewBox = document.createElement('div');
+                previewBox.className = 'gcp-preview-box';
+                row.appendChild(hexBox);
+                row.appendChild(previewBox);
+
+
+                                 const ctx = canvas.getContext('2d');
+
+
+                function drawCanvas() {
+                    const w = canvas.width, h = canvas.height;
+                    ctx.fillStyle = `hsl(${_hue}, 100%, 50%)`;
+                    ctx.fillRect(0, 0, w, h);
+                    const grdWhite = ctx.createLinearGradient(0, 0, w, 0);
+                    grdWhite.addColorStop(0, 'rgba(255,255,255,1)');
+                    grdWhite.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = grdWhite;
+                    ctx.fillRect(0, 0, w, h);
+                    const grdBlack = ctx.createLinearGradient(0, 0, 0, h);
+                    grdBlack.addColorStop(0, 'rgba(0,0,0,0)');
+                    grdBlack.addColorStop(1, 'rgba(0,0,0,1)');
+                    ctx.fillStyle = grdBlack;
+                    ctx.fillRect(0, 0, w, h);
+                }
+
+
+                function renderAll() {
+                    drawCanvas();
+                    svCursor.style.left = (_sat * 100) + '%';
+                    svCursor.style.top = ((1 - _val) * 100) + '%';
+                    hueThumb.style.left = (_hue / 360 * 100) + '%';
+                    const hex = gcp_getHex(_hue, _sat, _val);
+                    if (document.activeElement !== hexInput) hexInput.value = hex.replace('#','').toUpperCase();
+                    previewBox.style.background = hex;
+                    autoApply();
+                }
+
+
+                                 let canvasDrag = false;
+                function handleCanvasPos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    let x = (clientX - rect.left) / rect.width;
+                    let y = (clientY - rect.top) / rect.height;
+                    x = Math.max(0, Math.min(1, x));
+                    y = Math.max(0, Math.min(1, y));
+                    _sat = x; _val = 1 - y;
+                    renderAll();
+                }
+                canvas.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); canvasDrag = true; handleCanvasPos(e); });
+                canvas.addEventListener('touchstart', (e) => { e.stopPropagation(); canvasDrag = true; handleCanvasPos(e); }, { passive: false });
+                document.addEventListener('mousemove', (e) => { if (canvasDrag) handleCanvasPos(e); });
+                document.addEventListener('touchmove', (e) => { if (canvasDrag) handleCanvasPos(e); }, { passive: false });
+                document.addEventListener('mouseup', () => { canvasDrag = false; });
+                document.addEventListener('touchend', () => { canvasDrag = false; });
+
+
+                                 let hueDrag = false;
+                function handleHuePos(e) {
+                    const rect = hueWrap.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    let x = (clientX - rect.left) / rect.width;
+                    x = Math.max(0, Math.min(1, x));
+                    _hue = x * 360;
+                    renderAll();
+                }
+                hueWrap.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); hueDrag = true; handleHuePos(e); });
+                hueWrap.addEventListener('touchstart', (e) => { e.stopPropagation(); hueDrag = true; handleHuePos(e); }, { passive: false });
+                document.addEventListener('mousemove', (e) => { if (hueDrag) handleHuePos(e); });
+                document.addEventListener('touchmove', (e) => { if (hueDrag) handleHuePos(e); }, { passive: false });
+                document.addEventListener('mouseup', () => { hueDrag = false; });
+                document.addEventListener('touchend', () => { hueDrag = false; });
+
+
+                                 hexInput.addEventListener('input', (e) => {
+                    e.stopPropagation();
+                    const val = e.target.value.replace(/[^0-9a-fA-F]/g, '').substring(0, 6);
+                    e.target.value = val.toUpperCase();
+                    if (val.length === 6) {
+                        const r2 = gcp_hexToRgb('#' + val);
+                        const h2 = gcp_rgbToHsv(r2.r, r2.g, r2.b);
+                        _hue = h2.h; _sat = h2.s; _val = h2.v;
+                        renderAll();
+                    }
+                });
+                hexInput.addEventListener('click', (e) => e.stopPropagation());
+                hexInput.addEventListener('mousedown', (e) => e.stopPropagation());
+
+
+                popover.appendChild(row);
+
+
+                                 const presetsDiv = document.createElement('div');
+                presetsDiv.className = 'gcp-presets';
+                presetColors.forEach(c => {
+                    const s = document.createElement('div');
+                    s.className = 'gcp-swatch';
+                    s.style.background = c;
+                    if (c === '#FFFFFF') s.style.border = '1px solid var(--border)';
+                    s.title = c;
+                    s.onclick = (e) => {
+                        e.stopPropagation();
+                        const r2 = gcp_hexToRgb(c);
+                        const h2 = gcp_rgbToHsv(r2.r, r2.g, r2.b);
+                        _hue = h2.h; _sat = h2.s; _val = h2.v;
+                        renderAll();
+                    };
+                    presetsDiv.appendChild(s);
+                });
+                popover.appendChild(presetsDiv);
+
+
+                                 if (_gcpRecent.length > 0) {
+                    const label = document.createElement('span');
+                    label.className = 'gcp-label';
+                    label.textContent = 'Recentes';
+                    popover.appendChild(label);
+                    const recentDiv = document.createElement('div');
+                    recentDiv.className = 'gcp-recent';
+                    _gcpRecent.forEach(c => {
+                        const rs = document.createElement('div');
+                        rs.className = 'gcp-recent-swatch';
+                        rs.style.background = c;
+                        rs.title = c;
+                        rs.onclick = (e) => {
+                            e.stopPropagation();
+                            const r2 = gcp_hexToRgb(c);
+                            const h2 = gcp_rgbToHsv(r2.r, r2.g, r2.b);
+                            _hue = h2.h; _sat = h2.s; _val = h2.v;
+                            renderAll();
+                        };
+                        recentDiv.appendChild(rs);
+                    });
+                    popover.appendChild(recentDiv);
+                }
+
+
+                                 const autoApply = () => {
+                    const hex = gcp_getHex(_hue, _sat, _val);
+                    selectedBannerColor = hex;
+                    settingsBannerMode = 'color';
+                    document.getElementById('colorPreview').style.background = hex;
+                    document.getElementById('colorHexDisplay').textContent = hex.toUpperCase();
+                    document.getElementById('colorPickerSwatch').style.background = hex;
+                    syncSettingsBannerButton(hex);
+                    document.querySelectorAll('.color-preset').forEach(p => {
+                        const match = p.getAttribute('onclick')?.includes(hex.toUpperCase());
+                        p.style.borderColor = match ? 'var(--dark)' : 'transparent';
+                    });
+                    gcp_addRecent(hex);
+                };
+
+
+                                 const tabColor = document.getElementById('settingsTabColor');
+                const container = tabColor.querySelector('div');
+                popover.style.position = 'relative';
+                popover.style.width = '100%';
+                popover.style.borderRadius = '16px';
+                popover.style.zIndex = 'auto';
+                popover.style.animation = 'popUp 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                popover.style.marginTop = '12px';
+                container.appendChild(popover);
+
+
+                renderAll();
+            };
+
+
+                         document.addEventListener('mousedown', (e) => {
+                if (!e.target.closest('.gcp-popover') && !e.target.closest('.color-picker-btn')) {
+                    window.closeBannerColorPicker();
+                }
+            });
+        </script>
+    </body>
+</html>

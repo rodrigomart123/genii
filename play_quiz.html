@@ -1,0 +1,1222 @@
+﻿<!doctype html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Jogar - Genii</title>
+        <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="static/css/style.css?v=3" />
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+        <script src="static/js/theme.js"></script>
+    </head>
+    <body data-page="play-quiz">
+        <audio id="bg-music" src="static/audio/background.mp3" loop></audio>
+        <audio id="sfx-correct" src="static/audio/correct.mp3"></audio>
+        <audio id="sfx-wrong" src="static/audio/incorrect.mp3"></audio>
+
+        <div class="game-header" id="main-header">
+            <div class="score-badge">
+                <i class="fa-solid fa-list-ol"></i>
+                <span id="q-counter">1 / 10</span>
+            </div>
+            <div class="brand-logo" id="header-title"></div>
+            <div class="header-right">
+                <button class="sound-btn" id="muteBtn" onclick="toggleAudio()">
+                    <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+                </button>
+                <div class="score-badge">
+                    <i class="fa-solid fa-star"></i>
+                    <span id="score-display">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="start-overlay-transparent" id="start-screen">
+            <div id="loading-spinner">
+                <i class="fa-solid fa-circle-notch fa-spin fa-4x" style="color: var(--primary);"></i>
+                <h2 style="font-family: 'Fredoka', sans-serif; font-size: 2rem; color: var(--dark); margin-top: 15px;">
+                    A invocar o set...
+                </h2>
+            </div>
+
+            <div id="start-title-container" class="start-lobby-card" style="display: none">
+                <div class="lobby-cover-container">
+                    <div id="lobby-cover-wrapper" class="lobby-cover-wrapper">
+                    </div>
+                    <div class="lobby-player-avatar-box" id="lobbyPlayerAvatar">
+                    </div>
+                </div>
+
+                <div class="lobby-welcome-text">
+                    Preparado, <span id="lobby-player-name" style="color: var(--purple);">Recruta</span>?
+                </div>
+
+                <h1 id="start-quiz-title" class="start-quiz-title">
+                    Carregando...
+                </h1>
+
+                <p id="start-quiz-desc" class="start-quiz-desc">
+                    Responde rápido para ganhares a pontuação máxima! Boa sorte!
+                </p>
+
+                <div class="lobby-badges-row">
+                    <span class="lobby-badge color-blue">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <span id="lobby-q-count">0</span> Slides
+                    </span>
+                    <span class="lobby-badge color-purple">
+                        <i class="fa-solid fa-gamepad"></i>
+                        Solo
+                    </span>
+                </div>
+
+                <button class="btn-start-game" onclick="beginCountdown()">
+                    Começar <i class="fa-solid fa-play"></i>
+                </button>
+            </div>
+
+            <div id="countdown-container" class="countdown-container" style="display: none"></div>
+        </div>
+
+        <div class="stage-container" id="stage">
+        </div>
+
+        <div class="click-anywhere-overlay" id="next-overlay" onclick="nextQuestion()"></div>
+        <div class="mobile-continue-hint" id="mobile-continue-hint">
+            <span class="hint-arrow"><i class="fa-solid fa-chevron-left"></i></span>
+            Toque ou deslize
+        </div>
+        <div class="footer-feedback-bar" id="footer-feedback">
+            <div class="feedback-left">
+                <div class="feedback-icon" id="feedback-icon-container">
+                    <i class="fa-solid" id="feedback-icon-i"></i>
+                </div>
+                <div class="feedback-text-container">
+                    <div class="feedback-title" id="feedback-title"></div>
+                    <div class="feedback-subtitle" id="feedback-subtitle"></div>
+                </div>
+            </div>
+            <button
+                class="feedback-btn"
+                id="feedback-btn"
+                onclick="nextQuestion()"
+            >
+                <span id="feedback-btn-text">Continuar</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+        <div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
+            <button class="lightbox-close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <img id="lightbox-img" src="" alt="Imagem" />
+        </div>
+
+        <div class="fullscreen-layer-blur" id="end-screen">
+            <div class="result-card-premium">
+                <div class="result-card-banner" id="result-card-banner">
+                    <div class="result-bubble rb-1"></div>
+                    <div class="result-bubble rb-2"></div>
+                    <div class="result-bubble rb-3"></div>
+                </div>
+
+                <div class="result-avatar-trophy-container">
+                    <div class="result-player-avatar-box">
+                        <div class="avatar-badge-diagonal" id="avatar-badge-diagonal">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div id="result-avatar-wrapper" style="width: 100%; height: 100%; position: relative; overflow: hidden; border-radius: 24px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-card-scroll-body">
+                    <h1 class="result-title">Fim do Jogo!</h1>
+                <p class="result-subtitle">O seu desempenho neste set</p>
+
+                <div
+                    class="xp-reward-box"
+                    id="xp-reward-box"
+                    style="display: none"
+                >
+                    <i class="fa-solid fa-bolt" style="color: #ffce00"></i>
+                    <span id="final-xp-text">+0 XP Ganho</span>
+                </div>
+
+                <div class="stats-grid-premium">
+                    <div class="stat-box-premium stat-flask stat-score">
+                        <div class="flask-container">
+                            <div class="particle-emitter" id="emitter-score"></div>
+                            <svg class="flask-svg" viewBox="0 0 100 100">
+                                <defs>
+                                    <clipPath id="clip-pentagon-score">
+                                        <polygon points="50,5 95,40 80,95 20,95 5,40" />
+                                    </clipPath>
+                                </defs>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-bg" />
+                                <g clip-path="url(#clip-pentagon-score)">
+                                    <g class="liquid-group" id="liquid-score" style="transform: translateY(100px);">
+                                        <rect x="-10" y="0" width="120" height="110" class="liquid-rect" style="fill: #a270f4;" />
+                                        <path class="liquid-wave" d="M 0,0 Q 25,-8 50,0 T 100,0 Q 125,-8 150,0 T 200,0 L 200,30 L 0,30 Z" style="fill: #a270f4;" />
+                                    </g>
+                                </g>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-border" />
+                            </svg>
+                            <div class="flask-value" id="final-points">0</div>
+                        </div>
+                        <div class="stat-label">Pontuação</div>
+                    </div>
+ 
+                    <div class="stat-box-premium stat-flask stat-correct">
+                        <div class="flask-container">
+                            <div class="particle-emitter" id="emitter-correct"></div>
+                            <svg class="flask-svg" viewBox="0 0 100 100">
+                                <defs>
+                                    <clipPath id="clip-pentagon-correct">
+                                        <polygon points="50,5 95,40 80,95 20,95 5,40" />
+                                    </clipPath>
+                                </defs>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-bg" />
+                                <g clip-path="url(#clip-pentagon-correct)">
+                                    <g class="liquid-group" id="liquid-correct" style="transform: translateY(100px);">
+                                        <rect x="-10" y="0" width="120" height="110" class="liquid-rect" style="fill: #00b894;" />
+                                        <path class="liquid-wave" d="M 0,0 Q 25,-8 50,0 T 100,0 Q 125,-8 150,0 T 200,0 L 200,30 L 0,30 Z" style="fill: #00b894;" />
+                                    </g>
+                                </g>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-border" />
+                            </svg>
+                            <div class="flask-value" id="final-correct">0/0</div>
+                        </div>
+                        <div class="stat-label">Acertos</div>
+                    </div>
+ 
+                    <div class="stat-box-premium stat-flask stat-wrong">
+                        <div class="flask-container">
+                            <div class="particle-emitter" id="emitter-wrong"></div>
+                            <svg class="flask-svg" viewBox="0 0 100 100">
+                                <defs>
+                                    <clipPath id="clip-pentagon-wrong">
+                                        <polygon points="50,5 95,40 80,95 20,95 5,40" />
+                                    </clipPath>
+                                </defs>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-bg" />
+                                <g clip-path="url(#clip-pentagon-wrong)">
+                                    <g class="liquid-group" id="liquid-wrong" style="transform: translateY(100px);">
+                                        <rect x="-10" y="0" width="120" height="110" class="liquid-rect" style="fill: #d63031;" />
+                                        <path class="liquid-wave" d="M 0,0 Q 25,-8 50,0 T 100,0 Q 125,-8 150,0 T 200,0 L 200,30 L 0,30 Z" style="fill: #d63031;" />
+                                    </g>
+                                </g>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-border" />
+                            </svg>
+                            <div class="flask-value" id="final-wrong">0</div>
+                        </div>
+                        <div class="stat-label">Erros</div>
+                    </div>
+ 
+                    <div class="stat-box-premium stat-flask stat-accuracy">
+                        <div class="flask-container">
+                            <div class="particle-emitter" id="emitter-accuracy"></div>
+                            <svg class="flask-svg" viewBox="0 0 100 100">
+                                <defs>
+                                    <clipPath id="clip-pentagon-accuracy">
+                                        <polygon points="50,5 95,40 80,95 20,95 5,40" />
+                                    </clipPath>
+                                </defs>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-bg" />
+                                <g clip-path="url(#clip-pentagon-accuracy)">
+                                    <g class="liquid-group" id="liquid-accuracy" style="transform: translateY(100px);">
+                                        <rect x="-10" y="0" width="120" height="110" class="liquid-rect" style="fill: #0984e3;" />
+                                        <path class="liquid-wave" d="M 0,0 Q 25,-8 50,0 T 100,0 Q 125,-8 150,0 T 200,0 L 200,30 L 0,30 Z" style="fill: #0984e3;" />
+                                    </g>
+                                </g>
+                                <polygon points="50,5 95,40 80,95 20,95 5,40" class="flask-border" />
+                            </svg>
+                            <div class="flask-value" id="final-accuracy">0%</div>
+                        </div>
+                        <div class="stat-label">Precisão</div>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button
+                        onclick="window.location.reload()"
+                        class="genii-3d-btn btn-repeat"
+                    >
+                        <i class="fa-solid fa-rotate-right"></i> Jogar Novamente
+                    </button>
+                    <a href="my_sets.html" class="genii-3d-btn btn-exit-game">
+                        <i class="fa-solid fa-house"></i> Sair
+                    </a>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="module">
+            import {
+                doc,
+                getDoc,
+                setDoc,
+                updateDoc,
+                increment,
+                serverTimestamp,
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+            import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            import { auth, db } from "./firebase-config.js";
+            import {
+                recordGame,
+                updateStreak,
+            } from "./static/js/gamification.js";
+            import {
+                checkMissionsAfterGame,
+                progressMission,
+            } from "./static/js/daily-missions.js";
+
+            let currentUserUid = null;
+            let quizIsPublic = false;
+
+            const params = new URLSearchParams(window.location.search);
+            const quizId = params.get("id");
+            const assignmentMode = params.get("mode") === "assignment";
+            const assignmentClassId = params.get("classId");
+            const assignmentPostId = params.get("postId");
+
+                          onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    window.location.href = "login.html?returnUrl=/play_quiz?id=" + (quizId || "");
+                    return;
+                }
+                currentUserUid = user.uid;
+
+                                  const quizLoadPromise = quizId ? loadGameData(user) : Promise.resolve();
+
+                                  updateStreak(user.uid).then(result => {
+                    if (result.isNewDay) {
+                        progressMission(user.uid, "daily_login").catch(() => {});
+                    }
+                }).catch(() => {});
+
+                                  if (assignmentMode && assignmentClassId && assignmentPostId) {
+                    try {
+                        const subRef = doc(
+                            db,
+                            `classrooms/${assignmentClassId}/submissions`,
+                            `${user.uid}_${assignmentPostId}`,
+                        );
+                        const subSnap = await getDoc(subRef);
+                        if (subSnap.exists()) {
+                            document.getElementById("end-screen").style.display = "flex";
+                            document.getElementById("main-header").style.display = "none";
+                            const sub = subSnap.data();
+                            document.getElementById("final-correct").innerText =
+                                `${sub.correctCount || 0}/${sub.totalQuestions || 0}`;
+                            document.getElementById("final-wrong").innerText =
+                                (sub.totalQuestions || 0) - (sub.correctCount || 0);
+                            document.getElementById("final-accuracy").innerText =
+                                sub.totalQuestions > 0
+                                    ? Math.round(((sub.correctCount || 0) / sub.totalQuestions) * 100) + "%"
+                                    : "0%";
+                            document.getElementById("final-points").innerText = sub.score || 0;
+                            const qArea = document.getElementById("stage");
+                            if (qArea) qArea.style.display = "none";
+                            return;
+                        }
+                    } catch (e) {
+                        console.log("Erro check submission:", e);
+                    }
+                }
+
+                await quizLoadPromise;
+            });
+
+            let questions = [];
+            let currentIndex = 0;
+            let score = 0;
+            let correctCount = 0;
+            let isMuted = false;
+
+            function darkenColor(hex, amount = 40) {
+                let c = hex.replace("#", "");
+                if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+                const r = Math.max(0, parseInt(c.substring(0, 2), 16) - amount);
+                const g = Math.max(0, parseInt(c.substring(2, 4), 16) - amount);
+                const b = Math.max(0, parseInt(c.substring(4, 6), 16) - amount);
+                return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+            }
+
+            function getContrastTextColor(hex) {
+                if (!hex) return "#2D3436";
+                let c = hex.replace("#", "");
+                if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+                const r = parseInt(c.substring(0, 2), 16);
+                const g = parseInt(c.substring(2, 4), 16);
+                const b = parseInt(c.substring(4, 6), 16);
+                const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+                return luminance > 0.6 ? "#2D3436" : "#FFFFFF";
+            }
+
+            const bgMusic = document.getElementById("bg-music");
+            const sfxCorrect = document.getElementById("sfx-correct");
+            const sfxWrong = document.getElementById("sfx-wrong");
+            if (bgMusic) bgMusic.volume = 0.2;
+            if (sfxCorrect) sfxCorrect.volume = 0.6;
+            if (sfxWrong) sfxWrong.volume = 0.5;
+
+            window.beginCountdown = () => {
+                document.getElementById("start-title-container").style.display =
+                    "none";
+                const countdownEl = document.getElementById(
+                    "countdown-container",
+                );
+                countdownEl.style.display = "flex";
+
+                const nums = [3, 2, 1];
+                let i = 0;
+
+                function showNext() {
+                    countdownEl.innerHTML = "";
+                    if (i < nums.length) {
+                                                  countdownEl.innerHTML = `
+                    <div class="blob-wrapper">
+                        <div class="genii-blob dark"></div>
+                        <div class="genii-blob"></div>
+                    </div>
+                    <div class="countdown-number">${nums[i]}</div>`;
+                        i++;
+                        setTimeout(showNext, 1000);
+                    } else {
+                        countdownEl.style.display = "none";
+                        document.getElementById("start-screen").style.display =
+                            "none";
+                        startGame();
+                    }
+                }
+                showNext();
+            };
+
+            window.startGame = () => {
+                if (!isMuted && bgMusic)
+                    bgMusic.play().catch((e) => console.log("Audio block", e));
+                renderQuestion(0, "slide-in");
+                setTimeout(() => {
+                    const card = document.getElementById(`card-0`);
+                    if (card) card.classList.add("slide-active");
+                }, 50);
+            };
+
+            window.toggleAudio = () => {
+                isMuted = !isMuted;
+                const btn = document.getElementById("muteBtn");
+                const icon = document.getElementById("soundIcon");
+                if (isMuted) {
+                    if (bgMusic) bgMusic.pause();
+                    btn.classList.add("muted");
+                    icon.className = "fa-solid fa-volume-xmark";
+                } else {
+                    if (bgMusic) bgMusic.play();
+                    btn.classList.remove("muted");
+                    icon.className = "fa-solid fa-volume-high";
+                }
+            };
+
+            function playSound(type) {
+                if (isMuted) return;
+                const sfx = type === "correct" ? sfxCorrect : sfxWrong;
+                if (sfx) {
+                    sfx.currentTime = 0;
+                    sfx.play().catch((e) => {});
+                }
+            }
+
+            if (!quizId) window.location.href = "my_sets.html";
+
+                          function _buildLobbyAvatar(data) {
+                if (!data) data = {};
+
+                if (data.avatarRenderUrl) {
+                    return `<img src="${data.avatarRenderUrl}" style="width:100%;height:100%;object-fit:contain;object-position:center 35%;">`;
+                }
+
+                const type = data.profileType || 'avatar';
+                const photo = data.customPhotoUrl || data.photoURL || '';
+
+                if (type === 'photo' && photo) {
+                    return `<img src="${photo}" style="width:100%;height:100%;object-fit:cover;">`;
+                }
+
+                const avatar = data.avatar || {};
+                if (typeof avatar === 'object' && (avatar.skin || avatar.face)) {
+                    const skin = avatar.skin || '001';
+                    const face = avatar.face || '001';
+                    const hat = avatar.hat || 'none';
+                    const hasHat = hat && hat !== 'none';
+                    const scaleStyle = hasHat
+                        ? 'transform:scale(0.75);transform-origin:center 58%;'
+                        : 'transform:scale(0.88);transform-origin:center center;';
+                    let imgs = `<img src="static/img/avatareditor/skins/${skin}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;"><img src="static/img/avatareditor/faces/${face}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;">`;
+                    if (hasHat) imgs += `<img src="static/img/avatareditor/hats/${hat}.png" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;">`;
+                    return `<div style="position:absolute;inset:0;${scaleStyle}">${imgs}</div>`;
+                }
+
+                                  const name = data.displayName || data.username || data.name || 'G';
+                const initial = name.charAt(0).toUpperCase();
+                const gradients = ['linear-gradient(135deg,#6C5CE7,#a29bfe)','linear-gradient(135deg,#00D2BA,#55efc4)','linear-gradient(135deg,#FF4757,#ff6b81)','linear-gradient(135deg,#FFA502,#ffeaa7)'];
+                const idx = name.charCodeAt(0) % gradients.length;
+                return `<div style="position:absolute;inset:0;background:${gradients[idx]};display:flex;align-items:center;justify-content:center;color:white;font-family:Fredoka,sans-serif;font-weight:700;font-size:1.4rem;border-radius:12px;">${initial}</div>`;
+            }
+
+            function setupLobbyPlayerVisuals() {
+                try {
+                    const cachedData = localStorage.getItem("genii_user_cache");
+                    if (cachedData) {
+                        const u = JSON.parse(cachedData);
+                        document.getElementById('lobby-player-name').innerText = u.displayName || u.username || 'Recruta';
+                        document.getElementById('lobbyPlayerAvatar').innerHTML = _buildLobbyAvatar(u);
+                        document.getElementById('result-avatar-wrapper').innerHTML = _buildLobbyAvatar(u);
+                    } else {
+                        document.getElementById('lobbyPlayerAvatar').innerHTML = _buildLobbyAvatar({});
+                        document.getElementById('result-avatar-wrapper').innerHTML = _buildLobbyAvatar({});
+                    }
+                } catch(e) {
+                    console.log("Erro ao carregar avatar no lobby", e);
+                    document.getElementById('lobbyPlayerAvatar').innerHTML = _buildLobbyAvatar({});
+                    document.getElementById('result-avatar-wrapper').innerHTML = _buildLobbyAvatar({});
+                }
+            }
+
+            function updateEndScreenVisuals(accuracy) {
+                const titleEl = document.querySelector('.result-title');
+                const subtitleEl = document.querySelector('.result-subtitle');
+                const diagonalBadge = document.getElementById('avatar-badge-diagonal');
+                const bannerEl = document.getElementById('result-card-banner');
+
+                if (accuracy >= 80) {
+                    titleEl.innerText = "Excelente!";
+                    subtitleEl.innerText = "Parabéns! Estás no caminho de génio!";
+                    if (bannerEl) bannerEl.style.background = "#00cfc1";
+                    if (diagonalBadge) {
+                        diagonalBadge.innerHTML = `<i class="fa-solid fa-crown" style="color: #ffce00;"></i>`;
+                    }
+                } else if (accuracy >= 50) {
+                    titleEl.innerText = "Bom Trabalho!";
+                    subtitleEl.innerText = "Grande esforço! Continua a treinar.";
+                    if (bannerEl) bannerEl.style.background = "#00cfc1";
+                    if (diagonalBadge) {
+                        diagonalBadge.innerHTML = `<i class="fa-solid fa-star" style="color: #ffce00;"></i>`;
+                    }
+                } else {
+                    titleEl.innerText = "Quase lá!";
+                    subtitleEl.innerText = "Não desistas, tenta outra vez!";
+                    if (bannerEl) bannerEl.style.background = "#1cb0f6";
+                    if (diagonalBadge) {
+                        diagonalBadge.innerHTML = `<i class="fa-solid fa-face-frown" style="color: #a270f4;"></i>`;
+                    }
+                }
+            }
+
+            function animateFlasks(pointsPct, correctPct, wrongPct, accuracy) {
+                                  document.getElementById('liquid-score').style.transform = `translateY(${100 - pointsPct}px)`;
+                document.getElementById('liquid-correct').style.transform = `translateY(${100 - correctPct}px)`;
+                document.getElementById('liquid-wrong').style.transform = `translateY(${100 - wrongPct}px)`;
+                document.getElementById('liquid-accuracy').style.transform = `translateY(${100 - accuracy}px)`;
+
+                                  setTimeout(() => emitParticles('emitter-score', '#a270f4'), 200);
+                setTimeout(() => emitParticles('emitter-correct', '#00b894'), 400);
+                setTimeout(() => emitParticles('emitter-wrong', '#d63031'), 600);
+                setTimeout(() => emitParticles('emitter-accuracy', '#0984e3'), 800);
+            }
+
+            function emitParticles(emitterId, color) {
+                const emitter = document.getElementById(emitterId);
+                if (!emitter) return;
+                emitter.innerHTML = '';
+                for (let i = 0; i < 20; i++) {
+                    setTimeout(() => {
+                        const p = document.createElement('div');
+                        p.className = 'flask-particle';
+                        p.style.backgroundColor = color;
+                        p.style.left = `${30 + Math.random() * 40}%`;
+                        p.style.animationDuration = `${0.5 + Math.random() * 0.4}s`;
+                        p.style.animationDelay = `${Math.random() * 0.15}s`;
+                        emitter.appendChild(p);
+                        setTimeout(() => p.remove(), 1000);
+                    }, i * 60);
+                }
+            }
+
+            function triggerSadRain() {
+                const existingRain = document.querySelector('.rain-overlay');
+                if (existingRain) existingRain.remove();
+
+                const rainContainer = document.createElement('div');
+                rainContainer.className = 'rain-overlay';
+                
+                const resultCard = document.querySelector('.result-card-premium');
+                if (resultCard) {
+                    resultCard.appendChild(rainContainer);
+                    for (let i = 0; i < 25; i++) {
+                        const drop = document.createElement('div');
+                        drop.className = 'rain-drop';
+                        drop.style.left = `${Math.random() * 100}%`;
+                        drop.style.animationDuration = `${0.8 + Math.random() * 0.8}s`;
+                        drop.style.animationDelay = `${Math.random() * 1.5}s`;
+                        rainContainer.appendChild(drop);
+                    }
+                }
+            }
+
+            async function loadGameData(authUser) {
+                try {
+                                          const token = authUser ? await authUser.getIdToken() : await auth.currentUser?.getIdToken();
+                    const res = await fetch(`/api/quiz-play?id=${quizId}`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    if (!res.ok) {
+                        const err = await res.json();
+                        throw new Error(err.error || "Erro ao carregar set");
+                    }
+                                        const quizData = await res.json();
+                    questions = quizData.questions || [];
+
+                    quizIsPublic =
+                        quizData.isPublic === true ||
+                        quizData.visibility === "public";
+
+                    if (questions.length === 0) {
+                        document.getElementById("loading-spinner").innerHTML =
+                            "<h2>Este quiz não tem perguntas com resposta.</h2><a href='my_sets.html' style='color:var(--genii-purple);'>Voltar</a>";
+                        return;
+                    }
+
+                                          window._quizOwnerId = quizData.ownerId;
+
+                                          document.getElementById("start-quiz-title").innerText = quizData.title || "Set Genii";
+                    if (quizData.description && quizData.description.trim() !== "") {
+                        document.getElementById("start-quiz-desc").innerText = quizData.description;
+                    }
+                    document.getElementById("lobby-q-count").innerText = questions.filter(q => q.type !== 'slide').length;
+                    
+                                          const coverWrapper = document.getElementById("lobby-cover-wrapper");
+                    if (quizData.cover_image_url && quizData.cover_image_url.trim() !== "") {
+                        coverWrapper.innerHTML = `<img src="${quizData.cover_image_url}" alt="Capa">`;
+                    } else {
+                        coverWrapper.innerHTML = `<div class="placeholder-art">Genii</div>`;
+                    }
+
+                                          setupLobbyPlayerVisuals();
+
+                    document.getElementById("loading-spinner").style.display = "none";
+                    document.getElementById("start-title-container").style.display = "flex";
+                } catch (e) {
+                    console.error(e);
+                                          document.getElementById("loading-spinner").innerHTML =
+                        "<h2>Erro ao carregar set.</h2><p style='color:#999;margin:8px 0;'>Tenta novamente mais tarde.</p><a href='discover.html' style='color:var(--genii-purple);'>Voltar</a>";
+                }
+            }
+
+            function renderQuestion(index, animationClass = "slide-in") {
+                const q = questions[index];
+                const container = document.getElementById("stage");
+                resetHeader();
+
+                const card = document.createElement("div");
+                card.className = `question-card ${animationClass}`;
+                card.id = `card-${index}`;
+
+                let mediaHtml = "";
+                if (q.imageUrl && q.imageUrl.trim() !== "") {
+                    mediaHtml = `<div class="media-area" style="display:flex"><img src="${q.imageUrl}" onclick="openLightbox('${q.imageUrl}')" style="cursor:zoom-in;" title="Clique para ampliar"></div>`;
+                }
+
+                let optionsHtml = "";
+                const type = q.type || "quiz";
+                const letters = ["A", "B", "C", "D"];
+
+                                  const optionKeys =
+                    q.shuffleOptions && type === "quiz"
+                        ? q._shuffledKeys ||
+                          (() => {
+                              const keys = ["A", "B", "C", "D"].filter(
+                                  (k) => q.options && q.options[k],
+                              );
+                              for (let i = keys.length - 1; i > 0; i--) {
+                                  const j = Math.floor(Math.random() * (i + 1));
+                                  [keys[i], keys[j]] = [keys[j], keys[i]];
+                              }
+                              q._shuffledKeys = keys;
+                              return keys;
+                          })()
+                        : ["A", "B", "C", "D"];
+
+                if (type === "quiz") {
+                    let hasAnyOption = false;
+                    optionKeys.forEach((key, i) => {
+                        const optText = q.options ? q.options[key] || "" : "";
+                        if (!optText) return;
+                        hasAnyOption = true;
+                        const customColor =
+                            q.answerColors && q.answerColors[key]
+                                ? q.answerColors[key]
+                                : null;
+                        const styles =
+                            q.answerStyles && q.answerStyles[key]
+                                ? q.answerStyles[key]
+                                : {};
+                        let colorStyle = "";
+                        let colorClass = "color-neutral";
+                        if (customColor) {
+                            const textColor =
+                                styles.textColor ||
+                                getContrastTextColor(customColor);
+                            colorStyle = `style="background-color:${customColor}; box-shadow:0 8px 0 ${darkenColor(customColor)}; color:${textColor};${styles.bold ? " font-weight:900;" : ""}${styles.italic ? " font-style:italic;" : ""}"`;
+                            colorClass = "";
+                        } else {
+                            const extraStyle = [];
+                            if (styles.textColor)
+                                extraStyle.push(`color:${styles.textColor}`);
+                            if (styles.bold) extraStyle.push("font-weight:900");
+                            if (styles.italic)
+                                extraStyle.push("font-style:italic");
+                            if (extraStyle.length)
+                                colorStyle = `style="${extraStyle.join(";")};"`;
+                        }
+                        let ansImgHtml = "";
+                        if (q.answerImages && q.answerImages[key]) {
+                            ansImgHtml = `<img class="opt-ans-img" src="${q.answerImages[key]}" alt="">`;
+                        }
+                        optionsHtml += `<div class="option-btn ${colorClass}" ${colorStyle} onclick="checkAnswer(${index}, '${key}', this)"><div class="opt-icon">${key}</div>${ansImgHtml} ${optText}</div>`;
+                    });
+                    if (!hasAnyOption) {
+                        optionsHtml = `<div style="text-align:center;padding:40px 20px;color:var(--grey)"><p style="font-size:1.1rem;margin-bottom:16px;">Esta pergunta não tem opções disponíveis.</p><button class="typing-game-submit" onclick="nextQuestion()" style="display:inline-flex;padding:12px 32px;">Continuar</button></div>`;
+                    }
+                } else if (type === "boolean") {
+                    optionsHtml = `
+                <div class="option-btn opt-true" onclick="checkAnswer(${index}, 'A', this)"><div class="opt-icon"><i class="fa-solid fa-check"></i></div> Verdadeiro</div>
+                <div class="option-btn opt-false" onclick="checkAnswer(${index}, 'B', this)"><div class="opt-icon"><i class="fa-solid fa-xmark"></i></div> Falso</div>
+            `;
+                } else if (type === "typing") {
+                    optionsHtml = `
+                <div class="typing-game-container">
+                    <input type="text" class="typing-game-input" id="typing-input-${index}" placeholder="Escreva a sua resposta..." autocomplete="off">
+                    <button class="typing-game-submit" onclick="checkTypingAnswer(${index})"><i class="fa-solid fa-paper-plane"></i> Responder</button>
+                </div>
+            `;
+                }
+
+                                  const qStyles = q.questionStyles || {};
+                let qStyleAttr = "";
+                const qStyleParts = [];
+                if (qStyles.textColor)
+                    qStyleParts.push(`color:${qStyles.textColor}`);
+                if (qStyles.bold) qStyleParts.push("font-weight:900");
+                if (qStyles.italic) qStyleParts.push("font-style:italic");
+                if (qStyleParts.length)
+                    qStyleAttr = `style="${qStyleParts.join(";")}"`;
+
+                                  if (type === "slide") {
+                    card.classList.add('slide-mode');
+                    const slideTitle = q.question_text || "Slide";
+                    const slideBody = (q.body || "").replace(/\n/g, "<br>");
+                    const hasImage = q.imageUrl && q.imageUrl.trim() !== "";
+
+                    card.innerHTML = `
+                <div class="slide-presentation-card">
+                    <div class="slide-title-banner">${slideTitle}</div>
+                    ${hasImage ? `<div class="slide-media-area has-image"><img src="${q.imageUrl}" onclick="openLightbox('${q.imageUrl}')" title="Clique para ampliar"></div>` : ''}
+                    ${slideBody ? `<div class="slide-body-bubble">${slideBody}</div>` : ''}
+                    <button class="slide-continue-btn" id="slide-continue-${index}" onclick="slideContinue(${index})" disabled>
+                        Continuar <i class="fa-solid fa-chevron-right"></i>
+                        <div class="slide-continue-timer" id="slide-timer-bar-${index}" style="width:100%"></div>
+                    </button>
+                </div>
+            `;
+
+                    container.appendChild(card);
+                    document.getElementById("q-counter").innerText =
+                        `${index + 1} / ${questions.length}`;
+
+                                          const SLIDE_DELAY = 3000;
+                    const btn = document.getElementById(`slide-continue-${index}`);
+                    const timerBar = document.getElementById(`slide-timer-bar-${index}`);
+                    const startTime = Date.now();
+
+                    const timerInterval = setInterval(() => {
+                        const elapsed = Date.now() - startTime;
+                        const pct = Math.max(0, 100 - (elapsed / SLIDE_DELAY) * 100);
+                        if (timerBar) timerBar.style.width = pct + '%';
+                        if (elapsed >= SLIDE_DELAY) {
+                            clearInterval(timerInterval);
+                            if (btn) {
+                                btn.disabled = false;
+                                btn.classList.add('active');
+                            }
+                            if (timerBar) timerBar.style.width = '0%';
+                        }
+                    }, 50);
+
+                    return;                   }
+
+                card.innerHTML = `
+            ${mediaHtml}
+            <div class="question-text" ${qStyleAttr}>${q.question_text || "Sem Texto"}</div>
+            <div class="options-grid">${optionsHtml}</div>
+        `;
+
+                container.appendChild(card);
+                document.getElementById("q-counter").innerText =
+                    `${index + 1} / ${questions.length}`;
+
+                if (type === "typing") {
+                    setTimeout(() => {
+                        const inp = document.getElementById(
+                            `typing-input-${index}`,
+                        );
+                        if (inp) inp.focus();
+                    }, 400);
+                    const inp = card.querySelector(".typing-game-input");
+                    if (inp)
+                        inp.addEventListener("keydown", (e) => {
+                            if (e.key === "Enter") checkTypingAnswer(index);
+                        });
+                }
+            }
+
+            window.openLightbox = (url) => {
+                const lb = document.getElementById("lightbox");
+                document.getElementById("lightbox-img").src = url;
+                lb.classList.add("active");
+            };
+            window.closeLightbox = () => {
+                document.getElementById("lightbox").classList.remove("active");
+            };
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "Escape") closeLightbox();
+            });
+
+            window.showFeedbackBar = (isCorrect, correctText) => {
+                const bar = document.getElementById("footer-feedback");
+                const iconI = document.getElementById("feedback-icon-i");
+                const title = document.getElementById("feedback-title");
+                const subtitle = document.getElementById("feedback-subtitle");
+                const btnText = document.getElementById("feedback-btn-text");
+                const btn = document.getElementById("feedback-btn");
+
+                                  bar.className = "footer-feedback-bar";
+                btn.className = "feedback-btn";
+
+                if (isCorrect) {
+                    bar.classList.add("correct");
+                    btn.classList.add("btn-correct");
+                    iconI.className = "fa-solid fa-check";
+                    title.textContent = "Excelente!";
+                    subtitle.textContent = "";
+                    btnText.textContent = "Continuar";
+                } else {
+                    bar.classList.add("wrong");
+                    btn.classList.add("btn-wrong");
+                    iconI.className = "fa-solid fa-xmark";
+                    title.textContent = "Não foi desta...";
+                    subtitle.innerHTML = correctText
+                        ? `A resposta correta é: <strong>${correctText}</strong>`
+                        : "";
+                    btnText.textContent = "Continuar";
+                }
+
+                                  document.getElementById("next-overlay").style.display = "block";
+
+                                  bar.classList.add("visible");
+
+                if (window.innerWidth <= 800) {
+                    const hint = document.getElementById("mobile-continue-hint");
+                    if (hint) hint.classList.add("visible");
+                }
+            };
+
+            function decodeCV(cv) { try { return JSON.parse(atob(cv.split('').reverse().join(''))); } catch { return null; } }
+
+            window.checkTypingAnswer = async (qIndex) => {
+                const card = document.getElementById(`card-${qIndex}`);
+                if (card.classList.contains("locked")) return;
+                card.classList.add("locked");
+
+                const q = questions[qIndex];
+                const inp = document.getElementById(`typing-input-${qIndex}`);
+                const userAnswer = (inp ? inp.value : "").trim();
+                inp.disabled = true;
+
+                                  const cv = decodeCV(q._cv);
+                let isCorrect = false;
+                let pointsEarned = 0;
+                let displayAccepted = q.acceptedAnswers || [];
+                let correctText = '';
+
+                if (cv && cv.tp === 'typing') {
+                    const accepted = (cv.aa || []).map(a => a.trim().toLowerCase());
+                    isCorrect = accepted.includes(userAnswer.toLowerCase());
+                    pointsEarned = isCorrect ? parseInt(q.points || 1000) : 0;
+                    displayAccepted = cv.aa || [];
+                    correctText = displayAccepted.join(', ');
+                }
+
+                if (isCorrect) {
+                    playSound("correct");
+                    inp.style.borderColor = "#00b894";
+                    inp.style.background = "#e6fff9";
+                    triggerConfetti();
+                    correctCount++;
+                    score += pointsEarned;
+                    updateHeader(true);
+                } else {
+                    playSound("wrong");
+                    inp.style.borderColor = "#d63031";
+                    inp.style.background = "#fff0f0";
+                    updateHeader(false);
+                }
+
+                const container = card.querySelector(".typing-game-container");
+                if (container) {
+                    const hint = document.createElement("div");
+                    hint.style.cssText =
+                        "margin-top:12px; font-weight:700; font-size:1rem; color:#666;";
+                    hint.innerHTML = `Respostas aceites: <b style="color:#00b894;">${displayAccepted.join(", ")}</b>`;
+                    container.appendChild(hint);
+                }
+
+                document.getElementById("score-display").innerText = score;
+                showFeedbackBar(isCorrect, correctText);
+
+                                  try {
+                    const token = await auth.currentUser?.getIdToken();
+                    fetch('/api/check-answer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({ quizId, questionIndex: qIndex, typingAnswer: userAnswer, validationToken: q._vt })
+                    }).catch(() => {});
+                } catch {}
+            };
+
+            window.checkAnswer = async (qIndex, selectedKey, btnElement) => {
+                const card = document.getElementById(`card-${qIndex}`);
+                if (card.classList.contains("locked")) return;
+
+                card.classList.add("locked");
+                const q = questions[qIndex];
+
+                                  const cv = decodeCV(q._cv);
+                let isCorrect = false;
+                let pointsEarned = 0;
+                let effectiveCorrectKey = null;
+                let correctText = '';
+
+                if (cv) {
+                    effectiveCorrectKey = cv.ck;
+                    if (Array.isArray(cv.ck)) { isCorrect = cv.ck.includes(selectedKey); }
+                    else { isCorrect = cv.ck === selectedKey; }
+                    pointsEarned = isCorrect ? parseInt(q.points || 1000) : 0;
+                    if (q.type === 'boolean') { correctText = cv.ck === 'A' ? 'Verdadeiro' : 'Falso'; }
+                    else if (q.options) {
+                        correctText = Array.isArray(cv.ck)
+                            ? cv.ck.map(k => q.options[k] || k).join(', ')
+                            : (q.options[cv.ck] || '');
+                    }
+                }
+
+                const allBtns = card.querySelectorAll(".option-btn");
+
+                if (isCorrect) {
+                    playSound("correct");
+                    btnElement.classList.add("correct");
+                    triggerConfetti();
+                    correctCount++;
+                    score += pointsEarned;
+                    updateHeader(true);
+                    allBtns.forEach((btn) => {
+                        if (btn !== btnElement) btn.classList.add("dimmed");
+                    });
+                } else {
+                    playSound("wrong");
+                    btnElement.classList.add("wrong");
+                    updateHeader(false);
+
+                                          allBtns.forEach((btn) => {
+                        const btnKey = btn.querySelector(".opt-icon")
+                            ? btn.querySelector(".opt-icon").innerText.trim()
+                            : "";
+                        let isBtnCorrect = false;
+                        if (Array.isArray(effectiveCorrectKey))
+                            isBtnCorrect = effectiveCorrectKey.includes(btnKey);
+                        else isBtnCorrect = effectiveCorrectKey === btnKey;
+
+                        if (isBtnCorrect) {
+                            btn.classList.add("correct");
+                        } else if (btn !== btnElement) {
+                            btn.classList.add("dimmed");
+                        }
+                    });
+                }
+
+                document.getElementById("score-display").innerText = score;
+                showFeedbackBar(isCorrect, correctText);
+
+                                  try {
+                    const token = await auth.currentUser?.getIdToken();
+                    fetch('/api/check-answer', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                        body: JSON.stringify({ quizId, questionIndex: qIndex, selectedKey, validationToken: q._vt })
+                    }).catch(() => {});
+                } catch {}
+            };
+
+            function triggerConfetti() {
+                const geniiColors = [
+                    "#0c71c3",
+                    "#e02424",
+                    "#198754",
+                    "#d97706",
+                    "#f59e0b",
+                    "#7c3aed",
+                ];
+                const duration = 800;
+                const end = Date.now() + duration;
+                (function frame() {
+                    confetti({
+                        particleCount: 8,
+                        angle: 270,
+                        spread: 180,
+                        origin: { x: Math.random(), y: -0.2 },
+                        colors: geniiColors,
+                        scalar: 1.5,
+                        shapes: ["square", "circle"],
+                        gravity: 3,
+                        drift: 0,
+                        ticks: 100,
+                        zIndex: 1500,
+                    });
+                    if (Date.now() < end) requestAnimationFrame(frame);
+                })();
+            }
+
+            function updateHeader(isCorrect) {
+                const header = document.getElementById("main-header");
+                const title = document.getElementById("header-title");
+                if (isCorrect) {
+                    header.classList.add("header-correct");
+                    title.innerHTML =
+                        "<i class='fa-solid fa-check'></i> CORRETO";
+                } else {
+                    header.classList.add("header-wrong");
+                    title.innerHTML =
+                        "<i class='fa-solid fa-xmark'></i> INCORRETO";
+                }
+            }
+
+            function resetHeader() {
+                const header = document.getElementById("main-header");
+                const title = document.getElementById("header-title");
+                header.className = "game-header";
+                title.innerText = "";
+            }
+
+            window.nextQuestion = () => {
+                if (window.confetti) window.confetti.reset();
+                document.getElementById("next-overlay").style.display = "none";
+                document
+                    .getElementById("footer-feedback")
+                    .classList.remove("visible");
+                const hint = document.getElementById("mobile-continue-hint");
+                if (hint) hint.classList.remove("visible");
+
+                const currentCard = document.getElementById(
+                    `card-${currentIndex}`,
+                );
+                currentCard.classList.remove("slide-active");
+                currentCard.classList.add("slide-out");
+
+                currentIndex++;
+                if (currentIndex < questions.length) {
+                    setTimeout(() => {
+                        renderQuestion(currentIndex, "slide-in");
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                const nextCard = document.getElementById(
+                                    `card-${currentIndex}`,
+                                );
+                                if (nextCard)
+                                    nextCard.classList.add("slide-active");
+                            });
+                        });
+                    }, 120);
+                    setTimeout(() => {
+                        if (currentCard) currentCard.remove();
+                    }, 450);
+                } else finishGame();
+            };
+
+            window.slideContinue = (index) => {
+                const currentCard = document.getElementById(`card-${index}`);
+                if (!currentCard) return;
+
+                currentCard.classList.remove("slide-active");
+                currentCard.classList.add("slide-out");
+
+                currentIndex++;
+                if (currentIndex < questions.length) {
+                    setTimeout(() => {
+                        renderQuestion(currentIndex, "slide-in");
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                const nextCard = document.getElementById(
+                                    `card-${currentIndex}`,
+                                );
+                                if (nextCard)
+                                    nextCard.classList.add("slide-active");
+                            });
+                        });
+                    }, 120);
+                    setTimeout(() => {
+                        if (currentCard) currentCard.remove();
+                    }, 450);
+                } else finishGame();
+            };
+
+            async function finishGame() {
+                resetHeader();
+                document.getElementById("main-header").style.display = "none";
+
+                const total = questions.filter(q => q.type !== 'slide').length;
+                const wrongCount = total - correctCount;
+                const accuracy =
+                    total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+                document.getElementById("final-points").innerText = score;
+                document.getElementById("final-correct").innerText =
+                    `${correctCount}/${total}`;
+                document.getElementById("final-wrong").innerText = wrongCount;
+                document.getElementById("final-accuracy").innerText =
+                    `${accuracy}%`;
+
+                                  updateEndScreenVisuals(accuracy);
+
+                document.getElementById("end-screen").style.display = "flex";
+                const resetPremiumCard = document.querySelector(".result-card-premium");
+                if (resetPremiumCard) {
+                    resetPremiumCard.scrollTop = 0;
+                    setTimeout(() => {
+                        resetPremiumCard.scrollTop = 0;
+                    }, 50);
+                }
+
+                                  const pointsPct = Math.min(100, Math.max(0, Math.round((score / ((total || 1) * 1000)) * 100)));
+                const correctPct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+                const wrongPct = total > 0 ? Math.round((wrongCount / total) * 100) : 0;
+                animateFlasks(pointsPct, correctPct, wrongPct, accuracy);
+
+                                  playSound(accuracy >= 50 ? "correct" : "wrong");
+
+                if (quizId) {
+                    try {
+                        const quizRef = doc(db, "quizzes", quizId);
+                        await updateDoc(quizRef, {
+                            playCount: increment(1),
+                            weeklyPlays: increment(1),
+                            lastPlayedAt: serverTimestamp(),
+                        });
+                    } catch (err) {
+                        console.error("Erro ao incrementar playCount:", err);
+                    }
+                }
+
+                if (currentUserUid) {
+                    try {
+                        const earnedXp = await recordGame(currentUserUid, {
+                            correctCount,
+                            totalQuestions: total,
+                            isPublicQuiz: quizIsPublic,
+                            isMultiplayer: false,
+                        });
+
+                        const isPerfect = correctCount === total;
+                        await checkMissionsAfterGame(currentUserUid, {
+                            isPerfect,
+                            isPublicQuiz: quizIsPublic,
+                        });
+
+                        const xpBox = document.getElementById("xp-reward-box");
+                        const xpText = document.getElementById("final-xp-text");
+                        if (xpBox && xpText && earnedXp > 0) {
+                            xpText.innerText = `+${earnedXp} XP Ganho`;
+                            xpBox.style.display = "inline-flex";
+                        }
+                    } catch (e) {
+                        console.error("Erro ao gravar stats:", e);
+                    }
+                }
+
+                if (
+                    assignmentMode &&
+                    assignmentClassId &&
+                    assignmentPostId &&
+                    currentUserUid
+                ) {
+                    try {
+                        const subId = `${currentUserUid}_${assignmentPostId}`;
+                        await setDoc(
+                            doc(
+                                db,
+                                `classrooms/${assignmentClassId}/submissions`,
+                                subId,
+                            ),
+                            {
+                                userId: currentUserUid,
+                                postId: assignmentPostId,
+                                quizId: quizId,
+                                score: score,
+                                correctCount: correctCount,
+                                totalQuestions: total,
+                                submittedAt: serverTimestamp(),
+                            },
+                        );
+                    } catch (e) {
+                        console.error("Erro ao guardar submission:", e);
+                    }
+                }
+
+                if (accuracy >= 50) {
+                    triggerConfetti();
+                } else {
+                    triggerSadRain();
+                }
+            }
+
+            let touchStartX = 0;
+            let touchStartY = 0;
+            document.addEventListener(
+                "touchstart",
+                (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    touchStartY = e.changedTouches[0].screenY;
+                },
+                { passive: true },
+            );
+            document.addEventListener(
+                "touchend",
+                (e) => {
+                    const overlay = document.getElementById("next-overlay");
+                    if (overlay.style.display !== "block") return;
+                    const dx = e.changedTouches[0].screenX - touchStartX;
+                    const dy = Math.abs(
+                        e.changedTouches[0].screenY - touchStartY,
+                    );
+                    if (dx < -50 && dy < Math.abs(dx) * 0.6) {
+                        nextQuestion();
+                    }
+                },
+                { passive: true },
+            );
+        </script>
+    </body>
+</html>

@@ -1,0 +1,3129 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Studio - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    
+    <script type="module" src="static/js/components.js"></script>
+    <link rel="stylesheet" href="static/css/style.css?v=3" />`n    <script src="static/js/theme.js"></script>
+    <script>if(localStorage.getItem('genii_ai_disabled')==='true'){document.documentElement.setAttribute('data-ai-disabled','true');var _s=document.createElement('style');_s.textContent='html[data-ai-disabled="true"] #tab-ai,html[data-ai-disabled="true"] #btn-generate-ai-single,html[data-ai-disabled="true"] #ai-gen-loading,html[data-ai-disabled="true"] .mobile-bar-geno{display:none!important}';document.head.appendChild(_s)}</script>
+
+
+    
+    </head>
+<body data-page="studio">
+
+
+    <div id="geno-panel" class="geno-panel">
+        <div class="geno-character-area">
+            <div class="geno-img-wrapper">
+                <div id="geno-bubble" class="geno-chat-bubble"></div>
+                <img id="geno-img" src="static/img/geno/side.png" alt="Geno" class="geno-img">
+            </div>
+        </div>
+        <div class="geno-chat-box">
+            <div class="geno-header">
+                <h3><img src="static/img/geno/genoicon.png" alt="Geno Icon"> Geno AI</h3>
+                <div class="geno-header-actions">
+                    <button class="geno-expand-btn" id="geno-expand-btn" onclick="toggleGenoFullscreen()" title="Expandir"><i class="fa-solid fa-expand"></i></button>
+                    <button class="icon-btn" onclick="toggleGenoPanel()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="geno-messages" id="geno-messages"></div>
+            <div class="geno-quick-actions" id="geno-quick-actions"></div>
+            <div class="geno-input-row">
+                <textarea id="geno-chat-input" placeholder="Peça algo ao Geno..." rows="1"></textarea>
+                <button class="geno-send-btn" id="geno-send-btn" onclick="sendGenoMessage()">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="image-modal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 650px;">
+            <div class="modal-title" style="color: var(--dark);">
+                <i class="fa-solid fa-image" style="color: var(--purple);"></i> Adicionar Média
+            </div>
+            
+            <div class="image-modal-tabs">
+                <button class="img-tab active" onclick="switchImageTab('upload')"><i class="fa-solid fa-computer"></i> <br> Computador</button>
+                <button class="img-tab" onclick="switchImageTab('unsplash')"><i class="fa-brands fa-unsplash"></i> <br> Unsplash</button>
+                <button class="img-tab" onclick="switchImageTab('ai')"><i class="fa-solid fa-wand-magic-sparkles"></i> <br> Gerar com IA</button>
+            </div>
+
+
+            <div class="img-tab-content active" id="tab-upload">
+                <div class="upload-area" id="modal-upload-area" onclick="document.getElementById('modal-file-input').click()">
+                    <i class="fa-solid fa-cloud-arrow-up fa-3x" style="color: var(--primary); margin-bottom: 10px;"></i>
+                    <h3 style="margin-top: 15px; color:var(--dark);">Clique para procurar</h3>
+                    <p style="color: var(--grey); font-size: 0.9rem;">PNG, JPG ou GIF (Max. 5MB)</p>
+                    <input type="file" id="modal-file-input" accept="image/*" style="display:none;" onchange="handleModalFileUpload(event)">
+                </div>
+            </div>
+
+
+            <div class="img-tab-content" id="tab-unsplash">
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="unsplash-search" class="modal-input" placeholder="Pesquisar fotos (ex: space)..." style="margin:0;">
+                    <button class="btn" style="background: var(--primary); color: white; padding: 0 20px; box-shadow: 0 4px 0 var(--primary-dark);" onclick="searchUnsplash()">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                <div id="unsplash-grid" class="image-grid"></div>
+                <div id="unsplash-loading" style="display:none; text-align:center; padding: 20px;">
+                    <div style="font-size: 2rem; color: var(--dark); margin-bottom: 10px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    <p style="font-weight:700; color:var(--dark);">A procurar imagens perfeitas...</p>
+                </div>
+            </div>
+
+
+            <div class="img-tab-content" id="tab-ai">
+                <p style="color:var(--grey); font-size:0.95rem; margin-bottom:15px; font-weight:600; text-align:center;">
+                    Descreve o que imaginas. O Geno AI trata do resto!
+                </p>
+                <textarea id="ai-image-prompt" class="modal-input" rows="3" placeholder="Ex: Um gato astronauta em marte a comer pizza..." style="resize:none; font-size: 1.1rem; padding: 16px; border-radius: 20px;"></textarea>
+
+
+                <button id="btn-generate-ai-single" class="btn" style="width: 100%; background: var(--purple); color: white; box-shadow: 0 4px 0 #5a4bd4; font-size: 1.2rem; padding: 16px; border-radius: 16px; margin-top: 15px;" onclick="generateAiImageSingle()">
+                    <i class="fa-solid fa-bolt"></i> Gerar
+                </button>
+
+
+                <div id="ai-gen-loading" style="display:none; text-align:center; padding: 20px;">
+                    <div style="font-size: 2rem; color: var(--purple); margin-bottom: 10px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    <p style="font-weight:700; color:var(--purple);">A pintar a sua ideia...</p>
+                    <p style="font-size:0.85rem; color:var(--grey);">Isto pode demorar cerca de 10 segundos.</p>
+                </div>
+            </div>
+
+
+            <div class="modal-actions" style="margin-top: 24px;">
+                <button class="btn btn-exit" onclick="closeModal('image-modal')" style="width: 100%; padding: 14px;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <header class="studio-header">
+        <div style="display:flex; align-items:center; gap:15px;">
+            <div class="studio-logo" onclick="confirmExit()" style="cursor:pointer;">
+                <img src="static/img/geniilogo.png" height="30" alt="">
+            </div>
+            <div class="title-area">
+                <input type="text" id="quizTitleInput" class="quiz-title-input" value="Carregando..." maxlength="100">
+                <i id="privacyIcon" class="fa-solid fa-lock status-lock" title="Privado" onclick="togglePrivacy()"></i>
+                <div class="undo-redo-group">
+                    <button class="undo-redo-btn" id="undoBtn" onclick="undo()" disabled title="Desfazer (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
+                    <button class="undo-redo-btn" id="redoBtn" onclick="redo()" disabled title="Refazer (Ctrl+Shift+Z)"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="studio-credits" id="studioCredits"><img src="static/img/icons/credit.png" alt="cr"/><span id="studio-credits-count">100</span></div>
+            <div style="width:1px; height:30px; background:var(--border); margin:0 5px;"></div>
+            <button class="icon-btn ai-btn" onclick="toggleGenoPanel()" title="Geno AI">
+                <img src="static/img/geno/genoicon.png" alt="Geno Icon">
+            </button>
+            <button class="icon-btn" onclick="openSettingsPage()">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            <div style="width:1px; height:30px; background:var(--border); margin:0 5px;"></div>
+            <button class="btn btn-exit" onclick="window.location.href='my_sets.html'">Sair</button>
+            <button class="btn btn-save" id="saveQuizBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Guardar</button>
+        </div>
+    </header>
+
+
+    <div class="studio-workspace">
+        
+        <aside class="slides-sidebar">
+            <div id="slidesContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <button class="btn-add-slide" id="addSlideBtn"><i class="fa-solid fa-plus"></i><span class="btn-add-text"> Novo Slide</span></button>
+        </aside>
+
+
+        <main class="main-canvas">
+            
+            <div class="studio-context-bar" id="context-toolbar">
+            </div>
+
+
+            <div class="canvas-container">
+                <div class="question-input" id="qTextInput" contenteditable="true" data-placeholder="Escreva o slide aqui..." onkeydown="if(event.key==='Enter'){event.preventDefault();}" onpaste="event.preventDefault(); document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));"></div>
+
+
+                <div class="media-area">
+                    <div class="media-placeholder" id="mediaUploadBtn">
+                        <img id="mediaPreview" class="media-preview-img" onerror="this.src='static/img/placeholder.png'; this.parentElement.classList.remove('has-image');">
+                        <div class="placeholder-content" id="mediaPlaceholderContent">
+                            <i class="fa-solid fa-image fa-2x"></i>
+                            <span style="font-weight:700; margin-top:5px;">Adicionar Média</span>
+                        </div>
+                        <div class="remove-img-btn" id="removeImgBtn" title="Remover"><i class="fa-solid fa-xmark"></i></div>
+                        <input type="file" id="mediaInput" accept="image/*">
+                    </div>
+                </div>
+
+
+                <div class="answers-grid" id="optionsGrid"></div>
+
+
+                <div class="typing-container" id="typingArea">
+                    <p style="color:var(--grey); font-weight:700;">Respostas Aceites (Pressione Enter):</p>
+                    <input type="text" class="genii-select" id="typingInput" placeholder="Ex: Paris">
+                    <div class="typing-input-list" id="acceptedAnswersList"></div>
+                </div>
+
+
+                <div class="slide-body-container" id="slideBodyArea" style="display:none;">
+                    <label class="slide-body-label"><i class="fa-solid fa-align-left"></i> Conteúdo do Slide</label>
+                    <textarea id="slideBodyInput" class="slide-body-textarea" placeholder="Escreve o conteúdo informativo que os alunos vão ler..."></textarea>
+                </div>
+            </div>
+        </main>
+
+
+        <aside class="settings-panel">
+            <div class="sheet-drag-handle"><i class="fa-solid fa-gear"></i></div>
+            <div class="panel-section">
+                <div class="settings-header-row">
+                    <h4>Definições do Slide</h4>
+                </div>
+                
+                <div class="setting-group">
+                    <label class="setting-label"><i class="fa-solid fa-list"></i> Tipo de Slide</label>
+                    <select class="genii-select" id="typeSelect">
+                        <option value="quiz">Quiz (Padrão)</option>
+                        <option value="boolean">Verdadeiro ou Falso</option>
+                        <option value="typing">Escrever Resposta</option>
+                        <option value="slide">Apresentação</option>
+                    </select>
+                </div>
+
+
+                <div class="setting-group">
+                    <label class="setting-label"><i class="fa-regular fa-clock"></i> Tempo Limite</label>
+                    <select class="genii-select" id="timeSelect">
+                        <option value="10">10 Segundos</option>
+                        <option value="20">20 Segundos</option>
+                        <option value="30" selected>30 Segundos</option>
+                        <option value="60">60 Segundos</option>
+                    </select>
+                </div>
+
+
+                <div class="setting-group">
+                    <label class="setting-label"><i class="fa-solid fa-trophy"></i> Pontos</label>
+                    <select class="genii-select" id="pointsSelect">
+                        <option value="0">0 Pontos</option>
+                        <option value="1000" selected>Padrão (1000)</option>
+                        <option value="2000">Dobro (2000)</option>
+                    </select>
+                </div>
+
+
+                <div class="settings-divider"></div>
+
+
+                <div class="setting-group">
+                    <div class="toggle-row" id="shuffleToggleRow">
+                        <div class="toggle-label"><i class="fa-solid fa-shuffle"></i> Randomizar opções</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="shuffleOptionsToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top:auto; padding-top:16px; border-top:2px solid var(--border);">
+                <button class="btn-delete-question" id="deleteCurrentSlideBtn">
+                    <i class="fa-solid fa-trash"></i> Apagar Slide
+                </button>
+            </div>
+        </aside>
+
+
+    </div>
+
+
+    <div class="mobile-bottom-bar" id="mobileBottomBar">
+        <button class="mobile-bar-btn mobile-bar-settings" onclick="toggleMobileSettings()">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+        <button class="mobile-bar-btn mobile-bar-geno" onclick="toggleGenoSheet()">
+            <img src="static/img/geno/genoicon.png" alt="Geno" class="mobile-geno-icon">
+        </button>
+    </div>
+
+
+    <div class="geno-sheet-wrapper" id="genoSheetWrapper">
+        <div class="geno-sheet-mascot-area" id="genoSheetMascot">
+            <div class="geno-sheet-bubble" id="genoSheetBubble"></div>
+            <img src="static/img/geno/side.png" alt="Geno" class="geno-sheet-mascot">
+        </div>
+        <div class="geno-sheet" id="genoSheet">
+            <div class="geno-sheet-header">
+                <div class="geno-sheet-title">
+                    <img src="static/img/geno/genoicon.png" alt="Geno" class="geno-sheet-icon">
+                    <h3>Geno AI</h3>
+                </div>
+                <button class="geno-expand-btn" onclick="toggleGenoSheetFullscreen()"><i class="fa-solid fa-expand"></i></button>
+            </div>
+            <div class="geno-sheet-messages" id="genoSheetMessages"></div>
+            <div class="geno-sheet-quick" id="genoSheetQuick"></div>
+            <div class="geno-sheet-input">
+                <textarea id="genoSheetInput" placeholder="Peça algo ao Geno..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendGenoSheetMessage();}"></textarea>
+                <button class="geno-sheet-send" id="genoSheetSend" onclick="sendGenoSheetMessage()">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="geno-sheet-backdrop" id="genoSheetBackdrop" onclick="closeGenoSheet()"></div>
+
+
+    <div class="settings-backdrop" id="settingsBackdrop" onclick="closeMobileSettings()"></div>
+
+
+    <input type="file" id="ansImgInput" accept="image/*">
+
+
+<script type="module">
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+    import "./static/js/components.js";
+    import { getAuthHeaders, updateCreditsAfterSpend, showCreditsWarning, refreshCredits } from "./static/js/credits.js";
+
+
+    let _cloudinaryToken = null;
+
+
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('id');
+
+
+    if (!quizId) window.location.href = "my_sets.html";
+
+
+    let quizData = null;
+    let questions =[];
+    let currentIndex = 0;
+    
+    let draggedItemIndex = null;
+    let currentAnsImgTarget = null;
+
+
+    const _history = [];
+    let _historyIdx = -1;
+    let _historyPaused = false;
+    const MAX_HISTORY = 50;
+
+
+    function saveSnapshot() {
+        if (_historyPaused) return;
+        const snapshot = {
+            questions: JSON.parse(JSON.stringify(questions)),
+            currentIndex: currentIndex,
+            title: quizData?.title || '',
+            isPublic: quizData?.isPublic ?? true
+        };
+        if (_historyIdx < _history.length - 1) _history.splice(_historyIdx + 1);
+        _history.push(snapshot);
+        if (_history.length > MAX_HISTORY) _history.shift();
+        _historyIdx = _history.length - 1;
+        updateUndoRedoButtons();
+    }
+
+
+    function restoreSnapshot(snapshot) {
+        _historyPaused = true;
+        questions = JSON.parse(JSON.stringify(snapshot.questions));
+        currentIndex = snapshot.currentIndex;
+        if (quizData) {
+            quizData.title = snapshot.title;
+            quizData.isPublic = snapshot.isPublic;
+            document.getElementById('quizTitleInput').value = snapshot.title;
+            const lock = document.getElementById('privacyIcon');
+            if (snapshot.isPublic) { lock.className = "fa-solid fa-globe status-lock public"; lock.title = "Público"; }
+            else { lock.className = "fa-solid fa-lock status-lock private"; lock.title = "Privado"; }
+        }
+        if (currentIndex >= questions.length) currentIndex = questions.length - 1;
+        if (currentIndex < 0) currentIndex = 0;
+        renderThumbnailList();
+        loadQuestionToCanvas(currentIndex);
+        _historyPaused = false;
+        updateUndoRedoButtons();
+    }
+
+
+    window.undo = () => {
+        if (_historyIdx <= 0) return;
+        _historyIdx--;
+        restoreSnapshot(_history[_historyIdx]);
+    };
+
+
+    window.redo = () => {
+        if (_historyIdx >= _history.length - 1) return;
+        _historyIdx++;
+        restoreSnapshot(_history[_historyIdx]);
+    };
+
+
+    function updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undoBtn');
+        const redoBtn = document.getElementById('redoBtn');
+        if (undoBtn) undoBtn.disabled = _historyIdx <= 0;
+        if (redoBtn) redoBtn.disabled = _historyIdx >= _history.length - 1;
+    }
+
+
+    let imageModalTargetType = null;
+    let imageModalTargetKey = null;
+
+
+    let selectedElementType = null; 
+    let selectedElementKey = null;  
+    let draggedAnswerKey = null;
+
+
+    const NEUTRAL_COLOR = '#FFFFFF';
+
+
+    let genoChatHistory = [];
+    let genoIsProcessing = false;
+
+
+    const GENO_QUICK_ACTIONS = [
+        { label: 'Gerar imagem para este slide', prompt: 'Gere uma imagem adequada para a pergunta atual.' },
+        { label: 'Adicionar 2 slides', prompt: 'Adicione mais 2 slides sobre o mesmo tema do set.' },
+        { label: 'Corrigir ortografia', prompt: 'Corrija a ortografia e gramática da pergunta atual e das suas opções.' },
+        { label: 'Criar set completo', prompt: 'Crie um set completo com 5 slides sobre o tema deste set.' },
+        { label: 'Traduzir para inglês', prompt: 'Traduza a pergunta atual e as suas opções para inglês.' },
+        { label: 'Dificultar slides', prompt: 'Torne este slide mais difícil com opções mais complexas.' },
+        { label: 'Simplificar texto', prompt: 'Simplifique a linguagem do slide e opções para ser mais fácil de entender.' },
+        { label: 'Adicionar dicas', prompt: 'Adicione pequenas dicas de contexto ou explicações às opções de resposta.' },
+    ];
+
+
+    window.toggleGenoPanel = () => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const panel = document.getElementById('geno-panel');
+        if (panel.classList.contains('open')) {
+            panel.classList.remove('open', 'fullscreen');
+            setGenoState('idle');
+        } else {
+            panel.classList.add('open');
+            if (genoChatHistory.length === 0) {
+                addGenoMessage('assistant', 'Olá, sou o Geno o seu assistente! Peça-me qualquer coisa, posso criar slides, gerar imagens, corrigir texto e muito mais!');
+                renderQuickActions(GENO_QUICK_ACTIONS);
+            }
+            setGenoState('idle');
+            setTimeout(() => document.getElementById('geno-chat-input').focus(), 300);
+        }
+    };
+
+
+    window.toggleGenoFullscreen = () => {
+        const panel = document.getElementById('geno-panel');
+        const btn = document.getElementById('geno-expand-btn');
+        const isFull = panel.classList.toggle('fullscreen');
+        btn.innerHTML = isFull
+            ? '<i class="fa-solid fa-compress"></i>'
+            : '<i class="fa-solid fa-expand"></i>';
+        btn.title = isFull ? 'Reduzir' : 'Expandir';
+    };
+
+
+    let genoSheetHistory = [];
+
+
+    window.toggleGenoSheet = () => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const wrapper = document.getElementById('genoSheetWrapper');
+        const backdrop = document.getElementById('genoSheetBackdrop');
+        const mascot = document.getElementById('genoSheetMascot');
+        const settingsPanel = document.querySelector('.settings-panel');
+        const settingsBackdrop = document.getElementById('settingsBackdrop');
+        if (wrapper.classList.contains('open')) {
+            closeGenoSheet();
+        } else {
+            if (settingsPanel) { settingsPanel.classList.remove('open'); settingsPanel.style.transform = ''; }
+            if (settingsBackdrop) settingsBackdrop.classList.remove('show');
+            wrapper.classList.add('open');
+            backdrop.classList.add('show');
+            if (mascot) mascot.classList.add('visible');
+            if (genoSheetHistory.length === 0) {
+                renderGenoSheetMessages([{ role: 'assistant', text: 'Olá! Sou o Geno, o seu assistente. Peça-me qualquer coisa!' }]);
+                renderGenoSheetQuick(GENO_QUICK_ACTIONS);
+            }
+            setTimeout(() => document.getElementById('genoSheetInput').focus(), 350);
+        }
+    };
+
+
+    window.closeGenoSheet = () => {
+        stopSheetTypewriter();
+        const wrapper = document.getElementById('genoSheetWrapper');
+        const backdrop = document.getElementById('genoSheetBackdrop');
+        const mascot = document.getElementById('genoSheetMascot');
+        const bar = document.getElementById('mobileBottomBar');
+        wrapper.classList.remove('open', 'fullscreen');
+        backdrop.classList.remove('show');
+        if (mascot) mascot.classList.remove('visible');
+        if (bar) bar.style.display = '';
+    };
+
+
+    window.toggleGenoSheetFullscreen = () => {
+        const wrapper = document.getElementById('genoSheetWrapper');
+        const btn = wrapper.querySelector('.geno-expand-btn');
+        const bar = document.getElementById('mobileBottomBar');
+        const isFull = wrapper.classList.toggle('fullscreen');
+        if (btn) btn.innerHTML = isFull ? '<i class="fa-solid fa-compress"></i>' : '<i class="fa-solid fa-expand"></i>';
+        if (bar) bar.style.display = isFull ? 'none' : '';
+    };
+
+
+    function renderGenoSheetMessages(msgs) {
+        stopSheetTypewriter();
+        const c = document.getElementById('genoSheetMessages');
+        c.innerHTML = msgs.map(m => {
+            const cls = m.role === 'user' ? 'user' : 'assistant';
+            return `<div class="geno-msg ${cls}">${escapeGenoHtml(m.text)}</div>`;
+        }).join('');
+        requestAnimationFrame(() => {
+            c.scrollTo({ top: c.scrollHeight, behavior: 'instant' });
+        });
+    }
+
+
+    function renderGenoSheetQuick(actions) {
+        const c = document.getElementById('genoSheetQuick');
+        c.innerHTML = actions.map(a =>
+            `<button class="geno-qa-btn" onclick="sendGenoSheetMessage('${a.prompt.replace(/'/g, "\\'")}')">${a.label}</button>`
+        ).join('');
+    }
+
+
+    window.sendGenoSheetMessage = async (text) => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const input = document.getElementById('genoSheetInput');
+        const msg = text || input.value.trim();
+        if (!msg || genoIsProcessing) return;
+        if (!text) { input.value = ''; input.style.height = 'auto'; }
+
+
+        genoSheetHistory.push({ role: 'user', text: msg });
+        renderGenoSheetMessages(genoSheetHistory);
+        document.getElementById('genoSheetQuick').innerHTML = '';
+
+
+        genoIsProcessing = true;
+        const sendBtn = document.getElementById('genoSheetSend');
+        sendBtn.disabled = true;
+        setGenoState('planning', 'A pensar...');
+
+
+        const c = document.getElementById('genoSheetMessages');
+        const typingEl = document.createElement('div');
+        typingEl.className = 'geno-msg assistant';
+        typingEl.id = 'geno-sheet-typing';
+        typingEl.innerHTML = '<div class="geno-typing"><span></span><span></span><span></span></div>';
+        c.appendChild(typingEl);
+        c.scrollTo({ top: c.scrollHeight, behavior: 'instant' });
+
+
+        try {
+            const systemPrompt = buildGenoSystemPrompt();
+            const apiMessages = [...genoSheetHistory.map(m => ({ role: m.role, text: m.text }))];
+
+
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: await getAuthHeaders(),
+                body: JSON.stringify({ messages: apiMessages, systemPrompt })
+            });
+
+
+            if (response.status === 429) { showCreditsWarning(); throw new Error('Créditos insuficientes.'); }
+            if (!response.ok) throw new Error('Erro no servidor.');
+
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '', fullText = '';
+
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const events = parseSSE(buffer);
+                buffer = buffer.split('\n\n').pop() || '';
+                for (const event of events) {
+                    if (event.credits !== undefined) updateCreditsAfterSpend(event.credits);
+                    if (event.token) fullText += event.token;
+                    if (event.error) throw new Error(event.error);
+                }
+            }
+
+
+            let cleanText = fullText;
+            if (cleanText.includes('```json')) cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+            else if (cleanText.includes('```')) cleanText = cleanText.split('```')[1].split('```')[0].trim();
+
+
+            let parsed;
+            try { parsed = JSON.parse(cleanText); }
+            catch { const m = cleanText.match(/\{[\s\S]*\}/); if (m) parsed = JSON.parse(m[0]); else throw new Error('Resposta não-JSON'); }
+
+
+            if (parsed.tools && parsed.tools.length > 0) {
+                setGenoState('magic', 'A executar...');
+                await executeGenoTools(parsed.tools);
+                document.getElementById('saveQuizBtn').click();
+                saveSnapshot();
+            }
+
+
+            const reply = parsed.reply || parsed.chat_reply || 'Feito!';
+
+
+            const typingRemove = document.getElementById('geno-sheet-typing');
+            if (typingRemove) typingRemove.remove();
+
+
+            genoSheetHistory.push({ role: 'assistant', text: reply });
+            sheetTypeQueue = reply;
+            sheetTypeTarget = null;
+            startSheetTypewriter(reply);
+            renderGenoSheetQuick(GENO_QUICK_ACTIONS);
+            setGenoState('talking', '');
+        } catch (err) {
+            const typingRemove = document.getElementById('geno-sheet-typing');
+            if (typingRemove) typingRemove.remove();
+            genoSheetHistory.push({ role: 'assistant', text: 'Ups, algo correu mal. Tente novamente.' });
+            renderGenoSheetMessages(genoSheetHistory);
+            setGenoState('idle');
+        } finally {
+            genoIsProcessing = false;
+            sendBtn.disabled = false;
+            setTimeout(() => setGenoState('idle'), 2000);
+        }
+    };
+
+
+    let sheetTypeQueue = '';
+    let sheetTypeTimer = null;
+    let sheetTypeTarget = null;
+
+
+    function startSheetTypewriter(text) {
+        const container = document.getElementById('genoSheetMessages');
+        const oldTyping = document.getElementById('geno-sheet-typing');
+        if (oldTyping) oldTyping.remove();
+
+
+        sheetTypeTarget = document.createElement('div');
+        sheetTypeTarget.className = 'geno-msg assistant';
+        sheetTypeTarget.id = 'geno-sheet-streaming';
+        sheetTypeTarget.textContent = '';
+        container.appendChild(sheetTypeTarget);
+        sheetTypeQueue = text;
+        sheetTypeTimer = setInterval(sheetTypeTick, 25);
+    }
+
+
+    function sheetTypeTick() {
+        if (sheetTypeQueue.length > 0) {
+            const batch = Math.min(sheetTypeQueue.length, 3);
+            sheetTypeTarget.textContent += sheetTypeQueue.substring(0, batch);
+            sheetTypeQueue = sheetTypeQueue.substring(batch);
+            const container = document.getElementById('genoSheetMessages');
+            container.scrollTo({ top: container.scrollHeight, behavior: 'instant' });
+        } else {
+            stopSheetTypewriter();
+            if (sheetTypeTarget) sheetTypeTarget.removeAttribute('id');
+        }
+    }
+
+
+    function stopSheetTypewriter() {
+        if (sheetTypeTimer) { clearInterval(sheetTypeTimer); sheetTypeTimer = null; }
+        sheetTypeQueue = '';
+    }
+
+
+    window.setGenoState = (state, message = null) => {
+        const img = document.getElementById('geno-img');
+        const bubble = document.getElementById('geno-bubble');
+        const mobileMascot = document.querySelector('.geno-sheet-mascot');
+        const mobileBubble = document.getElementById('genoSheetBubble');
+        const states = {
+            idle: 'static/img/geno/side.png',
+            talking: 'static/img/geno/side.png',
+            planning: 'static/img/geno/plan.png',
+            magic: 'static/img/geno/magic.png'
+        };
+        const src = states[state] || states.idle;
+        if (img) img.src = src;
+        if (mobileMascot) mobileMascot.src = src;
+        const transforms = {
+            planning: 'scale(1.25) translate(-6px, 0)',
+            magic: 'scale(1.18) translate(-5px, 0)',
+            idle: 'scale(1) translate(0, 0)',
+            talking: 'scale(1) translate(0, 0)'
+        };
+        const t = transforms[state] || transforms.idle;
+        if (img) img.style.transform = t;
+        if (mobileMascot) mobileMascot.style.transform = t;
+        if (message) {
+            if (bubble) { bubble.innerHTML = message; bubble.classList.add('visible'); }
+            if (mobileBubble) { mobileBubble.innerHTML = message; mobileBubble.classList.add('visible'); }
+        } else {
+            if (bubble) bubble.classList.remove('visible');
+            if (mobileBubble) { mobileBubble.innerHTML = ''; mobileBubble.classList.remove('visible'); }
+        }
+    };
+
+
+    function addGenoMessage(role, text) {
+        genoChatHistory.push({ role, text });
+        renderGenoMessages();
+    }
+
+
+    function renderGenoMessages() {
+        const container = document.getElementById('geno-messages');
+        container.innerHTML = genoChatHistory.map(m => {
+            const cls = m.role === 'user' ? 'user' : 'assistant';
+            return `<div class="geno-msg ${cls}">${escapeGenoHtml(m.text)}</div>`;
+        }).join('');
+        container.scrollTop = container.scrollHeight;
+    }
+
+
+    function escapeGenoHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+
+    function showGenoTyping() {
+        const container = document.getElementById('geno-messages');
+        const typing = document.createElement('div');
+        typing.className = 'geno-msg assistant geno-typing';
+        typing.id = 'geno-typing-indicator';
+        typing.innerHTML = '<span></span><span></span><span></span>';
+        container.appendChild(typing);
+        container.scrollTop = container.scrollHeight;
+    }
+
+
+    function hideGenoTyping() {
+        const el = document.getElementById('geno-typing-indicator');
+        if (el) el.remove();
+    }
+
+
+    function renderQuickActions(actions) {
+        const container = document.getElementById('geno-quick-actions');
+        container.innerHTML = actions.map((a, i) =>
+            `<button class="geno-qa-btn" data-prompt="${a.prompt.replace(/"/g, '&quot;')}">${a.label}</button>`
+        ).join('');
+        container.style.display = actions.length ? '' : 'none';
+    }
+
+
+    function clearQuickActions() {
+        document.getElementById('geno-quick-actions').innerHTML = '';
+        document.getElementById('geno-quick-actions').style.display = 'none';
+    }
+
+
+    function buildGenoSystemPrompt() {
+        const quizTitle = document.getElementById('quizTitleInput')?.value || 'Sem título';
+        const q = questions[currentIndex] || {};
+        const qText = q.question_text || '(vazia)';
+        const opts = q.options || {};
+        const qType = q.type || 'quiz';
+        const timeLimit = q.timeLimit || '20';
+        const points = q.points || '1000';
+        const correctOpt = q.correct_option || [];
+        const totalQs = questions.length;
+
+
+        return `És o Geno, o assistente robótico super inteligente e simpático da plataforma educacional Genii.
+Falas em português de Portugal (pt-PT). És breve, amigável e usas emojis ocasionalmente.
+
+
+CONTEXTO ATUAL DO EDITOR:
+- Título do quiz: "${quizTitle}"
+- Total de slides: ${totalQs}
+- Slide atual: #${currentIndex + 1} — "${qText}"
+- Tipo: ${qType} | Tempo: ${timeLimit}s | Pontos: ${points}
+- Opções: A="${opts.A || ''}" | B="${opts.B || ''}" | C="${opts.C || ''}" | D="${opts.D || ''}"
+- Resposta(s) correta(s): ${Array.isArray(correctOpt) ? correctOpt.join(', ') : correctOpt}
+${qType === 'slide' ? `- Corpo do slide: "${(q.body || '').substring(0, 200)}"` : ''}
+
+
+FERRAMENTAS DISPONÍVEIS (usa-as quando o utilizador pede alterações ao quiz):
+1. "updateCurrentQuestion" — altera a pergunta atual. Data pode conter: question_text, options (objeto {A,B,C,D}), correct_option (array), timeLimit, points, type, body (para slides), imageKeyword.
+2. "addQuestions" — adiciona novas perguntas ao quiz. Data: { questions: [ {question_text, type, options:{A,B,C,D}, correct_option:["A"], body:"conteúdo do slide (só para tipo slide)", imageKeyword:"english prompt"} ] }
+3. "generateImage" — gera uma imagem para uma pergunta. Data: { prompt: "english detailed prompt", slideIndex: número (opcional, 0-based, default=pergunta atual) }
+4. "deleteQuestion" — apaga uma pergunta do quiz. Data: { slideIndex: número (0-based) }. NÃO apagues se só existir 1 pergunta.
+5. "removeQuestionImage" — remove a imagem de uma pergunta. Data: { slideIndex: número (opcional, 0-based, default=pergunta atual) }
+6. "removeAnswerImage" — remove a imagem de uma opção de resposta. Data: { key: "A"|"B"|"C"|"D", slideIndex: número (opcional) }
+7. "reorderQuestion" — move uma pergunta para cima ou baixo na ordem. Data: { slideIndex: número, direction: "up"|"down" }
+8. "updateQuizTitle" — altera o título do quiz. Data: { title: "novo título" }
+9. "togglePrivacy" — alterna o quiz entre público e privado. Data: {}
+10. "navigateToQuestion" — navega para uma pergunta específica. Data: { slideIndex: número (0-based) }
+
+
+FORMATO DE RESPOSTA OBRIGATÓRIO (JSON puro, sem markdown):
+{
+  "reply": "Mensagem curta (max 2 frases) sobre o que fizeste. Usa SEMPRE tempo passado pois é mostrada DEPOIS de executar (ex: 'Criei 5 perguntas sobre X' em vez de 'Vou criar'). Se só conversaste, responde normalmente.",
+  "tools": [
+    { "action": "updateCurrentQuestion|addQuestions|generateImage|deleteQuestion|removeQuestionImage|removeAnswerImage|reorderQuestion|updateQuizTitle|togglePrivacy|navigateToQuestion", "data": { ... } }
+  ]
+}
+
+
+Se o utilizador só quer conversar (sem alterar o quiz), devolve "tools": [].
+NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
+    }
+
+
+    async function executeGenoTools(tools) {
+        if (!tools || !Array.isArray(tools) || tools.length === 0) return;
+
+
+        for (const tool of tools) {
+            try {
+                if (tool.action === 'updateCurrentQuestion' && tool.data) {
+                    const q = questions[currentIndex];
+                    if (tool.data.question_text !== undefined) q.question_text = tool.data.question_text;
+                    if (tool.data.options) Object.assign(q.options, tool.data.options);
+                    if (tool.data.correct_option) q.correct_option = tool.data.correct_option;
+                    if (tool.data.timeLimit) q.timeLimit = tool.data.timeLimit;
+                    if (tool.data.points) q.points = tool.data.points;
+                    if (tool.data.type) q.type = tool.data.type;
+                    if (tool.data.body !== undefined) q.body = tool.data.body;
+                    if (tool.data.imageKeyword) {
+                        setGenoState('magic', 'A pintar a imagem...');
+                        (async () => {
+                            const { url: imgUrl, publicId: imgPublicId } = await generateAIImage(tool.data.imageKeyword);
+                            if (imgUrl) {
+                                if (q.imagePublicId && _cloudinaryToken) {
+                                    window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
+                                } else if (q.imageDeleteToken) {
+                                    fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [q.imageDeleteToken] }) }).catch(() => {});
+                                }
+                                q.imageUrl = imgUrl;
+                                q.imagePublicId = imgPublicId;
+                                loadQuestionToCanvas(currentIndex);
+                                renderThumbnailList();
+                            }
+                        })();
+                    }
+                    loadQuestionToCanvas(currentIndex);
+                    renderThumbnailList();
+                }
+                else if (tool.action === 'addQuestions' && tool.data?.questions) {
+                    const newQs = tool.data.questions.map(q => ({
+                        id: Date.now() + Math.random().toString(),
+                        type: q.type || 'quiz',
+                        question_text: q.question_text || '',
+                        options: q.options || { A: '', B: '', C: '', D: '' },
+                        correct_option: Array.isArray(q.correct_option) ? q.correct_option : [q.correct_option || 'A'],
+                        timeLimit: q.timeLimit || '20',
+                        points: q.points || '1000',
+                        imageUrl: null,
+                        shuffleOptions: q.shuffleOptions || false,
+                        body: q.body || '',
+                        _imageKeyword: q.imageKeyword || null
+                    }));
+
+
+                    if (questions.length === 1 && questions[0].question_text === '') questions = [];
+                    const baseIndex = questions.length;
+                    questions.push(...newQs);
+                    renderThumbnailList();
+
+
+                    const imageTasks = [];
+                    for (let i = 0; i < newQs.length; i++) {
+                        if (newQs[i]._imageKeyword) {
+                            imageTasks.push({ idx: baseIndex + i, keyword: newQs[i]._imageKeyword });
+                            delete questions[baseIndex + i]._imageKeyword;
+                        }
+                    }
+
+
+                    for (const task of imageTasks) {
+                        setGenoState('magic', 'A pintar ilustrações...');
+                        const { url: imgUrl, publicId: imgPublicId } = await generateAIImage(task.keyword);
+                        if (imgUrl) {
+                            const q = questions[task.idx];
+                            if (q.imagePublicId && _cloudinaryToken) {
+                                window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
+                            } else if (q.imageDeleteToken) {
+                                fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [q.imageDeleteToken] }) }).catch(() => {});
+                            }
+                            q.imageUrl = imgUrl;
+                            q.imagePublicId = imgPublicId;
+                            renderThumbnailList();
+                        }
+                    }
+                }
+                else if (tool.action === 'generateImage' && tool.data?.prompt) {
+                    const targetIdx = (tool.data.slideIndex !== undefined && tool.data.slideIndex >= 0 && tool.data.slideIndex < questions.length)
+                        ? tool.data.slideIndex : currentIndex;
+                    setGenoState('magic', 'A pintar a imagem...');
+                    const { url: imgUrl, publicId: imgPublicId } = await generateAIImage(tool.data.prompt);
+                    if (imgUrl) {
+                        const q = questions[targetIdx];
+                        if (q.imagePublicId && _cloudinaryToken) {
+                            window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
+                        } else if (q.imageDeleteToken) {
+                            fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [q.imageDeleteToken] }) }).catch(() => {});
+                        }
+                        q.imageUrl = imgUrl;
+                        q.imagePublicId = imgPublicId;
+                        loadQuestionToCanvas(targetIdx);
+                        renderThumbnailList();
+                    }
+                }
+                else if (tool.action === 'deleteQuestion' && tool.data) {
+                    const targetIdx = (tool.data.slideIndex !== undefined && tool.data.slideIndex >= 0 && tool.data.slideIndex < questions.length)
+                        ? tool.data.slideIndex : currentIndex;
+                    if (questions.length <= 1) continue;
+                    questions.splice(targetIdx, 1);
+                    if (currentIndex >= questions.length) currentIndex = questions.length - 1;
+                    loadQuestionToCanvas(currentIndex);
+                    renderThumbnailList();
+                }
+                else if (tool.action === 'removeQuestionImage') {
+                    const targetIdx = (tool.data && tool.data.slideIndex !== undefined && tool.data.slideIndex >= 0 && tool.data.slideIndex < questions.length)
+                        ? tool.data.slideIndex : currentIndex;
+                    const q = questions[targetIdx];
+                    if (q.imagePublicId && _cloudinaryToken) {
+                        window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {});
+                    } else if (q.imageDeleteToken) {
+                        fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [q.imageDeleteToken] }) }).catch(() => {});
+                    }
+                    q.imageUrl = null;
+                    q.imagePublicId = '';
+                    q.imageDeleteToken = '';
+                    loadQuestionToCanvas(currentIndex);
+                    renderThumbnailList();
+                }
+                else if (tool.action === 'removeAnswerImage' && tool.data?.key) {
+                    const targetIdx = (tool.data.slideIndex !== undefined && tool.data.slideIndex >= 0 && tool.data.slideIndex < questions.length)
+                        ? tool.data.slideIndex : currentIndex;
+                    const q = questions[targetIdx];
+                    const key = tool.data.key;
+                    if (q.answerImagePublicIds && q.answerImagePublicIds[key] && _cloudinaryToken) {
+                        window.deleteFromCloudinary(q.answerImagePublicIds[key], _cloudinaryToken).catch(() => {});
+                    } else if (q.answerImageTokens && q.answerImageTokens[key]) {
+                        fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [q.answerImageTokens[key]] }) }).catch(() => {});
+                    }
+                    if (q.answerImages) delete q.answerImages[key];
+                    if (q.answerImageTokens) delete q.answerImageTokens[key];
+                    if (q.answerImagePublicIds) delete q.answerImagePublicIds[key];
+                    loadQuestionToCanvas(currentIndex);
+                }
+                else if (tool.action === 'reorderQuestion' && tool.data) {
+                    const fromIdx = (tool.data.slideIndex !== undefined) ? tool.data.slideIndex : currentIndex;
+                    const dir = tool.data.direction;
+                    if (dir === 'up' && fromIdx > 0) {
+                        [questions[fromIdx], questions[fromIdx - 1]] = [questions[fromIdx - 1], questions[fromIdx]];
+                        if (currentIndex === fromIdx) currentIndex--;
+                        else if (currentIndex === fromIdx - 1) currentIndex++;
+                    } else if (dir === 'down' && fromIdx < questions.length - 1) {
+                        [questions[fromIdx], questions[fromIdx + 1]] = [questions[fromIdx + 1], questions[fromIdx]];
+                        if (currentIndex === fromIdx) currentIndex++;
+                        else if (currentIndex === fromIdx + 1) currentIndex--;
+                    }
+                    renderThumbnailList();
+                    loadQuestionToCanvas(currentIndex);
+                    renderContextToolbar();
+                }
+                else if (tool.action === 'updateQuizTitle' && tool.data?.title) {
+                    document.getElementById('quizTitleInput').value = tool.data.title;
+                    if (quizData) quizData.title = tool.data.title;
+                    await updateDoc(doc(db, "quizzes", quizId), { title: tool.data.title });
+                }
+                else if (tool.action === 'togglePrivacy') {
+                    if (quizData) {
+                        quizData.isPublic = !quizData.isPublic;
+                        const lock = document.getElementById('privacyIcon');
+                        if (quizData.isPublic) {
+                            lock.className = "fa-solid fa-globe status-lock public";
+                            lock.title = "Público";
+                        } else {
+                            lock.className = "fa-solid fa-lock status-lock private";
+                            lock.title = "Privado";
+                        }
+                        await updateDoc(doc(db, "quizzes", quizId), { isPublic: quizData.isPublic });
+                    }
+                }
+                else if (tool.action === 'navigateToQuestion' && tool.data) {
+                    const targetIdx = tool.data.slideIndex;
+                    if (targetIdx >= 0 && targetIdx < questions.length) {
+                        currentIndex = targetIdx;
+                        loadQuestionToCanvas(currentIndex);
+                        renderThumbnailList();
+                        renderContextToolbar();
+                    }
+                }
+            } catch (err) {
+                console.error('Geno tool error:', tool.action, err);
+            }
+        }
+    }
+
+
+    function parseSSE(text) {
+        const events = [];
+        const lines = text.split('\n');
+        for (const line of lines) {
+            if (line.startsWith('data: ')) {
+                try { events.push(JSON.parse(line.slice(6))); } catch {}
+            }
+        }
+        return events;
+    }
+
+
+    let _genoTypeQueue = '';
+    let _genoTypeTimer = null;
+    let _genoTypeEl = null;
+
+
+    function startTypewriter() {
+        const container = document.getElementById('geno-messages');
+        hideGenoTyping();
+        _genoTypeEl = document.createElement('div');
+        _genoTypeEl.className = 'geno-msg assistant';
+        _genoTypeEl.id = 'geno-streaming-msg';
+        _genoTypeEl.textContent = '';
+        container.appendChild(_genoTypeEl);
+        _genoTypeTimer = setInterval(_genoTypeTick, 25);
+    }
+
+
+    function _genoTypeTick() {
+        if (_genoTypeQueue.length > 0) {
+            const batch = Math.min(_genoTypeQueue.length, 3);
+            const chars = _genoTypeQueue.substring(0, batch);
+            _genoTypeQueue = _genoTypeQueue.substring(batch);
+            if (_genoTypeEl) {
+                _genoTypeEl.textContent += chars;
+                const container = document.getElementById('geno-messages');
+                container.scrollTop = container.scrollHeight;
+            }
+        } else {
+            stopTypewriter();
+            if (_genoTypeEl) {
+                _genoTypeEl.removeAttribute('id');
+            }
+        }
+    }
+
+
+    function pushTypeChunk(text) {
+        _genoTypeQueue += text;
+        if (!_genoTypeTimer) startTypewriter();
+    }
+
+
+    function stopTypewriter() {
+        if (_genoTypeTimer) {
+            clearInterval(_genoTypeTimer);
+            _genoTypeTimer = null;
+        }
+        _genoTypeQueue = '';
+    }
+
+
+    function finalizeStreamingMessage(text) {
+        stopTypewriter();
+        const el = document.getElementById('geno-streaming-msg');
+        if (el) {
+            el.textContent = '';
+            _genoTypeQueue = text;
+            _genoTypeEl = el;
+            _genoTypeTimer = setInterval(_genoTypeTick, 25);
+        }
+    }
+
+
+    window.sendGenoMessage = async (text) => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const inputEl = document.getElementById('geno-chat-input');
+        const msg = text || inputEl.value.trim();
+        if (!msg || genoIsProcessing) return;
+
+
+        if (!text) inputEl.value = '';
+        inputEl.style.height = 'auto';
+        clearQuickActions();
+
+
+        addGenoMessage('user', msg);
+        showGenoTyping();
+        setGenoState('planning', 'A pensar...');
+        genoIsProcessing = true;
+
+
+        const sendBtn = document.getElementById('geno-send-btn');
+        sendBtn.disabled = true;
+
+
+        try {
+            const systemPrompt = buildGenoSystemPrompt();
+            const apiMessages = [...genoChatHistory.map(m => ({ role: m.role, text: m.text }))];
+
+
+            const response = await fetch('/api/gemini', {
+                method: 'POST',
+                headers: await getAuthHeaders(),
+                body: JSON.stringify({ messages: apiMessages, systemPrompt })
+            });
+
+
+            if (response.status === 429) {
+                showCreditsWarning();
+                throw new Error('Créditos insuficientes.');
+            }
+            if (!response.ok) throw new Error('Erro no servidor.');
+
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let fullText = '';
+
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+
+
+                const events = parseSSE(buffer);
+                buffer = buffer.split('\n\n').pop() || '';
+
+
+                for (const event of events) {
+                    if (event.credits !== undefined) updateCreditsAfterSpend(event.credits);
+                    if (event.token) {
+                        fullText += event.token;
+                        if (fullText.length < 20) setGenoState('talking');
+                    }
+                    if (event.error) throw new Error(event.error);
+                }
+            }
+
+
+            let cleanText = fullText;
+            if (cleanText.includes('```json')) cleanText = cleanText.split('```json')[1].split('```')[0].trim();
+            else if (cleanText.includes('```')) cleanText = cleanText.split('```')[1].split('```')[0].trim();
+
+
+            let parsed;
+            try {
+                parsed = JSON.parse(cleanText);
+            } catch {
+                const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) parsed = JSON.parse(jsonMatch[0]);
+                else throw new Error('Resposta não-JSON do LLM');
+            }
+
+
+            const reply = parsed.reply || parsed.chat_reply || 'Feito!';
+
+
+            if (parsed.tools && parsed.tools.length > 0) {
+                setGenoState('magic', 'A executar...');
+                await executeGenoTools(parsed.tools);
+                document.getElementById('saveQuizBtn').click();
+                setGenoState('talking', '');
+                saveSnapshot();
+            }
+
+
+            hideGenoTyping();
+            const msgContainer = document.getElementById('geno-messages');
+            const streamMsg = document.createElement('div');
+            streamMsg.className = 'geno-msg assistant';
+            streamMsg.id = 'geno-streaming-msg';
+            msgContainer.appendChild(streamMsg);
+
+
+            finalizeStreamingMessage(reply);
+            genoChatHistory.push({ role: 'assistant', text: reply });
+
+
+            renderQuickActions(GENO_QUICK_ACTIONS);
+
+
+        } catch (error) {
+            console.error(error);
+            hideGenoTyping();
+            stopTypewriter();
+            const streamEl = document.getElementById('geno-streaming-msg');
+            if (streamEl) streamEl.remove();
+            addGenoMessage('assistant', 'Ups! Tive um problema a processar o seu pedido. Tente outra vez!');
+            setGenoState('idle');
+            renderQuickActions(GENO_QUICK_ACTIONS);
+        } finally {
+            genoIsProcessing = false;
+            sendBtn.disabled = false;
+            inputEl.focus();
+        }
+    };
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const inputEl = document.getElementById('geno-chat-input');
+        if (inputEl) {
+            inputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendGenoMessage();
+                }
+            });
+            inputEl.addEventListener('input', () => {
+                inputEl.style.height = 'auto';
+                inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
+            });
+        }
+
+
+        const qa = document.getElementById('geno-quick-actions');
+        if (qa) {
+            let isDown = false, startX, scrollLeft;
+            let didDrag = false;
+            qa.addEventListener('mousedown', (e) => {
+                isDown = true;
+                qa.classList.add('dragging');
+                startX = e.pageX - qa.offsetLeft;
+                scrollLeft = qa.scrollLeft;
+                didDrag = false;
+            });
+            qa.addEventListener('mouseleave', () => { isDown = false; qa.classList.remove('dragging'); });
+            qa.addEventListener('mouseup', () => { isDown = false; qa.classList.remove('dragging'); });
+            qa.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - qa.offsetLeft;
+                const walk = x - startX;
+                qa.scrollLeft = scrollLeft - walk * 1.5;
+                if (Math.abs(walk) > 5) didDrag = true;
+            });
+            qa.addEventListener('click', (e) => {
+                const btn = e.target.closest('.geno-qa-btn');
+                if (btn) {
+                    if (didDrag) { e.stopPropagation(); return; }
+                    sendGenoMessage(btn.dataset.prompt);
+                }
+            });
+        }
+    });
+
+
+    document.addEventListener('keydown', (e) => {
+        const tag = e.target.tagName;
+        const isInput = tag === 'INPUT' || tag === 'TEXTAREA' || e.target.isContentEditable;
+        if (e.key === 'z' && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+            e.preventDefault();
+            undo();
+        } else if ((e.key === 'z' && (e.ctrlKey || e.metaKey) && e.shiftKey) || (e.key === 'y' && (e.ctrlKey || e.metaKey))) {
+            e.preventDefault();
+            redo();
+        }
+    });
+
+
+    document.addEventListener('focusout', (e) => {
+        if (e.target.classList && e.target.classList.contains('ans-input')) {
+            saveSnapshot();
+        }
+    });
+
+
+    function getContrastTextColor(hex) {
+        if (!hex) return '#2D3436';
+        let c = hex.replace('#', '');
+        if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+        const r = parseInt(c.substring(0,2), 16);
+        const g = parseInt(c.substring(2,4), 16);
+        const b = parseInt(c.substring(4,6), 16);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance > 0.6 ? '#2D3436' : '#FFFFFF';
+    }
+
+
+    function darkenColor(hex, amount = 40) {
+        let c = hex.replace('#', '');
+        if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+        const r = Math.max(0, parseInt(c.substring(0,2), 16) - amount);
+        const g = Math.max(0, parseInt(c.substring(2,4), 16) - amount);
+        const b = Math.max(0, parseInt(c.substring(4,6), 16) - amount);
+        return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+    } 
+
+
+    window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+
+    window.renderContextToolbar = () => {
+        const bar = document.getElementById('context-toolbar');
+        if (!selectedElementType) {
+            bar.classList.remove('active');
+            return;
+        }
+
+
+        bar.classList.add('active');
+        let html = '';
+
+
+        if (selectedElementType === 'answer') {
+            const key = selectedElementKey;
+            const q = questions[currentIndex];
+            const styles = q.answerStyles?.[key] || {};
+
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const defaultHex = isDark ? '#2a2a2a' : '#FFFFFF';
+            const customColor = q.answerColors?.[key] || null;
+            const activeBg = customColor || defaultHex;
+
+
+            const txtColor = styles.textColor || (isDark ? '#ffffff' : getContrastTextColor(activeBg));
+            const isBold = styles.bold ? 'active' : '';
+            const isItalic = styles.italic ? 'active' : '';
+
+
+            html = `
+                <span class="context-label">Opção ${key}</span>
+                <div style="position:relative;">
+                    <button class="color-picker-btn" onmousedown="event.preventDefault()" onclick="event.stopPropagation(); openGeniiColorPicker(this, '${activeBg}', '${key}', 'answer-bg')" title="Cor de Fundo">
+                        <span class="cp-swatch" style="background:${activeBg};"></span>
+                        <span class="cp-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                    </button>
+                </div>
+                <div style="position:relative;">
+                    <button class="color-picker-btn" onmousedown="event.preventDefault()" onclick="event.stopPropagation(); openGeniiColorPicker(this, '${txtColor}', '${key}', 'answer-text')" title="Cor do Texto">
+                        <span class="cp-swatch" style="background:${txtColor};"></span>
+                        <span class="cp-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                    </button>
+                </div>
+                <div class="ans-toolbar-divider"></div>
+                <button class="ans-tb-btn ${isBold}" onclick="toggleAnswerBold('${key}')" title="Negrito"><b>B</b></button>
+                <button class="ans-tb-btn ${isItalic}" onclick="toggleAnswerItalic('${key}')" title="Itálico"><i>I</i></button>
+                <div class="ans-toolbar-divider"></div>
+                <button class="ans-tb-reset" onclick="resetAnswerStyle('${key}')" title="Repor Predefinição"><i class="fa-solid fa-rotate-left"></i></button>
+            `;
+        } else if (selectedElementType === 'question') {
+            const canMoveUp = currentIndex > 0;
+            const canMoveDown = currentIndex < questions.length - 1;
+            const q = questions[currentIndex];
+            const qStyles = q.questionStyles || {};
+            const qIsBold = qStyles.bold ? 'active' : '';
+            const qIsItalic = qStyles.italic ? 'active' : '';
+            const qTextColor = qStyles.textColor || '';
+            const qDefaultColor = document.documentElement.getAttribute('data-theme') === 'dark' ? '#ffffff' : 'var(--dark)';
+
+
+            html = `
+                <span class="context-label">Slide</span>
+                <button class="ans-tb-btn" onclick="moveQuestionUp()" ${canMoveUp ? '' : 'disabled'} title="Mover para Cima"><i class="fa-solid fa-arrow-up"></i></button>
+                <button class="ans-tb-btn" onclick="moveQuestionDown()" ${canMoveDown ? '' : 'disabled'} title="Mover para Baixo"><i class="fa-solid fa-arrow-down"></i></button>
+                <div class="ans-toolbar-divider"></div>
+                <div style="position:relative;">
+                    <button class="color-picker-btn" onmousedown="event.preventDefault()" onclick="event.stopPropagation(); openGeniiColorPicker(this, '${qTextColor || qDefaultColor}', null, 'question-text')" title="Cor do Texto">
+                        <span class="cp-swatch" style="background:${qTextColor || qDefaultColor};"></span>
+                        <span class="cp-arrow"><i class="fa-solid fa-chevron-down"></i></span>
+                    </button>
+                </div>
+                <button class="ans-tb-btn ${qIsBold}" onclick="toggleQuestionBold()" title="Negrito"><b>B</b></button>
+                <button class="ans-tb-btn ${qIsItalic}" onclick="toggleQuestionItalic()" title="Itálico"><i>I</i></button>
+                <div class="ans-toolbar-divider"></div>
+                <button class="ans-tb-reset" onclick="resetQuestionStyle()" title="Repor Predefinição"><i class="fa-solid fa-rotate-left"></i></button>
+            `;
+        }
+
+
+        bar.innerHTML = `<div class="context-tools">${html}</div>`;
+    };
+
+
+    window.moveQuestionUp = () => {
+        if (currentIndex > 0) {
+            const temp = questions[currentIndex];
+            questions[currentIndex] = questions[currentIndex - 1];
+            questions[currentIndex - 1] = temp;
+            currentIndex--;
+            renderThumbnailList();
+            loadQuestionToCanvas(currentIndex);
+            renderContextToolbar();
+            saveSnapshot();
+        }
+    };
+
+
+    window.moveQuestionDown = () => {
+        if (currentIndex < questions.length - 1) {
+            const temp = questions[currentIndex];
+            questions[currentIndex] = questions[currentIndex + 1];
+            questions[currentIndex + 1] = temp;
+            currentIndex++;
+            renderThumbnailList();
+            loadQuestionToCanvas(currentIndex);
+            renderContextToolbar();
+            saveSnapshot();
+        }
+    };
+
+
+    document.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.answer-box')) return;
+        if (e.target.closest('.question-input')) return;
+        if (e.target.closest('.studio-context-bar')) return;
+        if (e.target.closest('.ans-tb-color')) return;
+        if (e.target.closest('.gcp-popover')) return;
+        if (e.target.closest('.color-picker-btn')) return;
+
+
+        window.closeGeniiColorPicker();
+        document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
+        const qInput = document.getElementById('qTextInput');
+        if (qInput) qInput.classList.remove('q-selected');
+        
+        selectedElementType = null;
+        selectedElementKey = null;
+        renderContextToolbar();
+    });
+
+
+    document.getElementById('qTextInput').addEventListener('focus', () => {
+        window.closeGeniiColorPicker();
+        document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
+        document.getElementById('qTextInput').classList.add('q-selected');
+        selectedElementType = 'question';
+        selectedElementKey = null;
+        renderContextToolbar();
+    });
+
+
+    let activeContextMenu = null;
+    function showThumbContextMenu(x, y, idx) {
+        hideThumbContextMenu();
+        const menu = document.createElement('div');
+        menu.className = 'thumb-context-menu';
+        const canUp = idx > 0, canDown = idx < questions.length - 1;
+        menu.innerHTML = `
+            <button class="cm-item" onclick="duplicateSlide(${idx}); hideThumbContextMenu();"><i class="fa-solid fa-copy"></i> Duplicar</button>
+            ${canUp ? `<button class="cm-item" onclick="moveSlideUp(${idx}); hideThumbContextMenu();"><i class="fa-solid fa-arrow-up"></i> Mover para Cima</button>` : ''}
+            ${canDown ? `<button class="cm-item" onclick="moveSlideDown(${idx}); hideThumbContextMenu();"><i class="fa-solid fa-arrow-down"></i> Mover para Baixo</button>` : ''}
+            <div class="cm-divider"></div>
+            <button class="cm-item cm-danger" onclick="deleteSlide(${idx}); hideThumbContextMenu();"><i class="fa-solid fa-trash"></i> Apagar</button>
+        `;
+        const mw = 180, mh = 200;
+        if (x + mw > window.innerWidth) x = window.innerWidth - mw - 10;
+        if (y + mh > window.innerHeight) y = window.innerHeight - mh - 10;
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+        document.body.appendChild(menu);
+        activeContextMenu = menu;
+        document.addEventListener('click', hideThumbContextMenu, { once: true });
+    }
+    window.hideThumbContextMenu = () => { if (activeContextMenu) { activeContextMenu.remove(); activeContextMenu = null; } };
+
+
+    window.moveSlideUp = (idx) => {
+        if (idx <= 0) return;
+        const tmp = questions[idx]; questions[idx] = questions[idx - 1]; questions[idx - 1] = tmp;
+        currentIndex = idx - 1; renderThumbnailList(); loadQuestionToCanvas(currentIndex); saveSnapshot();
+    };
+    window.moveSlideDown = (idx) => {
+        if (idx >= questions.length - 1) return;
+        const tmp = questions[idx]; questions[idx] = questions[idx + 1]; questions[idx + 1] = tmp;
+        currentIndex = idx + 1; renderThumbnailList(); loadQuestionToCanvas(currentIndex); saveSnapshot();
+    };
+
+
+    window.toggleMobileSettings = () => {
+        const panel = document.querySelector('.settings-panel');
+        const backdrop = document.getElementById('settingsBackdrop');
+        const genoWrapper = document.getElementById('genoSheetWrapper');
+        const genoMascot = document.getElementById('genoSheetMascot');
+        const genoBackdrop = document.getElementById('genoSheetBackdrop');
+        if (!panel) return;
+        const isOpen = panel.classList.contains('open');
+        if (isOpen) {
+            panel.classList.remove('open');
+            panel.style.transform = '';
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        } else {
+            if (genoWrapper) genoWrapper.classList.remove('open');
+            if (genoMascot) genoMascot.classList.remove('visible');
+            if (genoBackdrop) genoBackdrop.classList.remove('show');
+            panel.style.transition = 'none';
+            panel.classList.add('open');
+            panel.style.transform = 'translateY(0)';
+            backdrop.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => { panel.style.transition = ''; });
+        }
+    };
+    window.closeMobileSettings = () => {
+        const panel = document.querySelector('.settings-panel');
+        const backdrop = document.getElementById('settingsBackdrop');
+        if (!panel) return;
+        panel.classList.remove('open');
+        panel.style.transform = '';
+        backdrop.classList.remove('show');
+        document.body.style.overflow = '';
+    };
+
+
+    window.openImageModal = (type, key = null) => {
+        imageModalTargetType = type;
+        imageModalTargetKey = key;
+
+
+        const currentQuestionText = questions[currentIndex]?.question_text || "";
+        const aiPromptEl = document.getElementById('ai-image-prompt');
+        const unsplashSearchEl = document.getElementById('unsplash-search');
+        if (aiPromptEl) aiPromptEl.value = currentQuestionText;
+        if (unsplashSearchEl) unsplashSearchEl.value = currentQuestionText;
+
+
+        document.getElementById('image-modal').style.display = 'flex';
+        switchImageTab('upload');
+    };
+
+
+    window.switchImageTab = (tab) => {
+        document.querySelectorAll('.img-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.img-tab-content').forEach(c => c.classList.remove('active'));
+        const tabBtnIndex = tab === 'upload' ? 0 : (tab === 'unsplash' ? 1 : 2);
+        document.querySelectorAll('.image-modal-tabs .img-tab')[tabBtnIndex].classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+    };
+
+
+    window.handleModalFileUpload = (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+        handleImageUpload(file, (url, token) => { applySelectedImage(url, token); closeModal('image-modal'); });
+    };
+
+
+    function applySelectedImage(url, publicId = '') {
+        const q = questions[currentIndex];
+        if(imageModalTargetType === 'question') {
+            if (q.imagePublicId) _deleteStudioImage(q.imagePublicId);
+            else if (q.imageDeleteToken) _deleteStudioImage(q.imageDeleteToken);
+            q.imageUrl = url; q.imagePublicId = publicId; q.imageDeleteToken = '';
+            loadQuestionToCanvas(currentIndex); renderThumbnailList();
+        } else if (imageModalTargetType === 'answer') {
+            if(!q.answerImages) q.answerImages = {};
+            if(!q.answerImagePublicIds) q.answerImagePublicIds = {};
+            if(!q.answerImageTokens) q.answerImageTokens = {};
+            const oldPublicId = q.answerImagePublicIds?.[imageModalTargetKey];
+            const oldToken = q.answerImageTokens?.[imageModalTargetKey];
+            if (oldPublicId) _deleteStudioImage(oldPublicId);
+            else if (oldToken) _deleteStudioImage(oldToken);
+            q.answerImages[imageModalTargetKey] = url;
+            q.answerImagePublicIds[imageModalTargetKey] = publicId;
+            if (publicId) q.answerImageTokens[imageModalTargetKey] = '';
+            loadQuestionToCanvas(currentIndex);
+        }
+        saveSnapshot();
+    }
+
+
+    window.searchUnsplash = async () => {
+        const query = document.getElementById('unsplash-search').value.trim();
+        if(!query) return;
+        document.getElementById('unsplash-loading').style.display = 'block';
+        document.getElementById('unsplash-grid').innerHTML = '';
+        try {
+            const res = await fetch(`/api/unsplash?query=${encodeURIComponent(query)}`, {
+                headers: await getAuthHeaders()
+            });
+            if (!res.ok) throw new Error(await res.text() || "Erro ao procurar imagens.");
+            const data = await res.json();
+            document.getElementById('unsplash-loading').style.display = 'none';
+            if(data.results && data.results.length > 0) {
+                data.results.forEach(imgData => {
+                    const imgUrl = imgData.urls.regular;
+                    const img = document.createElement('img');
+                    img.src = imgUrl;
+                    img.onclick = () => { applySelectedImage(imgUrl); closeModal('image-modal'); };
+                    document.getElementById('unsplash-grid').appendChild(img);
+                });
+            } else {
+                document.getElementById('unsplash-grid').innerHTML = '<p style="grid-column: 1/-1; text-align:center; color:var(--grey);">Nenhuma imagem encontrada.</p>';
+            }
+        } catch (e) {
+            document.getElementById('unsplash-loading').style.display = 'none';
+            showGeniiToast(e.message || "Erro ao procurar imagens.", "error");
+        }
+    };
+
+
+    window.generateAiImageSingle = async () => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const promptText = document.getElementById('ai-image-prompt').value.trim();
+        if (!promptText) {
+            showGeniiToast("Escreve o que imaginas primeiro!", "error");
+            return;
+        }
+
+
+        const btn = document.getElementById('btn-generate-ai-single');
+        const loading = document.getElementById('ai-gen-loading');
+
+
+        btn.style.display = 'none';
+        loading.style.display = 'block';
+
+
+        try {
+            const response = await fetch("/api/generate_image", {
+                method: "POST",
+                headers: await getAuthHeaders(),
+                body: JSON.stringify({ prompt: promptText })
+            });
+
+
+            if (response.status === 429) {
+                showCreditsWarning();
+                throw new Error("Créditos insuficientes.");
+            }
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(errText || "Erro ao gerar imagem.");
+            }
+
+
+            const remaining = response.headers.get('X-Credits-Remaining');
+            if (remaining !== null) updateCreditsAfterSpend(parseInt(remaining));
+
+
+            const blob = await response.blob();
+            const { url: cloudinaryUrl, publicId: cloudinaryPublicId } = await uploadBlobToCloudinary(blob);
+
+
+            if (cloudinaryUrl) {
+                applySelectedImage(cloudinaryUrl, cloudinaryPublicId);
+                closeModal('image-modal');
+            } else {
+                throw new Error("Falha no upload para a nuvem.");
+            }
+        } catch (e) {
+            console.error("Erro na IA:", e);
+            showGeniiToast("Erro na geração. A procurar fotos reais...", "error");
+            switchImageTab('unsplash');
+            document.getElementById('unsplash-search').value = promptText;
+            searchUnsplash();
+        } finally {
+            btn.style.display = 'block';
+            loading.style.display = 'none';
+        }
+    };
+
+
+    window.confirmExit = () => {
+        showGeniiConfirm('Irá sair da sala, quer prosseguir?', (confirmed) => {
+            if (confirmed) window.location.href = 'join.html';
+        });
+    };
+
+
+    window.togglePrivacy = async () => {
+        if (!quizData) return;
+        const newStatus = !quizData.isPublic;
+        const lock = document.getElementById('privacyIcon');
+        try {
+            await updateDoc(doc(db, "quizzes", quizId), { isPublic: newStatus });
+            quizData.isPublic = newStatus;
+            if (newStatus) {
+                lock.className = "fa-solid fa-globe status-lock public";
+                lock.title = "Público";
+                showGeniiToast("Set agora público!", "success");
+            } else {
+                lock.className = "fa-solid fa-lock status-lock private";
+                lock.title = "Privado";
+                showGeniiToast("Set agora privado!", "success");
+            }
+            saveSnapshot();
+        } catch (e) {
+            showGeniiToast("Erro ao alterar privacidade.", "error");
+        }
+    };
+
+
+    window.openSettingsPage = () => window.location.href = `/edit_quiz?id=${quizId}&source=studio`;
+
+
+    async function uploadBlobToCloudinary(blob) {
+        try {
+            const result = await window.uploadToCloudinary(blob, _cloudinaryToken, 'studio_images');
+            return { url: result.url, publicId: result.publicId || '' };
+        } catch {
+            return { url: '', publicId: '' };
+        }
+    }
+
+
+    async function generateAIImage(prompt) {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return { url: '', publicId: '' }; }
+        try {
+            const response = await fetch('/api/generate_image', {
+                method: 'POST', headers: await getAuthHeaders(), body: JSON.stringify({ prompt: prompt })
+            });
+            if (response.status === 429) { showCreditsWarning(); return { url: '', publicId: '' }; }
+            if (!response.ok) throw new Error(await response.text());
+            const remaining = response.headers.get('X-Credits-Remaining');
+            if (remaining !== null) updateCreditsAfterSpend(parseInt(remaining));
+            const blob = await response.blob(); return await uploadBlobToCloudinary(blob);
+        } catch (error) { return { url: '', publicId: '' }; }
+    }
+
+
+    function hideAIElements() {
+        document.querySelectorAll('.studio-credits, .ai-btn, #geno-panel, .mobile-bar-geno').forEach(el => el.style.display = 'none');
+        const tabs = document.querySelectorAll('#image-modal .image-modal-tabs .img-tab');
+        if(tabs.length === 3) tabs[2].style.display = 'none';
+        document.querySelectorAll('#image-modal #tab-ai, #btn-generate-ai-single, #ai-gen-loading').forEach(el => {
+            if(el) el.style.display = 'none';
+        });
+    }
+    function applyMobileLayout() {
+        const w = window.innerWidth;
+        const cc = document.querySelector('.canvas-container');
+        if (!cc) return;
+        if (w <= 768) {
+            cc.style.setProperty('padding', '15px 16px', 'important');
+            cc.style.setProperty('margin-top', '18%', 'important');
+            cc.style.setProperty('margin-bottom', 'auto', 'important');
+            cc.style.setProperty('margin-left', 'auto', 'important');
+            cc.style.setProperty('margin-right', 'auto', 'important');
+            cc.style.removeProperty('transform');
+        } else {
+            cc.style.removeProperty('padding');
+            cc.style.removeProperty('margin-top');
+            cc.style.removeProperty('margin-bottom');
+            cc.style.removeProperty('margin-left');
+            cc.style.removeProperty('margin-right');
+            cc.style.removeProperty('margin');
+            cc.style.removeProperty('transform');
+        }
+    }
+    window.addEventListener('resize', applyMobileLayout);
+    setTimeout(applyMobileLayout, 50);
+
+
+    let qSwipeX = 0, qSwipeY = 0, qSwiping = false;
+    document.addEventListener('touchstart', (e) => {
+        const mc = e.target.closest('.main-canvas');
+        if (!mc || document.querySelector('.settings-panel.open')) { qSwipeX = 0; return; }
+        const t = e.touches[0];
+        qSwipeX = t.clientX; qSwipeY = t.clientY; qSwiping = false;
+        const cc = document.querySelector('.canvas-container');
+        if (cc) { cc.style.transition = 'none'; cc.style.transform = ''; }
+    }, { passive: true });
+    document.addEventListener('touchmove', (e) => {
+        if (!qSwipeX) return;
+        const t = e.touches[0];
+        const dx = t.clientX - qSwipeX;
+        const dy = Math.abs(t.clientY - qSwipeY);
+        if (dy > Math.abs(dx) * 1.5) { qSwipeX = 0; return; }
+        qSwiping = true;
+        const cc = document.querySelector('.canvas-container');
+        if (cc) cc.style.transform = `translateX(${dx}px)`;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+        if (!qSwipeX || !qSwiping) { qSwipeX = 0; return; }
+        const t = e.changedTouches[0];
+        const dx = t.clientX - qSwipeX;
+        const cc = document.querySelector('.canvas-container');
+        const goNext = dx < -50 && currentIndex < questions.length - 1;
+        const goPrev = dx > 50 && currentIndex > 0;
+        if (cc) {
+            cc.style.transition = 'transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            cc.style.transform = goNext ? 'translateX(-120%)' : goPrev ? 'translateX(120%)' : 'translateX(0)';
+            setTimeout(() => {
+                if (cc) { cc.style.transition = ''; cc.style.transform = ''; }
+            }, 260);
+        }
+        if (goNext) {
+            currentIndex++; loadQuestionToCanvas(currentIndex); renderThumbnailList();
+        } else if (goPrev) {
+            currentIndex--; loadQuestionToCanvas(currentIndex); renderThumbnailList();
+        }
+        qSwipeX = 0;
+    }, { passive: true });
+
+
+    let _lastTouchTime = 0;
+    let sheetStartY = 0, sheetDragging = false;
+    document.addEventListener('touchstart', (e) => {
+        const panel = e.target.closest('.settings-panel');
+        if (!panel) { sheetStartY = 0; return; }
+        const t = e.touches[0];
+        sheetStartY = t.clientY;
+        sheetDragging = false;
+        panel.style.transition = 'none';
+    }, { passive: true });
+    document.addEventListener('touchmove', (e) => {
+        if (!sheetStartY) return;
+        const panel = document.querySelector('.settings-panel');
+        if (!panel) return;
+        const t = e.touches[0];
+        const rawDy = t.clientY - sheetStartY;
+        const isOpen = panel.classList.contains('open');
+        if (isOpen && rawDy > 5) {
+            sheetDragging = true;
+            panel.style.transform = `translateY(${rawDy}px)`;
+        }
+    }, { passive: true });
+    document.addEventListener('touchend', () => {
+        _lastTouchTime = Date.now();
+        if (!sheetStartY) { sheetStartY = 0; return; }
+        const panel = document.querySelector('.settings-panel');
+        const backdrop = document.getElementById('settingsBackdrop');
+        sheetStartY = 0;
+        if (!panel) return;
+
+
+        if (sheetDragging) {
+            const match = panel.style.transform.match(/translateY\(([\d.]+)px\)/);
+            if (match) {
+                const y = parseFloat(match[1]);
+                const ph = panel.offsetHeight || 300;
+                panel.style.transition = 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                if (y < ph * 0.15) {
+                    panel.style.transform = 'translateY(0)';
+                } else {
+                    panel.style.transform = 'translateY(100%)';
+                    panel.classList.remove('open');
+                    if (backdrop) backdrop.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }
+        }
+    }, { passive: true });
+
+
+    if(localStorage.getItem('genii_ai_disabled')==='true') setTimeout(hideAIElements, 100);
+
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+            document.body.style.opacity = "1";
+            refreshCredits();
+            applyMobileLayout();
+            if(localStorage.getItem('genii_ai_disabled')==='true') hideAIElements();
+            await loadQuiz();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+
+    async function loadQuiz() {
+        try {
+            const snap = await getDoc(doc(db, "quizzes", quizId));
+            if (snap.exists()) {
+                quizData = snap.data();
+                document.getElementById('quizTitleInput').value = quizData.title;
+                const lock = document.getElementById('privacyIcon');
+                if(quizData.isPublic) { lock.className = "fa-solid fa-globe status-lock public"; lock.title = "Público"; } 
+                else { lock.className = "fa-solid fa-lock status-lock private"; lock.title = "Privado"; }
+                questions = quizData.questions ||[];
+                
+                if (questions.length === 0) window.addNewQuestion();
+                
+                renderThumbnailList();
+                loadQuestionToCanvas(0);
+
+
+                saveSnapshot();
+
+
+                document.getElementById('qTextInput').addEventListener('blur', () => saveSnapshot());
+                document.getElementById('quizTitleInput').addEventListener('blur', () => saveSnapshot());
+
+
+                const autoGen = params.get('autoGen');
+                if (autoGen === 'true') {
+                    const topic = params.get('topic') || '';
+                    const count = params.get('count') || '10';
+                    const diff = params.get('diff') || 'Médio';
+                    const imgs = params.get('imgs') === 'true';
+
+
+                    if (topic) {
+                        const cleanUrl = window.location.pathname + '?id=' + quizId;
+                        window.history.replaceState({}, '', cleanUrl);
+
+
+                        let prompt = `Cria um quiz completo sobre "${topic}" com ${count} perguntas de dificuldade ${diff}.`;
+                        if (imgs) prompt += ` Gera também uma imagem para cada pergunta.`;
+
+
+                        setTimeout(() => {
+                            toggleGenoPanel();
+                            setTimeout(() => sendGenoMessage(prompt), 500);
+                        }, 800);
+                    }
+                }
+            }
+        } catch (e) { console.error(e); }
+    }
+
+
+    document.getElementById('quizTitleInput').addEventListener('change', async (e) => {
+        const val = e.target.value.trim();
+        if(val) {
+            quizData.title = val;
+            await updateDoc(doc(db, "quizzes", quizId), { title: val });
+            showGeniiToast("Título atualizado!", "success");
+            saveSnapshot();
+        }
+    });
+
+
+    function loadQuestionToCanvas(index) {
+        if (index < 0 || index >= questions.length) return;
+        currentIndex = index;
+        const q = questions[index];
+
+
+        const qInput = document.getElementById('qTextInput');
+        qInput.innerText = q.question_text || "";
+
+
+        const qStyles = q.questionStyles || {};
+        if (qStyles.textColor) {
+            qInput.style.setProperty('color', qStyles.textColor, 'important');
+        } else {
+            qInput.style.removeProperty('color');
+        }
+        qInput.style.fontWeight = qStyles.bold ? '900' : '600';
+        qInput.style.fontStyle = qStyles.italic ? 'italic' : 'normal';
+
+
+        qInput.classList.remove('q-selected');
+        if (selectedElementType === 'question') {
+            qInput.classList.add('q-selected');
+        }
+
+
+        document.getElementById('timeSelect').value = q.timeLimit || "20";
+        document.getElementById('pointsSelect').value = q.points || "1000";
+        document.getElementById('typeSelect').value = q.type || "quiz";
+        document.getElementById('shuffleOptionsToggle').checked = q.shuffleOptions || false;
+
+
+        const mediaContainer = document.getElementById('mediaUploadBtn');
+        const mediaPrev = document.getElementById('mediaPreview');
+        if(q.imageUrl) {
+            mediaPrev.src = q.imageUrl;
+            mediaContainer.classList.add('has-image');
+        } else {
+            mediaContainer.classList.remove('has-image');
+        }
+
+
+        renderAnswersByType(q);
+        renderThumbnailList();
+        renderContextToolbar();
+
+
+        const isSlide = (q.type === 'slide');
+        const settingGroups = document.querySelectorAll('.settings-panel .setting-group');
+        settingGroups.forEach(g => {
+            const label = g.querySelector('.setting-label');
+            if (!label) return;
+            const text = label.textContent;
+            if (text.includes('Tempo Limite') || text.includes('Pontos') || text.includes('Randomizar')) {
+                g.style.display = isSlide ? 'none' : '';
+            }
+        });
+    }
+
+
+    function renderAnswersByType(q) {
+        const grid = document.getElementById('optionsGrid');
+        const typingArea = document.getElementById('typingArea');
+        const slideArea = document.getElementById('slideBodyArea');
+        const type = q.type || 'quiz';
+
+
+        grid.style.display = 'grid';
+        typingArea.style.display = 'none';
+        slideArea.style.display = 'none';
+        grid.innerHTML = '';
+
+
+        if (type === 'quiz') {['A', 'B', 'C', 'D'].forEach(opt => {
+                grid.appendChild(createAnswerBox(opt, q, false));
+            });
+        } 
+        else if (type === 'boolean') {
+            grid.appendChild(createAnswerBox('A', q, true, "Verdadeiro", "ans-true"));
+            grid.appendChild(createAnswerBox('B', q, true, "Falso", "ans-false"));
+        } 
+        else if (type === 'typing') {
+            grid.style.display = 'none';
+            typingArea.style.display = 'flex';
+            renderTypingList(q);
+        }
+        else if (type === 'slide') {
+            grid.style.display = 'none';
+            slideArea.style.display = 'flex';
+            document.getElementById('slideBodyInput').value = q.body || '';
+        }
+    }
+
+
+    window.handleAnsDragStart = (e, key) => {
+        const target = e.target;
+        const isTextarea = target.tagName === 'TEXTAREA' || target.closest('textarea') || target.getAttribute('contenteditable') === 'true';
+        const isButton = target.closest('.check-btn') || target.closest('.add-ans-img-btn');
+
+
+        if (isTextarea || isButton) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }
+        draggedAnswerKey = key;
+        e.currentTarget.style.opacity = '0.5';
+    };
+    window.handleAnsDragEnd = (e) => {
+        e.currentTarget.style.opacity = '1';
+        document.querySelectorAll('.answer-box.drag-over').forEach(el => el.classList.remove('drag-over'));
+        draggedAnswerKey = null;
+    };
+    window.handleAnsDragOver = (e) => {
+        e.preventDefault();
+        const box = e.target.closest('.answer-box');
+        if (box && box.dataset.key !== draggedAnswerKey) box.classList.add('drag-over');
+    };
+    window.handleAnsDragLeave = (e) => {
+        const box = e.target.closest('.answer-box');
+        if (box) box.classList.remove('drag-over');
+    };
+    window.handleAnsDrop = (e, targetKey) => {
+        e.preventDefault();
+        const box = e.target.closest('.answer-box');
+        if (box) box.classList.remove('drag-over');
+
+
+        if (draggedAnswerKey && draggedAnswerKey !== targetKey) {
+            swapAnswers(draggedAnswerKey, targetKey);
+        }
+    };
+
+
+    function swapAnswers(k1, k2) {
+        const q = questions[currentIndex];
+
+
+        function safeSwap(obj, key1, key2) {
+            if (!obj) return;
+            const v1 = obj[key1];
+            const v2 = obj[key2];
+            if (v2 !== undefined) obj[key1] = v2;
+            else delete obj[key1];
+            if (v1 !== undefined) obj[key2] = v1;
+            else delete obj[key2];
+        }
+
+
+        if (!q.options) q.options = {};
+        safeSwap(q.options, k1, k2);
+
+
+        safeSwap(q.answerColors, k1, k2);
+        safeSwap(q.answerStyles, k1, k2);
+        safeSwap(q.answerImages, k1, k2);
+
+
+        if (!q.correct_option) q.correct_option =[];
+        if (!Array.isArray(q.correct_option)) q.correct_option = [q.correct_option];
+
+
+        let c1 = q.correct_option.includes(k1);
+        let c2 = q.correct_option.includes(k2);
+
+
+        if (c1 && !c2) { q.correct_option = q.correct_option.filter(k=>k!==k1); q.correct_option.push(k2); }
+        else if (!c1 && c2) { q.correct_option = q.correct_option.filter(k=>k!==k2); q.correct_option.push(k1); }
+
+
+        if (selectedElementKey === k1) selectedElementKey = k2;
+        else if (selectedElementKey === k2) selectedElementKey = k1;
+
+
+        loadQuestionToCanvas(currentIndex);
+        saveSnapshot();
+    }
+
+
+    function createAnswerBox(key, q, isBoolean = false, forceText = null, forceClass = null) {
+        const div = document.createElement('div');
+        const colorClass = forceClass || `box-${key}`;
+        
+        let isCorrect = false;
+        if(Array.isArray(q.correct_option)) isCorrect = q.correct_option.includes(key);
+        else isCorrect = q.correct_option === key;
+
+
+        div.className = `answer-box ${colorClass} ${isCorrect ? 'correct' : ''}`;
+        if (selectedElementKey === key) div.classList.add('ans-selected');
+
+
+        const customColor = (!isBoolean && q.answerColors && q.answerColors[key]) ? q.answerColors[key] : null;
+        const styles = (!isBoolean && q.answerStyles && q.answerStyles[key]) ? q.answerStyles[key] : {};
+
+
+        const defaultHex = '#FFFFFF';
+        const activeBg = customColor || defaultHex;
+
+
+        if (customColor) {
+            div.style.backgroundColor = customColor;
+            div.style.boxShadow = `0 7px 0 ${darkenColor(customColor)}`;
+        }
+
+
+        const textColor = styles.textColor || getContrastTextColor(activeBg);
+        const isDarkText = textColor !== '#FFFFFF';
+        
+        const imgUrl = q.answerImages ? q.answerImages[key] : null;
+        if(imgUrl) div.classList.add('has-ans-img');
+
+
+        const iconBg = isDarkText ? '#F1F5F9' : 'rgba(255,255,255,0.22)';
+        const iconColor = isDarkText ? '#64748B' : 'white';
+        const addBtnBg = isDarkText ? '#F1F5F9' : 'rgba(255,255,255,0.22)';
+        const addBtnColor = isDarkText ? '#64748B' : 'white';
+        
+        let shapeIcon = '';
+        if(!isBoolean) {
+            const iconInline = customColor ? `background:${iconBg};color:${iconColor};` : '';
+            shapeIcon = `<div class="shape-icon" data-key="${key}" style="${iconInline}cursor:grab;" draggable="true" onmousedown="event.stopPropagation();" ondragstart="handleAnsDragStart(event, '${key}')">${key}</div>`;
+        } else {
+            const boolIcons = { A: 'fa-check', B: 'fa-xmark' };
+            shapeIcon = `<div class="shape-icon"><i class="fa-solid ${boolIcons[key]}"></i></div>`;
+        }
+
+
+        const fontWeight = styles.bold ? 'font-weight:900;' : '';
+        const fontStyle = styles.italic ? 'font-style:italic;' : '';
+        const placeholderColor = isDarkText ? 'rgba(45,52,54,0.4)' : 'rgba(255,255,255,0.5)';
+        const inputStyle = `color:${textColor}; ${fontWeight} ${fontStyle} --placeholder-color:${placeholderColor};`;
+
+
+        div.innerHTML = `
+            ${shapeIcon}
+            <img src="${imgUrl || ''}" class="ans-img-preview" id="prev-img-${key}">
+            ${imgUrl ? `<button class="add-ans-img-btn" onclick="event.stopPropagation(); removeAnsImg('${key}')" title="Remover imagem" style="background:rgba(225,26,60,0.5);"><i class="fa-solid fa-xmark"></i></button>` : `<button class="add-ans-img-btn" onclick="event.stopPropagation(); triggerAnsImg('${key}')" title="Imagem na resposta"${customColor ? ` style="background:${addBtnBg};color:${addBtnColor};"` : ''}><i class="fa-regular fa-image"></i></button>`}
+
+
+            <div class="ans-input" id="input${key}" contenteditable="${isBoolean ? 'false' : 'true'}" data-placeholder="${forceText || 'Resposta ' + key}"
+                   oninput="updateAnswerText('${key}', this.innerText, this);"
+                   onfocus="selectAnswerOnFocus('${key}')"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();}"
+                   onpaste="event.preventDefault(); document.execCommand('insertText', false, event.clipboardData.getData('text/plain'));"
+                   style="${inputStyle}">${forceText || (q.options ? q.options[key] : '')}</div>
+            
+            <div class="check-btn" onclick="event.stopPropagation(); toggleCorrect('${key}')" title="Marcar como correta"><i class="fa-solid fa-check"></i></div>
+        `;
+
+
+        if (!isBoolean) {
+            div.dataset.key = key;
+            div.draggable = false;
+            div.ondragstart = (e) => window.handleAnsDragStart(e, key);
+            div.ondragend = window.handleAnsDragEnd;
+            div.ondragover = window.handleAnsDragOver;
+            div.ondragleave = window.handleAnsDragLeave;
+            div.ondrop = (e) => window.handleAnsDrop(e, key);
+
+
+            div.onclick = (e) => {
+                if (e.target.closest('.check-btn') || e.target.closest('.add-ans-img-btn') || e.target.closest('.ans-input') || e.target.getAttribute('contenteditable') === 'true') return;
+
+
+                document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
+                document.getElementById('qTextInput').classList.remove('q-selected');
+
+
+                selectedElementType = 'answer';
+                selectedElementKey = key;
+                div.classList.add('ans-selected');
+                renderContextToolbar();
+            };
+        }
+
+
+        setTimeout(() => {
+            const ta = div.querySelector('.ans-input');
+            if (ta) {
+                if (ta.tagName === 'TEXTAREA') { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+                window.fitAnswerText(ta);
+            }
+        }, 0);
+
+
+        return div;
+    }
+
+
+    window.fitAnswerText = (el) => {
+        el.style.fontSize = '';
+        requestAnimationFrame(() => {
+            const hOverflow = el.scrollHeight > el.clientHeight + 2;
+            const wOverflow = el.scrollWidth > el.clientWidth + 2;
+            if (!hOverflow && !wOverflow) return;
+            const hRatio = hOverflow ? el.scrollHeight / el.clientHeight : 1;
+            const wRatio = wOverflow ? el.scrollWidth / el.clientWidth : 1;
+            const overflow = Math.max(hRatio, wRatio);
+            const shrink = Math.min(0.9, Math.max(0.7, 0.95 / overflow));
+            const px = parseFloat(getComputedStyle(el).fontSize);
+            const minPx = window.innerWidth <= 480 ? 10 : window.innerWidth <= 768 ? 11 : 13;
+            const newSize = Math.max(minPx, Math.round(px * shrink));
+            if (newSize !== px) el.style.fontSize = newSize + 'px';
+        });
+    };
+
+
+    window.updateAnswerText = (key, val, el) => {
+        if(!questions[currentIndex].options) questions[currentIndex].options = {};
+        questions[currentIndex].options[key] = val;
+        if (el) window.fitAnswerText(el);
+    };
+
+
+    window.selectAnswerOnFocus = (key) => {
+        const box = document.querySelector(`.answer-box[data-key="${key}"]`);
+        const alreadySelected = box && box.classList.contains('ans-selected');
+
+
+        if (!alreadySelected) {
+            window.closeGeniiColorPicker();
+            document.querySelectorAll('.answer-box.ans-selected').forEach(b => b.classList.remove('ans-selected'));
+            document.getElementById('qTextInput').classList.remove('q-selected');
+            if (box) box.classList.add('ans-selected');
+            selectedElementType = 'answer';
+            selectedElementKey = key;
+            renderContextToolbar();
+        }
+    };
+
+
+    window.setAnswerBgColor = (key, color) => {
+        const q = questions[currentIndex];
+        if (!q.answerColors) q.answerColors = {};
+        q.answerColors[key] = color;
+        if (!q.answerStyles || !q.answerStyles[key] || !q.answerStyles[key].textColor) {
+            if (!q.answerStyles) q.answerStyles = {};
+            if (!q.answerStyles[key]) q.answerStyles[key] = {};
+        }
+        loadQuestionToCanvas(currentIndex);
+    };
+
+
+    window.setAnswerTextColor = (key, color) => {
+        const q = questions[currentIndex];
+        if (!q.answerStyles) q.answerStyles = {};
+        if (!q.answerStyles[key]) q.answerStyles[key] = {};
+        q.answerStyles[key].textColor = color;
+        loadQuestionToCanvas(currentIndex);
+        const ta = document.querySelector(`.answer-box[data-key="${key}"] .ans-input`);
+        if (ta) ta.style.setProperty('color', color, 'important');
+    };
+
+
+    window.toggleAnswerBold = (key) => {
+        const q = questions[currentIndex];
+        if (!q.answerStyles) q.answerStyles = {};
+        if (!q.answerStyles[key]) q.answerStyles[key] = {};
+        q.answerStyles[key].bold = !q.answerStyles[key].bold;
+        loadQuestionToCanvas(currentIndex);
+    };
+
+
+    window.toggleAnswerItalic = (key) => {
+        const q = questions[currentIndex];
+        if (!q.answerStyles) q.answerStyles = {};
+        if (!q.answerStyles[key]) q.answerStyles[key] = {};
+        q.answerStyles[key].italic = !q.answerStyles[key].italic;
+        loadQuestionToCanvas(currentIndex);
+    };
+
+
+    window.resetAnswerStyle = (key) => {
+        const q = questions[currentIndex];
+        if (q.answerColors) delete q.answerColors[key];
+        if (q.answerStyles) delete q.answerStyles[key];
+        loadQuestionToCanvas(currentIndex);
+        const ta = document.querySelector(`.answer-box[data-key="${key}"] .ans-input`);
+        if (ta) ta.style.removeProperty('color');
+    };
+
+
+    window.setQuestionTextColor = (color) => {
+        const q = questions[currentIndex];
+        if (!q.questionStyles) q.questionStyles = {};
+        q.questionStyles.textColor = color;
+        loadQuestionToCanvas(currentIndex);
+        const qInput = document.getElementById('qTextInput');
+        if (qInput) qInput.style.setProperty('color', color, 'important');
+        renderContextToolbar();
+    };
+
+
+    window.toggleQuestionBold = () => {
+        const q = questions[currentIndex];
+        if (!q.questionStyles) q.questionStyles = {};
+        q.questionStyles.bold = !q.questionStyles.bold;
+        loadQuestionToCanvas(currentIndex);
+        renderContextToolbar();
+    };
+
+
+    window.toggleQuestionItalic = () => {
+        const q = questions[currentIndex];
+        if (!q.questionStyles) q.questionStyles = {};
+        q.questionStyles.italic = !q.questionStyles.italic;
+        loadQuestionToCanvas(currentIndex);
+        renderContextToolbar();
+    };
+
+
+    window.resetQuestionStyle = () => {
+        const q = questions[currentIndex];
+        delete q.questionStyles;
+        loadQuestionToCanvas(currentIndex);
+        const qInput = document.getElementById('qTextInput');
+        if (qInput) qInput.style.removeProperty('color');
+        renderContextToolbar();
+    };
+
+
+    document.getElementById('shuffleOptionsToggle').addEventListener('change', (e) => {
+        const q = questions[currentIndex];
+        if (q) q.shuffleOptions = e.target.checked;
+        saveSnapshot();
+    });
+
+
+    document.getElementById('shuffleToggleRow').addEventListener('click', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+        const cb = document.getElementById('shuffleOptionsToggle');
+        cb.checked = !cb.checked;
+        cb.dispatchEvent(new Event('change'));
+    });
+
+
+    ['timeSelect', 'pointsSelect', 'typeSelect'].forEach(id => {
+        document.getElementById(id).addEventListener('input', (e) => {
+            const val = e.target.value;
+            const q = questions[currentIndex];
+            
+            if (id === 'timeSelect') q.timeLimit = val;
+            else if (id === 'pointsSelect') q.points = val;
+            else if (id === 'typeSelect') {
+                q.type = val;
+                q.correct_option =[]; 
+                if(val === 'boolean') { q.options = {A: "Verdadeiro", B: "Falso"}; }
+                else if(val === 'quiz') { q.options = {A: "", B: "", C: "", D: ""}; }
+                if(val === 'typing') { q.acceptedAnswers =[]; }
+                if(val === 'slide') { q.body = q.body || ''; q.correct_option = []; }
+                
+                renderThumbnailList(); 
+                loadQuestionToCanvas(currentIndex);
+            }
+            saveSnapshot();
+        });
+    });
+    
+    document.getElementById('qTextInput').addEventListener('input', function() {
+        questions[currentIndex].question_text = this.innerText;
+        const thumb = document.getElementById(`thumb-text-${currentIndex}`);
+        if(thumb) thumb.innerText = this.innerText || '...';
+    });
+
+
+    document.getElementById('slideBodyInput').addEventListener('input', function() {
+        if (questions[currentIndex]) {
+            questions[currentIndex].body = this.value;
+        }
+    });
+
+
+    window.toggleCorrect = (key) => {
+        const q = questions[currentIndex];
+        if(!Array.isArray(q.correct_option)) {
+            q.correct_option = q.correct_option ? [q.correct_option] :[];
+        }
+        if(q.correct_option.includes(key)) {
+            q.correct_option = q.correct_option.filter(k => k !== key);
+        } else {
+            if(q.type === 'boolean') q.correct_option =[key];
+            else q.correct_option.push(key);
+        }
+        loadQuestionToCanvas(currentIndex);
+        saveSnapshot();
+    };
+
+
+    async function _deleteStudioImage(publicIdOrToken) {
+        if (!publicIdOrToken) return;
+        if (!_cloudinaryToken) return;
+        try {
+            await window.deleteFromCloudinary(publicIdOrToken, _cloudinaryToken);
+        } catch {
+            try {
+                await fetch('/api/delete-image', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${_cloudinaryToken}` }, body: JSON.stringify({ deleteTokens: [publicIdOrToken] }) });
+            } catch {}
+        }
+    }
+
+
+    async function handleImageUpload(file, callback) {
+        if(!file) return;
+        if(!file.type.startsWith('image/')) return showGeniiToast("Apenas imagens!", "error");
+        if(file.size > 10 * 1024 * 1024) return showGeniiToast("Máximo 10MB", "error");
+
+
+        const btn = document.getElementById('saveQuizBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A enviar...';
+        btn.disabled = true;
+
+
+        try {
+            const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'studio_images');
+            if (result.url) { showGeniiToast("Imagem guardada!", "success"); callback(result.url, result.publicId || ''); } 
+            else throw new Error("Erro");
+        } catch (error) { showGeniiToast("Erro ao enviar imagem.", "error"); } 
+        finally { btn.innerHTML = originalText; btn.disabled = false; }
+    }
+
+
+    const mediaIn = document.getElementById('mediaInput');
+    document.getElementById('mediaUploadBtn').onclick = (e) => {
+        if(!e.target.closest('.remove-img-btn')) {
+            openImageModal('question');
+        }
+    };
+    mediaIn.onchange = (e) => handleImageUpload(e.target.files[0], (url, publicId) => {
+        const q = questions[currentIndex];
+        if (q.imagePublicId) _deleteStudioImage(q.imagePublicId);
+        else if (q.imageDeleteToken) _deleteStudioImage(q.imageDeleteToken);
+        q.imageUrl = url;
+        q.imagePublicId = publicId;
+        q.imageDeleteToken = '';
+        loadQuestionToCanvas(currentIndex); renderThumbnailList();
+    });
+    document.getElementById('removeImgBtn').onclick = (e) => {
+        e.stopPropagation();
+        const q = questions[currentIndex];
+        if (q.imagePublicId) _deleteStudioImage(q.imagePublicId);
+        else if (q.imageDeleteToken) _deleteStudioImage(q.imageDeleteToken);
+        q.imageUrl = null; q.imagePublicId = ''; q.imageDeleteToken = ''; loadQuestionToCanvas(currentIndex); renderThumbnailList();
+        saveSnapshot();
+    };
+
+
+    window.triggerAnsImg = (key) => { openImageModal('answer', key); };
+    document.getElementById('ansImgInput').onchange = (e) => handleImageUpload(e.target.files[0], (url, publicId) => {
+        const q = questions[currentIndex]; if(!q.answerImages) q.answerImages = {};
+        if(!q.answerImagePublicIds) q.answerImagePublicIds = {};
+        if(!q.answerImageTokens) q.answerImageTokens = {};
+        const oldPublicId = q.answerImagePublicIds?.[currentAnsImgTarget];
+        const oldToken = q.answerImageTokens?.[currentAnsImgTarget];
+        if (oldPublicId) _deleteStudioImage(oldPublicId);
+        else if (oldToken) _deleteStudioImage(oldToken);
+        q.answerImages[currentAnsImgTarget] = url;
+        q.answerImagePublicIds[currentAnsImgTarget] = publicId;
+        if (publicId) q.answerImageTokens[currentAnsImgTarget] = '';
+        loadQuestionToCanvas(currentIndex);
+    });
+
+
+    window.removeAnsImg = (key) => {
+        const q = questions[currentIndex];
+        if (q.answerImages) {
+            if (q.answerImagePublicIds?.[key]) _deleteStudioImage(q.answerImagePublicIds[key]);
+            else if (q.answerImageTokens?.[key]) _deleteStudioImage(q.answerImageTokens[key]);
+            delete q.answerImages[key];
+            if (q.answerImagePublicIds) delete q.answerImagePublicIds[key];
+            if (q.answerImageTokens) delete q.answerImageTokens[key];
+            loadQuestionToCanvas(currentIndex); showGeniiToast("Imagem removida!", "success");
+            saveSnapshot();
+        }
+    };
+
+
+    document.getElementById('typingInput').addEventListener('keydown', (e) => {
+        if(e.key === 'Enter') {
+            const val = e.target.value.trim();
+            if(val) {
+                const q = questions[currentIndex];
+                if(!q.acceptedAnswers) q.acceptedAnswers =[];
+                q.acceptedAnswers.push(val); e.target.value = ''; renderTypingList(q);
+            }
+        }
+    });
+
+
+    function renderTypingList(q) {
+        const list = document.getElementById('acceptedAnswersList');
+        list.innerHTML = '';
+        if(q.acceptedAnswers) {
+            q.acceptedAnswers.forEach((ans, i) => {
+                const chip = document.createElement('div'); chip.className = 'typing-chip';
+                chip.innerHTML = `${ans} <i class="fa-solid fa-xmark" style="cursor:pointer" onclick="removeTypingAns(${i})"></i>`;
+                list.appendChild(chip);
+            });
+        }
+    }
+
+
+    window.removeTypingAns = (idx) => { questions[currentIndex].acceptedAnswers.splice(idx, 1); renderTypingList(questions[currentIndex]); };
+
+
+    function renderThumbnailList() {
+        const container = document.getElementById('slidesContainer');
+        container.innerHTML = "";
+        const boolColors = { A: '#4f46e5', B: '#e02424' };
+        const typeLabels = { quiz: 'Quiz', boolean: 'V/F', typing: 'Digitar', slide: 'Apresentação' };
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const neutralColor = isDark ? '#2a2a2a' : '#FFFFFF';
+
+
+        questions.forEach((q, idx) => {
+            const div = document.createElement('div');
+            div.className = `slide-thumbnail ${idx === currentIndex ? 'active' : ''}`;
+            div.draggable = true;
+            
+            div.ondragstart = () => { draggedItemIndex = idx; div.classList.add('dragging'); };
+            div.ondragend = () => { div.classList.remove('dragging'); draggedItemIndex = null; };
+            div.ondragover = (e) => e.preventDefault();
+            div.ondrop = () => handleDrop(idx);
+            
+            let longTapTimer = null;
+            div.onclick = () => loadQuestionToCanvas(idx);
+            div.oncontextmenu = (e) => { e.preventDefault(); clearTimeout(longTapTimer); showThumbContextMenu(e.clientX, e.clientY, idx); };
+            div.ontouchstart = (e) => { const t = e.touches[0]; longTapTimer = setTimeout(() => showThumbContextMenu(t.clientX, t.clientY, idx), 600); };
+            div.ontouchend = () => clearTimeout(longTapTimer);
+            div.ontouchmove = () => clearTimeout(longTapTimer);
+
+
+            const type = q.type || 'quiz';
+            const correctOpts = Array.isArray(q.correct_option) ? q.correct_option : (q.correct_option ? [q.correct_option] : []);
+
+
+            let answersHTML = '';
+            if (type === 'quiz') {
+                answersHTML = ['A','B','C','D'].map(k => {
+                    const c = (q.answerColors && q.answerColors[k]) || neutralColor;
+                    const isCorrect = correctOpts.includes(k);
+                    const shadowStyle = c === neutralColor ? (isDark ? 'box-shadow: 0 3px 0 #444444' : 'box-shadow: 0 3px 0 #e8edf1') : `box-shadow: 0 3px 0 ${darkenColor(c, 20)}`;
+                    const mark = isCorrect ? 'correct-mark' : '';
+                    
+                    const customStyles = (q.answerStyles && q.answerStyles[k]) || {};
+                    let textColor = customStyles.textColor;
+                    if (!textColor) {
+                        textColor = isDark && c === neutralColor ? '#ffffff' : (getContrastTextColor?.(c) || (isDark ? '#ffffff' : '#333333'));
+                    }
+                    const isDarkText = textColor !== '#FFFFFF' && textColor !== '#ffffff' && textColor !== '#FFF' && textColor !== '#fff';
+                    
+                    const iconBg = isDark && c === neutralColor ? '#333333' : (isDarkText ? '#F1F5F9' : 'rgba(255,255,255,0.22)');
+                    const iconColor = isDark && c === neutralColor ? '#b0b0b0' : (isDarkText ? '#64748B' : 'white');
+
+
+                    let txt = q.options?.[k] || '';
+                    txt = txt.replace(/<[^>]*>?/gm, '');
+                    if (!txt.trim()) txt = `Resposta ${k}`;
+                    
+                    const fontWeight = customStyles.bold ? 'font-weight:900;' : '';
+                    const fontStyle = customStyles.italic ? 'font-style:italic;' : '';
+                    
+                    let iconHtml = `<div class="thumb-ans-icon" style="background:${iconBg}; color:${iconColor};">${k}</div>`;
+                    let ansImgHtml = '';
+                    if (q.answerImages && q.answerImages[k]) {
+                        ansImgHtml = `<img src="${q.answerImages[k]}" style="width:16px; height:16px; border-radius:3px; object-fit:cover; flex-shrink:0; background:rgba(0,0,0,0.1);">`;
+                        iconHtml = '';
+                    }
+                    
+                    return `
+                    <div class="thumb-ans ${mark}" style="background:${c}; ${shadowStyle}; color:${textColor}; ${fontWeight} ${fontStyle}">
+                        ${iconHtml}
+                        ${ansImgHtml}
+                        <div class="thumb-ans-text">${txt}</div>
+                    </div>`;
+                }).join('');
+            } else if (type === 'boolean') {
+                answersHTML = ['A','B'].map(k => {
+                    const isCorrect = correctOpts.includes(k);
+                    const mark = isCorrect ? 'correct-mark' : '';
+                    const boolIcon = k === 'A' ? 'fa-check' : 'fa-xmark';
+                    const c = boolColors[k];
+                    return `
+                    <div class="thumb-ans ${mark}" style="background:${c}; box-shadow: 0 3px 0 ${darkenColor(c, 20)}; color:white;">
+                        <div class="thumb-ans-icon" style="background:rgba(255,255,255,0.22); color:white;"><i class="fa-solid ${boolIcon}"></i></div>
+                        <div class="thumb-ans-text">${k === 'A' ? 'Verdadeiro' : 'Falso'}</div>
+                    </div>`;
+                }).join('');
+            } else if (type === 'slide') {
+                let bodyPreview = (q.body || '').replace(/<[^>]*>?/gm, '').substring(0, 60);
+                if ((q.body || '').length > 60) bodyPreview += '...';
+                answersHTML = `
+                <div class="thumb-ans" style="background: linear-gradient(135deg, #6c5ce7 0%, #a270f4 100%); box-shadow: 0 3px 0 #5a4bd4; grid-column:span 2; display:flex; align-items:center; justify-content:center; color:white; gap:4px; text-align:center;">
+                    <i class="fa-solid fa-presentation-screen" style="font-size:0.6rem;"></i>
+                    <span class="thumb-ans-text" style="text-align:center; font-size:0.5rem;">${bodyPreview || 'Slide de apresentação'}</span>
+                </div>`;
+            } else {
+                answersHTML = `
+                <div class="thumb-ans" style="background:var(--surface); border: 1.5px solid var(--border); box-shadow: 0 3px 0 var(--border); grid-column:span 2; display:flex; align-items:center; justify-content:center; color:var(--grey);">
+                    <i class="fa-solid fa-keyboard" style="font-size:0.6rem;margin-right:4px;"></i>
+                    <span class="thumb-ans-text" style="text-align:center; font-size:0.5rem;">Escrever Resposta</span>
+                </div>`;
+            }
+
+
+            const imgHtml = q.imageUrl
+                ? `<img src="${q.imageUrl}" class="thumb-img-mini" onerror="this.style.display='none'">`
+                : '';
+                
+            const qTextColor = (q.questionStyles && q.questionStyles.textColor) ? q.questionStyles.textColor : 'var(--dark)';
+            const qBold = (q.questionStyles && q.questionStyles.bold) ? 'font-weight:900;' : 'font-weight:600;';
+            const qItalic = (q.questionStyles && q.questionStyles.italic) ? 'font-style:italic;' : 'font-style:normal;';
+            const qStyle = `color:${qTextColor} !important; ${qBold} ${qItalic}`;
+
+
+            let rawQText = q.question_text || '';
+            rawQText = rawQText.replace(/<[^>]*>?/gm, '');
+
+
+            div.innerHTML = `
+                <div class="thumb-header">
+                    <span style="background:var(--purple);color:white;width:20px;height:20px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;font-family:'Fredoka',sans-serif;">${idx + 1}</span>
+                    <span class="thumb-type-badge">${typeLabels[type] || 'Quiz'}</span>
+                </div>
+                <div class="thumb-preview">
+                    <div class="thumb-q-box" id="thumb-text-${idx}" style="${qStyle}">${rawQText || '<span style="color:var(--text-faint);font-family:\'Fredoka\',sans-serif;">Escreve o slide aqui...</span>'}</div>
+                    ${imgHtml}
+                    <div class="thumb-answers" style="grid-template-columns:1fr 1fr;gap:3px;width:100%;margin-top:auto;">${answersHTML}</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+        const active = container.querySelector('.slide-thumbnail.active');
+        if (active && window.innerWidth <= 768) {
+            active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+
+    function handleDrop(targetIndex) {
+        if (draggedItemIndex === null || draggedItemIndex === targetIndex) return;
+        const item = questions.splice(draggedItemIndex, 1)[0];
+        questions.splice(targetIndex, 0, item);
+        currentIndex = targetIndex; renderThumbnailList(); loadQuestionToCanvas(currentIndex);
+        saveSnapshot();
+    }
+
+
+    window.duplicateSlide = (idx) => {
+        const copy = JSON.parse(JSON.stringify(questions[idx])); copy.id = Date.now().toString();
+        questions.splice(idx + 1, 0, copy); renderThumbnailList(); loadQuestionToCanvas(idx + 1); showGeniiToast("Duplicado!", "success");
+        saveSnapshot();
+    };
+
+
+    window.deleteSlide = (idx) => {
+        if(questions.length <= 1) return showGeniiToast("Mínimo de 1 slide", "error");
+        showGeniiConfirm("Apagar este slide?", (confirmed) => {
+            if (!confirmed) return;
+            questions.splice(idx, 1);
+            if(currentIndex >= questions.length) currentIndex = questions.length - 1;
+            renderThumbnailList(); loadQuestionToCanvas(currentIndex);
+            saveSnapshot();
+        });
+    };
+
+
+    window.addNewQuestion = () => {
+        questions.push({
+            id: Date.now().toString(), type: 'quiz',
+            question_text: "", options: {A:"", B:"", C:"", D:""},
+            correct_option: [], timeLimit: "20", points: "1000", imageUrl: null, shuffleOptions: false
+        });
+        renderThumbnailList();
+        loadQuestionToCanvas(questions.length - 1);
+        const c = document.getElementById('slidesContainer');
+        setTimeout(() => c.scrollTop = c.scrollHeight, 100);
+        saveSnapshot();
+    }
+    document.getElementById('addSlideBtn').onclick = window.addNewQuestion;
+
+
+    document.getElementById('deleteCurrentSlideBtn').onclick = () => window.deleteSlide(currentIndex);
+
+
+    function validateQuestions(qs) {
+        for (let i = 0; i < qs.length; i++) {
+            const q = qs[i];
+            if (q.type === 'slide') continue;
+            if (q.type === 'quiz' || q.type === 'boolean') {
+                if (!Array.isArray(q.correct_option) || q.correct_option.length === 0) {
+                    return { valid: false, index: i, message: `Pergunta ${i + 1} não tem resposta correta definida.` };
+                }
+            }
+            if (q.type === 'typing') {
+                if (!Array.isArray(q.acceptedAnswers) || q.acceptedAnswers.length === 0) {
+                    return { valid: false, index: i, message: `Pergunta ${i + 1} (digitação) não tem respostas aceites.` };
+                }
+            }
+        }
+        return { valid: true };
+    }
+
+
+    document.getElementById('saveQuizBtn').onclick = async () => {
+        const btn = document.getElementById('saveQuizBtn');
+        const validation = validateQuestions(questions);
+        if (!validation.valid) {
+            showGeniiToast(validation.message, "error");
+            const thumb = document.querySelector(`.thumb-item[data-index="${validation.index}"]`);
+            if (thumb) {
+                thumb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                thumb.style.outline = '3px solid #ff6b6b';
+                setTimeout(() => { if (thumb) thumb.style.outline = ''; }, 3000);
+            }
+            return;
+        }
+        const old = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i>`;
+        try {
+            await updateDoc(doc(db, "quizzes", quizId), { questions, updatedAt: new Date() });
+            showGeniiToast("Guardado!");
+        } catch (e) { console.error(e); showGeniiToast("Erro!", "error"); }
+        finally { btn.innerHTML = old; }
+    };
+
+
+    let _gcpRecent = JSON.parse(localStorage.getItem('gcp_recent') || '[]');
+    let _savedSelRange = null;
+
+
+    function saveSelection() {
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) _savedSelRange = sel.getRangeAt(0).cloneRange();
+    }
+    function restoreSelection() {
+        if (!_savedSelRange) return;
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(_savedSelRange);
+    }
+
+
+    window.openGeniiColorPicker = (btnEl, currentHex, key, mode) => {
+        saveSelection();
+        window.closeGeniiColorPicker();
+
+
+        const initColor = currentHex || '#2D3436';
+        const rgb = gcp_hexToRgb(initColor);
+        const hsv = gcp_rgbToHsv(rgb.r, rgb.g, rgb.b);
+
+
+        let _hue = hsv.h, _sat = hsv.s, _val = hsv.v;
+
+
+        const presetColors = [
+            '#FFFFFF','#000000','#F87171','#FB923C','#FBBF24','#A3E635','#34D399','#22D3EE','#60A5FA','#A78BFA',
+            '#EF4444','#F97316','#EAB308','#84CC16','#10B981','#06B6D4','#3B82F6','#8B5CF6','#EC4899','#6B7280',
+            '#991B1B','#9A3412','#854D0E','#166534','#115E59','#1E40AF','#4338CA','#86198F','#44403C','#1F2937',
+            '#00cfc1','#1cb0f6','#a270f4','#ff6b6b','#ffce00'
+        ];
+
+
+        const popover = document.createElement('div');
+        popover.className = 'gcp-popover';
+        popover.id = 'gcp-popover';
+        popover.onclick = (e) => e.stopPropagation();
+        popover.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
+
+
+        const canvasWrap = document.createElement('div');
+        canvasWrap.className = 'gcp-canvas-wrap';
+        const canvas = document.createElement('canvas');
+        canvas.width = 248; canvas.height = 150;
+        canvas.style.width = '100%';
+        canvas.style.height = '150px';
+        canvasWrap.appendChild(canvas);
+        const svCursor = document.createElement('div');
+        svCursor.className = 'gcp-cursor';
+        canvasWrap.appendChild(svCursor);
+        popover.appendChild(canvasWrap);
+
+
+        const hueWrap = document.createElement('div');
+        hueWrap.className = 'gcp-hue-wrap';
+        const hueThumb = document.createElement('div');
+        hueThumb.className = 'gcp-hue-thumb';
+        hueWrap.appendChild(hueThumb);
+        popover.appendChild(hueWrap);
+
+
+        const row = document.createElement('div');
+        row.className = 'gcp-row';
+        const hexBox = document.createElement('div');
+        hexBox.className = 'gcp-hex-box';
+        const hashSpan = document.createElement('span');
+        hashSpan.className = 'gcp-hash';
+        hashSpan.textContent = '#';
+        const hexInput = document.createElement('input');
+        hexInput.type = 'text';
+        hexInput.className = 'gcp-hex';
+        hexInput.id = 'gcp-hex-input';
+        hexInput.value = initColor.replace('#','').toUpperCase();
+        hexInput.maxLength = 6;
+        hexInput.spellcheck = false;
+        hexBox.appendChild(hashSpan);
+        hexBox.appendChild(hexInput);
+        const previewBox = document.createElement('div');
+        previewBox.className = 'gcp-preview-box';
+        previewBox.id = 'gcp-preview';
+        row.appendChild(hexBox);
+        row.appendChild(previewBox);
+
+
+        const ctx = canvas.getContext('2d');
+
+
+        function drawCanvas() {
+            const w = canvas.width, h = canvas.height;
+            ctx.fillStyle = `hsl(${_hue}, 100%, 50%)`;
+            ctx.fillRect(0, 0, w, h);
+            const grdWhite = ctx.createLinearGradient(0, 0, w, 0);
+            grdWhite.addColorStop(0, 'rgba(255,255,255,1)');
+            grdWhite.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.fillStyle = grdWhite;
+            ctx.fillRect(0, 0, w, h);
+            const grdBlack = ctx.createLinearGradient(0, 0, 0, h);
+            grdBlack.addColorStop(0, 'rgba(0,0,0,0)');
+            grdBlack.addColorStop(1, 'rgba(0,0,0,1)');
+            ctx.fillStyle = grdBlack;
+            ctx.fillRect(0, 0, w, h);
+        }
+
+
+        function renderAll() {
+            drawCanvas();
+            svCursor.style.left = (_sat * 100) + '%';
+            svCursor.style.top = ((1 - _val) * 100) + '%';
+            hueThumb.style.left = (_hue / 360 * 100) + '%';
+            const hex = gcp_getHex(_hue, _sat, _val);
+            if (document.activeElement !== hexInput) hexInput.value = hex.replace('#','').toUpperCase();
+            previewBox.style.background = hex;
+        }
+
+
+        let canvasDrag = false;
+        function handleCanvasPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            let x = (clientX - rect.left) / rect.width;
+            let y = (clientY - rect.top) / rect.height;
+            x = Math.max(0, Math.min(1, x));
+            y = Math.max(0, Math.min(1, y));
+            _sat = x; _val = 1 - y;
+            renderAll();
+        }
+        canvas.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); canvasDrag = true; handleCanvasPos(e); });
+        canvas.addEventListener('touchstart', (e) => { e.stopPropagation(); canvasDrag = true; handleCanvasPos(e); }, { passive: false });
+        document.addEventListener('mousemove', (e) => { if (canvasDrag) handleCanvasPos(e); });
+        document.addEventListener('touchmove', (e) => { if (canvasDrag) handleCanvasPos(e); }, { passive: false });
+        document.addEventListener('mouseup', () => { canvasDrag = false; });
+        document.addEventListener('touchend', () => { canvasDrag = false; });
+
+
+        let hueDrag = false;
+        function handleHuePos(e) {
+            const rect = hueWrap.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            let x = (clientX - rect.left) / rect.width;
+            x = Math.max(0, Math.min(1, x));
+            _hue = x * 360;
+            renderAll();
+        }
+        hueWrap.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); hueDrag = true; handleHuePos(e); });
+        hueWrap.addEventListener('touchstart', (e) => { e.stopPropagation(); hueDrag = true; handleHuePos(e); }, { passive: false });
+        document.addEventListener('mousemove', (e) => { if (hueDrag) handleHuePos(e); });
+        document.addEventListener('touchmove', (e) => { if (hueDrag) handleHuePos(e); }, { passive: false });
+        document.addEventListener('mouseup', () => { hueDrag = false; });
+        document.addEventListener('touchend', () => { hueDrag = false; });
+
+
+        hexInput.addEventListener('input', (e) => {
+            e.stopPropagation();
+            const val = e.target.value.replace(/[^0-9a-fA-F]/g, '').substring(0, 6);
+            e.target.value = val.toUpperCase();
+            if (val.length === 6) {
+                const r2 = gcp_hexToRgb('#' + val);
+                const h2 = gcp_rgbToHsv(r2.r, r2.g, r2.b);
+                _hue = h2.h; _sat = h2.s; _val = h2.v;
+                renderAll();
+            }
+        });
+        hexInput.addEventListener('click', (e) => e.stopPropagation());
+        hexInput.addEventListener('mousedown', (e) => e.stopPropagation());
+
+
+        popover.appendChild(row);
+
+
+        const presetsDiv = document.createElement('div');
+        presetsDiv.className = 'gcp-presets';
+        presetColors.forEach(c => {
+            const s = document.createElement('div');
+            s.className = 'gcp-swatch';
+            s.style.background = c;
+            if (c === '#FFFFFF') s.style.border = '1px solid var(--border)';
+            s.title = c;
+            s.onclick = (e) => {
+                e.stopPropagation();
+                const r2 = gcp_hexToRgb(c);
+                const h2 = gcp_rgbToHsv(r2.r, r2.g, r2.b);
+                _hue = h2.h; _sat = h2.s; _val = h2.v;
+                renderAll();
+            };
+            presetsDiv.appendChild(s);
+        });
+        popover.appendChild(presetsDiv);
+
+
+        if (_gcpRecent.length > 0) {
+            const label = document.createElement('span');
+            label.className = 'gcp-label';
+            label.textContent = 'Recentes';
+            popover.appendChild(label);
+            const recentDiv = document.createElement('div');
+            recentDiv.className = 'gcp-recent';
+            _gcpRecent.forEach(c => {
+                const rs = document.createElement('div');
+                rs.className = 'gcp-recent-swatch';
+                rs.style.background = c;
+                rs.title = c;
+                rs.onclick = (e) => {
+                    e.stopPropagation();
+                    const r2 = gcp_hexToRgb(c);
+                    const h2 = gcp_rgbToHsv(r2.r, r2.g, r2.b);
+                    _hue = h2.h; _sat = h2.s; _val = h2.v;
+                    renderAll();
+                };
+                recentDiv.appendChild(rs);
+            });
+            popover.appendChild(recentDiv);
+        }
+
+
+        const actions = document.createElement('div');
+        actions.className = 'gcp-actions';
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'gcp-btn gcp-btn-cancel';
+        cancelBtn.textContent = 'Cancelar';
+        cancelBtn.onclick = (e) => { e.stopPropagation(); window.closeGeniiColorPicker(); };
+        const applyBtn = document.createElement('button');
+        applyBtn.className = 'gcp-btn gcp-btn-apply';
+        applyBtn.textContent = 'Aplicar';
+        applyBtn.onclick = (e) => {
+            e.stopPropagation();
+            const hex = gcp_getHex(_hue, _sat, _val);
+            gcp_applyColor(hex, key, mode);
+            gcp_addRecent(hex);
+            window.closeGeniiColorPicker();
+        };
+        actions.appendChild(cancelBtn);
+        actions.appendChild(applyBtn);
+        popover.appendChild(actions);
+
+
+        document.body.appendChild(popover);
+
+
+        const btnRect = btnEl.getBoundingClientRect();
+        const popWidth = 280;
+        let left = btnRect.left + btnRect.width / 2 - popWidth / 2;
+        let top = btnRect.bottom + 8;
+        left = Math.max(8, Math.min(window.innerWidth - popWidth - 8, left));
+        if (top + 400 > window.innerHeight) {
+            top = btnRect.top - 8 - 400;
+        }
+        popover.style.left = left + 'px';
+        popover.style.top = top + 'px';
+
+
+        restoreSelection();
+        renderAll();
+    };
+
+
+    function gcp_getHex(h, s, v) {
+        const r = gcp_hsvToRgb(h, s, v);
+        return gcp_rgbToHex(r[0], r[1], r[2]);
+    }
+
+
+    function gcp_applyColor(hex, key, mode) {
+        if (mode === 'answer-bg') {
+            setAnswerBgColor(key, hex);
+        } else if (mode === 'answer-text') {
+            if (_savedSelRange && !_savedSelRange.collapsed) {
+                gcp_applyToSelection(hex);
+            } else {
+                setAnswerTextColor(key, hex);
+            }
+        } else if (mode === 'question-text') {
+            if (_savedSelRange && !_savedSelRange.collapsed) {
+                gcp_applyToSelection(hex);
+            } else {
+                const q = questions[currentIndex];
+                if (!q.questionStyles) q.questionStyles = {};
+                q.questionStyles.textColor = hex;
+                loadQuestionToCanvas(currentIndex);
+                const qInput = document.getElementById('qTextInput');
+                if (qInput) qInput.style.setProperty('color', hex, 'important');
+                renderContextToolbar();
+            }
+        }
+        saveSnapshot();
+    }
+
+
+    function gcp_applyToSelection(hex) {
+        if (!_savedSelRange) return;
+        try {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(_savedSelRange);
+            if (sel.rangeCount === 0 || sel.isCollapsed) return;
+            const range = sel.getRangeAt(0);
+            const span = document.createElement('span');
+            span.style.color = hex;
+            range.surroundContents(span);
+            sel.removeAllRanges();
+        } catch(e) {
+            const active = document.activeElement;
+            if (active && active.classList.contains('ans-input')) {
+                active.style.setProperty('color', hex, 'important');
+            }
+        }
+        _savedSelRange = null;
+    }
+
+
+    function gcp_addRecent(hex) {
+        const h = hex.toUpperCase();
+        _gcpRecent = _gcpRecent.filter(c => c.toUpperCase() !== h);
+        _gcpRecent.unshift(hex);
+        if (_gcpRecent.length > 10) _gcpRecent.pop();
+        localStorage.setItem('gcp_recent', JSON.stringify(_gcpRecent));
+    }
+
+
+    window.closeGeniiColorPicker = () => {
+        const el = document.getElementById('gcp-popover');
+        if (el) el.remove();
+    };
+
+
+    function gcp_hexToRgb(hex) {
+        let c = hex.replace('#', '');
+        if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+        return { r: parseInt(c.substring(0,2), 16), g: parseInt(c.substring(2,4), 16), b: parseInt(c.substring(4,6), 16) };
+    }
+
+
+    function gcp_rgbToHex(r, g, b) {
+        return '#' + [r, g, b].map(x => Math.round(x).toString(16).padStart(2, '0')).join('');
+    }
+
+
+    function gcp_rgbToHsv(r, g, b) {
+        r /= 255; g /= 255; b /= 255;
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const d = max - min;
+        let h = 0, s = max === 0 ? 0 : d / max, v = max;
+        if (d !== 0) {
+            switch (max) {
+                case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                case g: h = ((b - r) / d + 2) / 6; break;
+                case b: h = ((r - g) / d + 4) / 6; break;
+            }
+        }
+        return { h: h * 360, s, v };
+    }
+
+
+    function gcp_hsvToRgb(h, s, v) {
+        h /= 360;
+        let r, g, b;
+        const i = Math.floor(h * 6);
+        const f = h * 6 - i;
+        const p = v * (1 - s);
+        const q = v * (1 - f * s);
+        const t = v * (1 - (1 - f) * s);
+        switch (i % 6) {
+            case 0: r = v; g = t; b = p; break;
+            case 1: r = q; g = v; b = p; break;
+            case 2: r = p; g = v; b = t; break;
+            case 3: r = p; g = q; b = v; break;
+            case 4: r = t; g = p; b = v; break;
+            case 5: r = v; g = p; b = q; break;
+        }
+        return [r * 255, g * 255, b * 255];
+    }
+
+
+</script>
+</body>
+</html>

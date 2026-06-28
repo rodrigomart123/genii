@@ -1,0 +1,940 @@
+﻿<!doctype html>
+<html lang="pt">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Genii - Aprende, Joga, Desenvolve</title>
+
+        <link
+            rel="icon"
+            href="static/img/favicon.ico?v=2"
+            type="image/x-icon"
+        />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+            rel="stylesheet"
+        />
+
+        
+        <script src="static/js/style.css?v=3" />`n    <script src="static/js/theme.js"></script>
+    </head>
+    <body data-page="index">
+        <header id="main-header">
+            <div class="nav-container">
+                <a href="index.html" class="logo">
+                    <img src="static/img/geniilogo.png" alt="Genii Logo" />
+                    <span>Genii</span>
+                </a>
+
+                <nav>
+                    <div
+                        id="nav-user"
+                        class="auth-hidden"
+                        style="display: flex; gap: 10px"
+                    >
+                        <a class="btn btn-primary btn-sm" href="join.html"
+                            >ACEDER</a
+                        >
+                    </div>
+                    <div id="nav-guest" style="display: flex; gap: 10px">
+                        <a href="login.html" class="btn btn-outline btn-sm"
+                            >ENTRAR</a
+                        >
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero">
+                <div class="hero-visual">
+                    <div class="hero-blob"></div>
+                    <img
+                        src="static/img/hero.png"
+                        alt="Genii App Preview"
+                    />
+                </div>
+
+                <div class="hero-text">
+                    <h1>
+                        Transforme a aula no <span>melhor jogo</span> do dia
+                    </h1>
+                    <p>
+                        Aprenda, jogue e desenvolva com a plataforma que Gamifica
+                        a sua sala de aula. Crie sets com IA em segundos e veja
+                        o entusiasmo crescer.
+                    </p>
+
+                    <div class="hero-cta-group">
+                        <a
+                            class="btn btn-primary"
+                            id="hero-cta"
+                            href="register.html"
+                        >
+                            COMEÇAR GRÁTIS
+                        </a>
+                        <a
+                            class="btn btn-outline"
+                            id="hero-secondary"
+                            href="login.html"
+                        >
+                            ENTRAR AGORA
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="magic-section" id="features">
+                <div class="magic-header">
+                    <div class="section-badge badge-purple">
+                        Funcionalidades
+                    </div>
+                    <h2>Descobre a Magia do Genii</h2>
+                    <p>
+                        Quatro super-poderes que transformam qualquer aula numa
+                        aventura épica.
+                    </p>
+                </div>
+
+                <div class="magic-grid">
+                    <div class="magic-card card-teal">
+                        <div
+                            class="card-icon"
+                            style="background: var(--primary)"
+                        >
+                            <i class="fa-solid fa-users-rays"></i>
+                        </div>
+                        <h3>Multiplayer ao Vivo</h3>
+                        <p>
+                            Até 50 jogadores em tempo real. Lance um set e veja a
+                            turma inteira a competir ao segundo - com rankings
+                            ao vivo e reações animadas.
+                        </p>
+                    </div>
+
+                    <div class="magic-card card-purple">
+                        <div
+                            class="card-icon"
+                            style="background: var(--purple)"
+                        >
+                            <i class="fa-solid fa-school"></i>
+                        </div>
+                        <h3>Turmas &amp; Trabalhos</h3>
+                        <p>
+                            Cria turmas, atribui trabalhos de casa gamificados e
+                            acompanha o progresso de cada aluno com relatórios
+                            visuais automáticos.
+                        </p>
+                    </div>
+
+                    <div class="magic-card card-coral">
+                        <div class="card-icon" style="background: var(--coral)">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <h3>Geração com IA</h3>
+                        <p>
+                            Cole o seu conteúdo e a inteligência artificial cria
+                            slides e imagens em segundos. O seu set fica
+                            pronto antes do café arrefecer.
+                        </p>
+                    </div>
+
+                    <div class="magic-card card-gold">
+                        <div
+                            class="card-icon"
+                            style="background: var(--accent)"
+                        >
+                            <i class="fa-solid fa-hat-wizard"></i>
+                        </div>
+                        <h3>Gamificação &amp; Avatares</h3>
+                        <p>
+                            XP, níveis, conquistas e um avatar totalmente
+                            personalizável. Os alunos não vão querer parar de
+                            aprender - prometemos.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="audience-section" id="publico">
+                <div class="audience-header">
+                    <div class="section-badge badge-teal">Para Todos</div>
+                    <h2>Para Professores e Alunos</h2>
+                    <p>
+                        Ferramentas pensadas para quem ensina e para quem
+                        aprende - simples, rápidas e divertidas.
+                    </p>
+                </div>
+
+                <div class="zigzag-row">
+                    <div class="zigzag-text">
+                        <div class="eyebrow purple">Professores</div>
+                        <h3>Crie sets incríveis em minutos com IA!</h3>
+                        <p>
+                            Cole os seus apontamentos, um PDF ou até um link - a
+                            IA do Genii gera slides num instante. Depois é só
+                            personalizar, lançar para a turma e acompanhar tudo
+                            em tempo real.
+                        </p>
+                        <ul class="feat-list">
+                            <li>
+                                <i style="background: var(--purple)"
+                                    ><span class="fa-solid fa-robot"></span
+                                ></i>
+                                Geração automática de slides com IA
+                            </li>
+                            <li>
+                                <i style="background: var(--primary)"
+                                    ><span
+                                        class="fa-solid fa-chart-column"
+                                    ></span
+                                ></i>
+                                Relatórios detalhados por aluno
+                            </li>
+                            <li>
+                                <i style="background: var(--coral)"
+                                    ><span
+                                        class="fa-solid fa-clipboard-list"
+                                    ></span
+                                ></i>
+                                Trabalhos de casa divertidos
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="zigzag-visual">
+                        <div class="zigzag-mockup mockup-purple">
+                            <img
+                                src="static/img/prof.png"
+                                alt="Mascote Genii Professor"
+                                class="mockup-img"
+                                onerror="
+                                    this.src =
+                                        'https://placehold.co/400x400/transparent/purple?text=Professor+Mascot'
+                                "
+                            />
+                            <span class="mockup-label"
+                                >Editor Mágico com IA</span
+                            >
+                        </div>
+                        <div
+                            class="float-badge"
+                            style="top: -15px; right: -15px"
+                        >
+                            <i
+                                class="fa-solid fa-fire"
+                                style="color: var(--coral)"
+                            ></i>
+                            Set pronto em 30s
+                        </div>
+                    </div>
+                </div>
+
+                <div class="zigzag-row reverse">
+                    <div class="zigzag-text">
+                        <div class="eyebrow teal">Alunos</div>
+                        <h3>Aprenda a jogar. Jogue a aprender.</h3>
+                        <p>
+                            Ganhe XP por cada resposta certa, suba de nível e
+                            desbloqueie itens épicos para o seu avatar. Compita
+                            com os seus colegas nos rankings da turma e torne o
+                            estudo no melhor momento do dia.
+                        </p>
+                        <ul class="feat-list">
+                            <li>
+                                <i style="background: var(--primary)"
+                                    ><span class="fa-solid fa-star"></span
+                                ></i>
+                                Sistema de XP, níveis e conquistas
+                            </li>
+                            <li>
+                                <i style="background: var(--accent)"
+                                    ><span class="fa-solid fa-shirt"></span
+                                ></i>
+                                Avatar personalizável com skins épicas
+                            </li>
+                            <li>
+                                <i style="background: var(--purple)"
+                                    ><span class="fa-solid fa-trophy"></span
+                                ></i>
+                                Rankings e desafios entre amigos
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="zigzag-visual">
+                        <div class="zigzag-mockup mockup-teal">
+                            <img
+                                src="static/img/gamer.png"
+                                alt="Mascote Genii Aluno Gamer"
+                                class="mockup-img"
+                                onerror="
+                                    this.src =
+                                        'https://placehold.co/400x400/transparent/00CFC1?text=Gamer+Mascot'
+                                "
+                            />
+                            <span class="mockup-label"
+                                >Ganhe XP e Suba de Nível</span
+                            >
+                        </div>
+                        <div
+                            class="float-badge"
+                            style="
+                                bottom: -15px;
+                                left: -15px;
+                                animation-delay: 1.5s;
+                            "
+                        >
+                            <i
+                                class="fa-solid fa-bolt"
+                                style="color: var(--accent)"
+                            ></i>
+                            +250 XP
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="cta-final">
+                <div class="cta-final-inner">
+                    <i class="fa-solid fa-sparkles cta-sparkle sparkle-1"></i>
+                    <i class="fa-solid fa-sparkles cta-sparkle sparkle-2"></i>
+
+                    <h2>Pronto para transformar as suas aulas?</h2>
+                    <p>
+                        Junte-se a dezenas de professores e alunos que já
+                        descobriram a magia de aprender com o Genii.
+                    </p>
+                    <a
+                        href="register.html"
+                        class="btn-cta-white"
+                        id="cta-final-btn"
+                    >
+                        COMEÇAR GRÁTIS <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <div class="cta-subtext">
+                        Sem cartão de crédito · Configuração em 30 segundos
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="genii-footer-wrapper">
+            <div class="gooey-bg-container layer-back">
+                <div class="gooey-solid-base"></div>
+                <div class="gooey-bubbles">
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5rem;
+                            --distance: 13rem;
+                            --position: 15%;
+                            --time: 5s;
+                            --delay: -1s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4rem;
+                            --distance: 14rem;
+                            --position: 45%;
+                            --time: 6s;
+                            --delay: -3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 6rem;
+                            --distance: 12rem;
+                            --position: 75%;
+                            --time: 7s;
+                            --delay: -2s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.5rem;
+                            --distance: 15rem;
+                            --position: 25%;
+                            --time: 5.5s;
+                            --delay: -4s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.5rem;
+                            --distance: 13.5rem;
+                            --position: 60%;
+                            --time: 6.5s;
+                            --delay: -1.5s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.5rem;
+                            --distance: 14.5rem;
+                            --position: 85%;
+                            --time: 5.8s;
+                            --delay: -2.5s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3rem;
+                            --distance: 12.5rem;
+                            --position: 5%;
+                            --time: 4.5s;
+                            --delay: -0.5s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4rem;
+                            --distance: 13rem;
+                            --position: 95%;
+                            --time: 6.2s;
+                            --delay: -3.5s;
+                        "
+                    ></div>
+                </div>
+            </div>
+
+            <div class="gooey-bg-container layer-mid">
+                <div class="gooey-solid-base"></div>
+                <div class="gooey-bubbles">
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4rem;
+                            --distance: 11rem;
+                            --position: 10%;
+                            --time: 4s;
+                            --delay: -2s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.5rem;
+                            --distance: 12rem;
+                            --position: 40%;
+                            --time: 5s;
+                            --delay: -4s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5rem;
+                            --distance: 10rem;
+                            --position: 70%;
+                            --time: 4.5s;
+                            --delay: -1s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.5rem;
+                            --distance: 11.5rem;
+                            --position: 90%;
+                            --time: 5.5s;
+                            --delay: -3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.8rem;
+                            --distance: 12.5rem;
+                            --position: 20%;
+                            --time: 4.8s;
+                            --delay: -1.8s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.2rem;
+                            --distance: 10.5rem;
+                            --position: 55%;
+                            --time: 5.2s;
+                            --delay: -2.2s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.2rem;
+                            --distance: 11.8rem;
+                            --position: 80%;
+                            --time: 4.2s;
+                            --delay: -3.2s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.1rem;
+                            --distance: 10.8rem;
+                            --position: 30%;
+                            --time: 5.8s;
+                            --delay: -0.8s;
+                        "
+                    ></div>
+                </div>
+            </div>
+
+            <div class="gooey-bg-container layer-front">
+                <div class="gooey-solid-base"></div>
+                <div class="gooey-bubbles">
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.6rem;
+                            --distance: 9.5rem;
+                            --position: 5%;
+                            --time: 2.1s;
+                            --delay: -2.4s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.8rem;
+                            --distance: 9.3rem;
+                            --position: 36%;
+                            --time: 2.7s;
+                            --delay: -2.7s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.6rem;
+                            --distance: 7.8rem;
+                            --position: 84%;
+                            --time: 2.2s;
+                            --delay: -2.7s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.3rem;
+                            --distance: 8.7rem;
+                            --position: 55%;
+                            --time: 2.1s;
+                            --delay: -2.8s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.5rem;
+                            --distance: 8.8rem;
+                            --position: 72%;
+                            --time: 3.1s;
+                            --delay: -3.4s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.2rem;
+                            --distance: 6.3rem;
+                            --position: 44%;
+                            --time: 3.1s;
+                            --delay: -2.3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.3rem;
+                            --distance: 6.2rem;
+                            --position: 75%;
+                            --time: 3.9s;
+                            --delay: -2.9s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.6rem;
+                            --distance: 8.4rem;
+                            --position: 9%;
+                            --time: 3.4s;
+                            --delay: -3.7s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.9rem;
+                            --distance: 6.8rem;
+                            --position: 64%;
+                            --time: 2.8s;
+                            --delay: -3.6s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.9rem;
+                            --distance: 8.8rem;
+                            --position: 2%;
+                            --time: 3.2s;
+                            --delay: -3.6s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.2rem;
+                            --distance: 9rem;
+                            --position: 30%;
+                            --time: 3.7s;
+                            --delay: -2.3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.1rem;
+                            --distance: 6.8rem;
+                            --position: 42%;
+                            --time: 3.1s;
+                            --delay: -2.5s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.1rem;
+                            --distance: 8.1rem;
+                            --position: 75%;
+                            --time: 2.4s;
+                            --delay: -2.5s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.9rem;
+                            --distance: 8.9rem;
+                            --position: 4%;
+                            --time: 2.2s;
+                            --delay: -2.6s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 3.2rem;
+                            --distance: 7.2rem;
+                            --position: 16%;
+                            --time: 3s;
+                            --delay: -2.3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.3rem;
+                            --distance: 6rem;
+                            --position: 6%;
+                            --time: 2.5s;
+                            --delay: -3.3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.8rem;
+                            --distance: 7.2rem;
+                            --position: 98%;
+                            --time: 3.7s;
+                            --delay: -2.5s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.1rem;
+                            --distance: 9.9rem;
+                            --position: 82%;
+                            --time: 2.6s;
+                            --delay: -2.8s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.6rem;
+                            --distance: 9.7rem;
+                            --position: 81%;
+                            --time: 2.5s;
+                            --delay: -3.4s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.1rem;
+                            --distance: 7.1rem;
+                            --position: 30%;
+                            --time: 3.1s;
+                            --delay: -2.2s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5rem;
+                            --distance: 6.4rem;
+                            --position: 5%;
+                            --time: 2.5s;
+                            --delay: -2s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 4.3rem;
+                            --distance: 9.6rem;
+                            --position: 95%;
+                            --time: 2.8s;
+                            --delay: -3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.4rem;
+                            --distance: 8.7rem;
+                            --position: 85%;
+                            --time: 3.7s;
+                            --delay: -2.3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2rem;
+                            --distance: 9.7rem;
+                            --position: 99%;
+                            --time: 3.6s;
+                            --delay: -3s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 2.3rem;
+                            --distance: 7.1rem;
+                            --position: 70%;
+                            --time: 2s;
+                            --delay: -2.7s;
+                        "
+                    ></div>
+                    <div
+                        class="gooey-bubble"
+                        style="
+                            --size: 5.4rem;
+                            --distance: 7rem;
+                            --position: 10%;
+                            --time: 3.7s;
+                            --delay: -2.1s;
+                        "
+                    ></div>
+                </div>
+            </div>
+
+            <footer class="genii-footer-content">
+                <div class="footer-particle p1"></div>
+                <div class="footer-particle p2"></div>
+                <div class="footer-particle p3"></div>
+                <div class="footer-particle p4"></div>
+
+                <img
+                    src="static/img/footer-mascot.png"
+                    alt="Mascote footer"
+                    class="footer-ghost-img"
+                    onerror="this.style.display = 'none'"
+                />
+
+                <div class="footer-grid">
+                    <div class="footer-brand">
+                        <div class="footer-logo">
+                            <img src="static/img/geniilogo.png" alt="Genii" />
+                            <span>Genii</span>
+                        </div>
+                        <p>
+                            A plataforma que torna a aprendizagem divertida,
+                            envolvente e acessível.
+                        </p>
+                        <div class="footer-social">
+                            <a href="#" aria-label="Instagram"
+                                ><i class="fa-brands fa-instagram"></i
+                            ></a>
+                            <a href="#" aria-label="TikTok"
+                                ><i class="fa-brands fa-tiktok"></i
+                            ></a>
+                            <a href="#" aria-label="YouTube"
+                                ><i class="fa-brands fa-youtube"></i
+                            ></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <ul>
+                            <li><a href="#features">Funcionalidades</a></li>
+                            <li><a href="#publico">Para Professores</a></li>
+                            <li>
+                                <a href="discover.html">Explorar Sets</a>
+                            </li>
+                        </ul>
+                        <ul>
+                            <li><a href="#">Termos de Uso</a></li>
+                            <li><a href="#">Privacidade</a></li>
+                            <li>
+                                <a href="mailto:a7252@aeprosa.pt">Contacto</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <span
+                        >&copy; <span id="ano"></span> Genii. Feito com
+                        magia.</span
+                    >
+                    <a
+                        href="#"
+                        onclick="
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            return false;
+                        "
+                    >
+                        Voltar ao topo <i class="fa-solid fa-arrow-up"></i>
+                    </a>
+                </div>
+            </footer>
+        </div>
+
+        <svg style="position: fixed; top: 100vh; width: 0; height: 0">
+            <defs>
+                <filter id="blob">
+                    <feGaussianBlur
+                        in="SourceGraphic"
+                        stdDeviation="10"
+                        result="blur"
+                    ></feGaussianBlur>
+                    <feColorMatrix
+                        in="blur"
+                        mode="matrix"
+                        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9"
+                        result="blob"
+                    ></feColorMatrix>
+                    <feComposite
+                        in="SourceGraphic"
+                        in2="blob"
+                        operator="atop"
+                    ></feComposite>
+                </filter>
+
+                <filter id="swirl-displace">
+                    <feTurbulence
+                        type="fractalNoise"
+                        baseFrequency="0.015"
+                        numOctaves="2"
+                        result="noise"
+                    />
+                    <feDisplacementMap
+                        in="SourceGraphic"
+                        in2="noise"
+                        scale="120"
+                        xChannelSelector="R"
+                        yChannelSelector="G"
+                    />
+                </filter>
+            </defs>
+        </svg>
+
+        <script type="module">
+            import {
+                onAuthStateChanged,
+                signOut,
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            import { auth } from "./firebase-config.js";
+
+            document.getElementById("ano").innerText = new Date().getFullYear();
+
+            const navUser = document.getElementById("nav-user");
+            const navGuest = document.getElementById("nav-guest");
+            const heroCta = document.getElementById("hero-cta");
+            const heroSecondary = document.getElementById("hero-secondary");
+
+            const header = document.getElementById("main-header");
+            window.addEventListener("scroll", () => {
+                if (window.scrollY > 20) {
+                    header.classList.add("scrolled");
+                } else {
+                    header.classList.remove("scrolled");
+                }
+            });
+
+            window.handleLogout = async () => {
+                try {
+                    await signOut(auth);
+                    navGuest.classList.remove("auth-hidden");
+                    navUser.classList.add("auth-hidden");
+                    heroCta.href = "register.html";
+                    heroCta.innerText = "COMEÇAR GRÁTIS";
+                    heroSecondary.href = "login.html";
+                    heroSecondary.innerText = "ENTRAR AGORA";
+                    heroSecondary.onclick = null;
+                } catch (error) {
+                    console.error("Erro ao sair:", error);
+                }
+            };
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    navGuest.classList.add("auth-hidden");
+                    navUser.classList.remove("auth-hidden");
+
+                    heroCta.href = "join.html";
+                    heroCta.innerText = "ACEDER AO PAINEL";
+
+                    heroSecondary.href = "#";
+                    heroSecondary.innerText = "TERMINAR SESSÃO";
+                    heroSecondary.onclick = window.handleLogout;
+                } else {
+                    navGuest.classList.remove("auth-hidden");
+                    navUser.classList.add("auth-hidden");
+
+                    heroCta.href = "register.html";
+                    heroCta.innerText = "COMEÇAR GRÁTIS";
+
+                    heroSecondary.href = "login.html";
+                    heroSecondary.innerText = "ENTRAR AGORA";
+                    heroSecondary.onclick = null;
+                }
+            });
+        </script>
+    </body>
+</html>

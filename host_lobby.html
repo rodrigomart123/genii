@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala de Espera - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="static/css/style.css?v=3" />
+    
+    
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="host-lobby">
+
+    <div class="background-animation">
+        <ul class="circles">
+            <li></li><li></li><li></li><li></li><li></li>
+            <li></li><li></li><li></li><li></li><li></li>
+        </ul>
+    </div>
+
+    <div class="lobby-window">
+        <div class="lobby-sidebar">
+            <div class="sidebar-top desktop-only-flex">
+                <button class="btn btn-danger btn-leave-lobby">
+                    <i class="fa-solid fa-arrow-left"></i> Sair
+                </button>
+            </div>
+            
+            <div class="chat-panel">
+                <div class="chat-messages" id="chatMessages">
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Escreve uma mensagem..." autocomplete="off">
+                    <button class="chat-send-btn" id="chatSendBtn"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="lobby-main">
+            <div class="lobby-header">
+                <div class="lobby-title-banner">
+                    <svg viewBox="0 0 500 80" width="100%" height="100%" preserveAspectRatio="none">
+                        <path d="M 15,20 L 50,15 L 50,55 L 15,60 L 25,40 Z" fill="#824dd6" />
+                        <path d="M 50,55 L 50,62 L 62,62 Z" fill="#6432b0" />
+                        <path d="M 485,20 L 450,15 L 450,55 L 485,60 L 475,40 Z" fill="#824dd6" />
+                        <path d="M 450,55 L 450,62 L 438,62 Z" fill="#6432b0" />
+                        <rect x="45" y="10" width="410" height="50" rx="12" fill="#a270f4" />
+                        </svg>
+                    <div class="lobby-title-text">
+                        <i class="fa-solid fa-star" style="color: var(--accent); margin-right: 8px;"></i>
+                        Sala de Espera
+                        <i class="fa-solid fa-star" style="color: var(--accent); margin-left: 8px;"></i>
+                    </div>
+                </div>
+                
+                <div class="lobby-pin-card">
+                    <div class="lobby-pin-label">Acede a gnii.me</div>
+                    <div class="lobby-pin-value" id="displayPin">...</div>
+                </div>
+            </div>
+
+            <div class="lobby-players-area">
+                <div class="players-grid" id="playersList">
+                    <div class="placeholder-msg">
+                        <i class="fa-solid fa-spinner fa-spin"></i> À espera de jogadores...
+                    </div>
+                </div>
+            </div>
+
+            <div class="lobby-footer">
+                <button class="btn btn-danger btn-leave-lobby mobile-only-btn"><i class="fa-solid fa-arrow-left"></i> Sair</button>
+                <button class="btn btn-success btn-start-lobby" id="btnStart" disabled>Começar</button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    import { ref, get as rtdbGet, update as rtdbUpdate, remove, onChildAdded, onChildRemoved, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { auth, rtdb } from "./firebase-config.js";
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import "./static/js/components.js";
+
+    document.body.style.opacity = "1";
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+        }
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const gameId = params.get('gameId');
+
+    if(!gameId) {
+        if (window.showGeniiToast) window.showGeniiToast("ID de jogo inválido.", "error");
+        setTimeout(() => window.location.href = "discover.html", 2000);
+    }
+
+    const pinEl = document.getElementById('displayPin');
+    const listEl = document.getElementById('playersList');
+    const countEl = document.getElementById('playerCount');
+    const btnStart = document.getElementById('btnStart');
+    const btnLeaveElements = document.querySelectorAll('.btn-leave-lobby');
+
+    let isNavigatingToGame = false;
+
+    const gameRef = ref(rtdb, `live_games/${gameId}`);
+    rtdbGet(gameRef).then(snap => {
+        if(snap.exists()) pinEl.innerText = snap.val().pin;
+        else window.location.href = "dashboard.html";
+    });
+
+    if (btnLeaveElements.length > 0) {
+        btnLeaveElements.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (window.showGeniiConfirm) {
+                    window.showGeniiConfirm("Tens a certeza que desejas cancelar o jogo e sair?", (confirmed) => {
+                        if (confirmed) {
+                            window.location.href = "discover.html";
+                        }
+                    });
+                } else {
+                    window.location.href = "discover.html";
+                }
+            });
+        });
+    }
+
+    const playersRef = ref(rtdb, `live_games/${gameId}/players`);
+
+    const playerElements = {};
+
+    onChildAdded(playersRef, (snap) => {
+        const uid = snap.key;
+        const p = snap.val();
+        const count = Object.keys(playerElements).length + 1;
+        if (countEl) countEl.innerText = count;
+        btnStart.disabled = false;
+
+        const placeholder = listEl.querySelector('.placeholder-msg');
+        if (placeholder) placeholder.remove();
+
+        const div = document.createElement('div');
+        div.className = 'player-card';
+        div.dataset.uid = uid;
+
+        let avatarHtml = '';
+        if (p.avatarRenderUrl) {
+            avatarHtml = `<div class="player-avatar"><img src="${p.avatarRenderUrl}"></div>`;
+        } else if (window.renderGeniiAvatar) {
+            avatarHtml = `<div class="player-avatar">${window.renderGeniiAvatar(p, '110px')}</div>`;
+        } else if (p.customPhotoUrl || p.photoURL) {
+            avatarHtml = `<div class="player-avatar"><img src="${p.customPhotoUrl || p.photoURL}" style="object-fit:cover; border-radius:16px;"></div>`;
+        } else {
+            avatarHtml = `<div class="player-avatar" style="background:var(--purple); border-radius:16px; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-user" style="font-size:2.5rem;color:white;"></i></div>`;
+        }
+
+        div.innerHTML = `
+            <button class="btn-kick" data-uid="${uid}" title="Remover jogador"><i class="fa-solid fa-xmark"></i></button>
+            <div class="player-card-avatar-container">
+                <div class="player-card-bg-shape"></div>
+                ${avatarHtml}
+            </div>
+            <div class="player-card-info">
+                <div class="player-card-name">${p.name || 'Jogador'}</div>
+                <div class="player-card-status">À espera...</div>
+            </div>
+        `;
+
+        const kickBtn = div.querySelector('.btn-kick');
+        kickBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const doKick = async () => {
+                try {
+                    await remove(ref(rtdb, `live_games/${gameId}/players/${uid}`));
+                } catch (err) {
+                    console.error('Erro ao remover jogador:', err);
+                }
+            };
+            if (window.showGeniiConfirm) {
+                window.showGeniiConfirm(`Remover ${p.name || 'Jogador'} da sala?`, (confirmed) => {
+                    if (confirmed) doKick();
+                });
+            } else {
+                doKick();
+            }
+        });
+
+        listEl.appendChild(div);
+        playerElements[uid] = div;
+
+    });
+
+    onChildRemoved(playersRef, (snap) => {
+        const uid = snap.key;
+        const el = playerElements[uid];
+        if (el) {
+            el.remove();
+            delete playerElements[uid];
+        }
+        const count = Object.keys(playerElements).length;
+        if (countEl) countEl.innerText = count;
+        if (count === 0) {
+            btnStart.disabled = true;
+            listEl.innerHTML = '<div class="placeholder-msg"><i class="fa-solid fa-spinner fa-spin"></i> À espera de jogadores...</div>';
+        }
+    });
+
+    btnStart.addEventListener('click', async () => {
+        btnStart.innerText = "A Iniciar...";
+        btnStart.disabled = true;
+        isNavigatingToGame = true;
+        try {
+            await rtdbUpdate(gameRef, { status: 'active' });
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.location.href = `/host_game?pin=${pinEl.innerText}`;
+        } catch (e) {
+            console.error(e);
+            isNavigatingToGame = false;
+            if (window.showGeniiToast) window.showGeniiToast("Erro ao iniciar jogo.", "error");
+            btnStart.innerText = "Começar";
+            btnStart.disabled = false;
+        }
+    });
+
+    const handleBeforeUnload = (e) => {
+        if (!isNavigatingToGame) {
+            try {
+                fetch(`https://playgenii-default-rtdb.europe-west1.firebasedatabase.app/live_games/${gameId}.json`, {
+                    method: 'DELETE',
+                    keepalive: true
+                });
+            } catch (err) {
+                console.warn('Falha no cleanup unload:', err);
+            }
+        }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    const chatMessagesEl = document.getElementById('chatMessages');
+    const chatInputEl = document.getElementById('chatInput');
+    const chatSendBtnEl = document.getElementById('chatSendBtn');
+
+    let hostName = "Host";
+    try {
+        const cachedUser = JSON.parse(localStorage.getItem('genii_user_cache'));
+        if (cachedUser && (cachedUser.name || cachedUser.displayName)) {
+            hostName = cachedUser.name || cachedUser.displayName;
+        }
+    } catch (e) {}
+
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function addChatMessage(sender, text, isHost = false) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'chat-message';
+        if (isHost) {
+            msgDiv.classList.add('is-host');
+        }
+        
+        msgDiv.innerHTML = `
+            <div class="chat-sender">${escapeHtml(sender)}</div>
+            <div class="chat-text">${escapeHtml(text)}</div>
+        `;
+        chatMessagesEl.appendChild(msgDiv);
+        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    }
+
+    function handleSendChat() {
+        const text = chatInputEl.value.trim();
+        if (!text) return;
+        
+        addChatMessage(hostName, text, true);
+        chatInputEl.value = '';
+        
+
+    }
+
+    if (chatSendBtnEl) {
+        chatSendBtnEl.addEventListener('click', handleSendChat);
+    }
+    if (chatInputEl) {
+        chatInputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleSendChat();
+        });
+    }
+
+</script>
+</body>
+</html>

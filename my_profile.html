@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="my-profile">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content has-banner">
+    
+    <div class="profile-banner">
+        <div class="banner-decoration bd-1"></div>
+        <div class="banner-decoration bd-2"></div>
+    </div>
+
+    <div class="container">
+        <div class="profile-grid">
+            
+            <div class="profile-left">
+              <div class="profile-left-sticky">
+
+                <div class="profile-card">
+                    <div class="profile-pic-wrapper" onclick="openModal()">
+                    </div>
+
+                    <h1 class="user-name" id="display-name">Carregando...</h1>
+                    
+                    <div class="level-badge">
+                        <i class="fa-solid fa-bolt"></i> <span id="display-level">Nível 1</span>
+                    </div>
+
+                    <div class="xp-container">
+                        <div class="xp-bar" style="width: 0%;"></div>
+                    </div>
+                    <div class="xp-text">0 / 0 XP</div>
+
+                    <button class="btn-edit" onclick="openModal()">
+                        <i class="fa-solid fa-pen"></i> Editar Perfil
+                    </button>
+                </div>
+
+                <div class="bio-card">
+                    <div class="bio-card-header">
+                        <span>Sobre mim</span>
+                        <button class="bio-edit-btn" onclick="openModal(true)" title="Editar biografia">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+                    <p class="bio-text" id="bio-text">...</p>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="content-area">
+                
+                <div class="stats-row">
+                    <div class="stat-card yellow">
+                        <div class="stat-icon"><i class="fa-solid fa-crown"></i></div>
+                        <span class="stat-value" id="stat-mastered">0</span>
+                        <span class="stat-label">Dominados</span>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-icon"><i class="fa-solid fa-fire"></i></div>
+                        <span class="stat-value" id="stat-streak">0</span>
+                        <span class="stat-label">Streak</span>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+                        <span class="stat-value" id="stat-days">0</span>
+                        <span class="stat-label">Dias Ativos</span>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-icon"><i class="fa-solid fa-gamepad"></i></div>
+                        <span class="stat-value" id="stat-games">0</span>
+                        <span class="stat-label">Jogos</span>
+                    </div>
+                </div>
+
+                <div class="dashboard-block">
+                    <div class="section-header">
+                        <div class="section-title">
+                            Missões Diárias
+                        </div>
+                        <span id="mission-timer" style="font-size: 0.85rem; color: var(--grey); font-weight: 600;">Reinicia em ...</span>
+                    </div>
+                    
+                    <div id="missions-skeleton">
+                        <div class="skeleton-mission-item"><div class="skeleton-mission-check"></div><div class="skeleton-mission-info"><div class="skeleton skeleton-text" style="width:60%; height:14px;"></div><div class="skeleton skeleton-text-sm" style="width:40%; height:10px; margin:0;"></div></div><div class="skeleton-mission-xp"></div></div>
+                        <div class="skeleton-mission-item"><div class="skeleton-mission-check"></div><div class="skeleton-mission-info"><div class="skeleton skeleton-text" style="width:55%; height:14px;"></div><div class="skeleton skeleton-text-sm" style="width:35%; height:10px; margin:0;"></div></div><div class="skeleton-mission-xp"></div></div>
+                        <div class="skeleton-mission-item"><div class="skeleton-mission-check"></div><div class="skeleton-mission-info"><div class="skeleton skeleton-text" style="width:65%; height:14px;"></div><div class="skeleton skeleton-text-sm" style="width:45%; height:10px; margin:0;"></div></div><div class="skeleton-mission-xp"></div></div>
+                    </div>
+                    <div class="mission-list" id="mission-list" style="display:none;"></div>
+                </div>
+
+                <div class="dashboard-block showcase-block">
+                    <div class="section-header">
+                        <div class="section-title">
+                            Jogos Criados
+                        </div>
+                        <a href="my_sets.html" style="font-size:0.9rem; font-weight:700; color:var(--primary); text-decoration:none;">Ver todos</a>
+                    </div>
+
+                    <div class="showcase-carousel-wrapper">
+                        <button class="showcase-nav-btn showcase-nav-left" id="showcaseLeft" style="display:none;">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <div class="quiz-carousel" id="showcase-grid">
+                            <div class="showcase-empty" id="showcase-loading">
+                                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 1.5rem; color: var(--secondary);"></i>
+                                <p>A carregar jogos...</p>
+                            </div>
+                        </div>
+                        <button class="showcase-nav-btn showcase-nav-right" id="showcaseRight" style="display:none;">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</main>
+
+<div class="avatar-modal-overlay" id="editModal">
+    <div class="avatar-modal">
+        <div class="modal-top-bar">
+            <h3><i class="fa-solid fa-palette" style="color:var(--purple);margin-right:8px;"></i>Editar Perfil</h3>
+            <button class="modal-close-btn" id="closeModalBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="segmented-control" id="profileToggle">
+            <button class="seg-btn active" data-mode="avatar">Avatar</button>
+            <button class="seg-btn" data-mode="photo">Foto</button>
+            <div class="seg-slider"></div>
+        </div>
+
+        <div id="avatarModeArea">
+            <div class="avatar-preview-floating" id="avatarPreview">
+                <img id="preview-skin" src="" style="z-index: 1;">
+                <img id="preview-face" src="" style="z-index: 2;">
+                <img id="preview-hat" src="" style="z-index: 3;">
+            </div>
+
+            <div class="avatar-options-panel">
+                <div class="sub-tabs" id="avatarSubTabs">
+                    <button class="sub-tab active" data-cat="skins"><i class="fa-solid fa-palette"></i> Pele</button>
+                    <button class="sub-tab" data-cat="faces"><i class="fa-solid fa-face-smile"></i> Cara</button>
+                    <button class="sub-tab" data-cat="hats"><i class="fa-solid fa-hat-wizard"></i> Chapéu</button>
+                </div>
+                <div class="options-grid" id="optionsGrid"></div>
+            </div>
+        </div>
+
+        <div id="photoModeArea" class="photo-upload-area">
+            <div class="photo-preview-frame" id="photoPreviewFrame">
+                <img id="photo-preview-img" src="static/img/default-genii.png">
+                <div class="photo-overlay-hint" id="photoOverlayHint">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Clique para alterar</span>
+                </div>
+            </div>
+            <label for="fileInput" class="btn-upload-photo">
+                <i class="fa-solid fa-image"></i> Escolher Imagem
+            </label>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <p class="upload-hint">Imagem quadrada recomendada &bull; Max 2MB</p>
+        </div>
+
+        <div style="padding: 0 24px 16px;">
+            <label for="bioInput" class="modal-bio-label">
+                Sobre mim
+            </label>
+            <textarea id="bioInput" class="modal-bio-textarea" maxlength="200" placeholder="Escreve algo sobre ti... (max. 200 caracteres)"></textarea>
+            <div class="modal-bio-counter"><span id="bioCharCount">0</span>/200</div>
+        </div>
+
+        <div class="modal-save-bar">
+            <button class="save-btn secondary" id="cancelModalBtn">Cancelar</button>
+            <button class="save-btn primary" id="saveAvatarBtn">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+    import { getXpProgress, updateStreak } from "./static/js/gamification.js";
+    import { getDailyMissions, progressMission, timeUntilReset } from "./static/js/daily-missions.js";
+
+    let currentUser = null;
+    let _cloudinaryToken = null;
+    let currentProfileType = 'avatar';
+    let currentSelection = { skin: '001', face: '001', hat: 'none' };
+    let uploadedPhotoUrl = null;
+    let isUploading = false;
+    let activeTab = 'skins';
+
+    const cached = getCachedUser();
+    if (cached) {
+        document.body.style.opacity = "1";
+        renderLayout('profile', cached);
+        currentProfileType = cached.profileType || 'avatar';
+        if (cached.avatar) currentSelection = { ...currentSelection, ...cached.avatar };
+        if (cached.customPhotoUrl) uploadedPhotoUrl = cached.customPhotoUrl;
+        populateProfileUI(cached);
+    }
+
+    function populateProfileUI(d) {
+        const nameEl = document.getElementById('display-name');
+        if(nameEl) nameEl.innerText = d.displayName || d.username || 'Utilizador';
+
+        const totalXp = d.totalXp || d.xp || 0;
+        const progress = getXpProgress(totalXp);
+
+        const levelEl = document.getElementById('display-level');
+        if(levelEl) levelEl.innerText = `Nível ${progress.level}`;
+
+        const xpBar = document.querySelector('.xp-bar');
+        if(xpBar) xpBar.style.width = `${progress.percentage}%`;
+
+        const xpText = document.querySelector('.xp-text');
+        if(xpText) xpText.innerText = `${progress.xpIntoLevel} / ${progress.xpNeeded} XP para Nível ${progress.level + 1}`;
+
+        const stats = d.stats || {};
+        document.getElementById('stat-mastered').innerText = stats.quizzesMastered || 0;
+        document.getElementById('stat-streak').innerText = stats.currentStreak || 0;
+        document.getElementById('stat-days').innerText = stats.activeDays || 0;
+        document.getElementById('stat-games').innerText = stats.gamesPlayed || 0;
+
+        const bioText = d.bio || '';
+        const bioEl = document.getElementById('bio-text');
+        if (bioEl) {
+            bioEl.innerText = bioText || '...';
+            bioEl.classList.toggle('bio-placeholder', !bioText);
+        }
+        const bioInput = document.getElementById('bioInput');
+        if (bioInput) {
+            bioInput.value = bioText;
+            document.getElementById('bioCharCount').innerText = bioText.length;
+        }
+
+        updatePageAvatarDisplay(d);
+    }
+
+    const ASSETS = {
+        skins: ['001', '002', '003', '004'], 
+        faces: ['001', '002', '003'],
+        hats: ['none', '001', '002', '003', '004', '005']
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+            if(!cached) document.body.style.opacity = "1";
+
+            let data = getCachedUser();
+
+            if (!isCacheFresh(data)) {
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if (snap.exists()) {
+                        data = snap.data();
+                        data.displayName = data.username || user.email.split('@')[0];
+                        saveUserToCache(data);
+                        renderLayout('profile', data);
+                        populateProfileUI(data);
+                        currentProfileType = data.profileType || 'avatar';
+                        if (data.avatar) currentSelection = { ...currentSelection, ...data.avatar };
+                        if (data.customPhotoUrl) uploadedPhotoUrl = data.customPhotoUrl;
+                    }
+                } catch (e) { console.error("Erro perfil:", e); }
+            }
+
+            if (!data) return;
+
+            const streakResult = await updateStreak(user.uid);
+            if (streakResult.isNewDay) {
+                document.getElementById('stat-streak').innerText = streakResult.streak;
+                document.getElementById('stat-days').innerText = streakResult.activeDays;
+                progressMission(user.uid, 'daily_login').catch(() => {});
+            }
+
+            await loadAndRenderMissions(user.uid);
+            startMissionTimer();
+            loadShowcaseQuizzes(user.uid);
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    document.addEventListener('app-logout', async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+    });
+
+    window.openModal = (focusBio = false) => {
+        const overlay = document.getElementById('editModal');
+        overlay.classList.add('open');
+
+        if(currentProfileType === 'photo') {
+            switchMode('photo');
+            if(uploadedPhotoUrl) document.getElementById('photo-preview-img').src = uploadedPhotoUrl;
+        } else {
+            switchMode('avatar');
+        }
+        updatePreview();
+
+        const bioInput = document.getElementById('bioInput');
+        const bioEl = document.getElementById('bio-text');
+        if (bioInput && bioEl && !bioEl.classList.contains('bio-placeholder')) {
+            bioInput.value = bioEl.innerText;
+            document.getElementById('bioCharCount').innerText = bioInput.value.length;
+        }
+        if (focusBio && bioInput) {
+            setTimeout(() => {
+                bioInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                bioInput.focus();
+            }, 150);
+        }
+    };
+
+    window.closeModal = () => {
+        document.getElementById('editModal').classList.remove('open');
+    };
+
+    window.switchMode = (mode) => {
+        currentProfileType = mode;
+        const avatarArea = document.getElementById('avatarModeArea');
+        const photoArea = document.getElementById('photoModeArea');
+
+        document.querySelectorAll('.seg-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+        const slider = document.querySelector('.seg-slider');
+        if (slider) slider.style.transform = mode === 'photo' ? 'translateX(100%)' : 'translateX(0)';
+
+        if (mode === 'photo') {
+            avatarArea.style.display = 'none';
+            photoArea.style.display = 'flex';
+        } else {
+            avatarArea.style.display = 'grid';
+            photoArea.style.display = 'none';
+            renderOptions(activeTab);
+        }
+    };
+
+    window.switchSubTab = (tabName) => {
+        activeTab = tabName;
+        document.querySelectorAll('.sub-tab').forEach(b => b.classList.toggle('active', b.dataset.cat === tabName));
+        renderOptions(tabName);
+    };
+
+    function renderOptions(category) {
+        const grid = document.getElementById('optionsGrid');
+        grid.innerHTML = ''; 
+        const items = ASSETS[category];
+
+        items.forEach(item => {
+            const div = document.createElement('div');
+            
+            if (item === 'none') {
+                div.className = 'opt-item opt-none-item';
+                div.innerHTML = `<i class="fa-solid fa-ban"></i><span>Remover</span>`;
+                div.onclick = () => selectItem(category, 'none');
+                if (currentSelection.hat === 'none' && category === 'hats') {
+                    div.style.borderColor = 'var(--danger)';
+                }
+            } else {
+                div.className = 'opt-item';
+                if (category === 'faces') div.classList.add('face-option');
+                div.innerHTML = `<img src="static/img/avatareditor/${category}/${item}.png">`;
+                div.onclick = () => selectItem(category, item);
+                
+                const currentVal = category === 'faces' ? currentSelection.face : category === 'hats' ? currentSelection.hat : currentSelection.skin;
+                if (currentVal === item) div.classList.add('selected');
+            }
+            grid.appendChild(div);
+        });
+    }
+
+    function selectItem(category, item) {
+        if (category === 'skins') currentSelection.skin = item;
+        if (category === 'faces') currentSelection.face = item;
+        if (category === 'hats') currentSelection.hat = item;
+        updatePreview();
+        renderOptions(category);
+    }
+
+    const fileInput = document.getElementById('fileInput');
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if(!file) return;
+
+        if (file.size > 5 * 1024 * 1024) { showGeniiToast("Max 5MB.", "error"); return; }
+
+        const saveBtn = document.getElementById('saveAvatarBtn');
+        const previewImg = document.getElementById('photo-preview-img');
+        const labelBtn = document.querySelector('.btn-upload-photo');
+        const hint = document.getElementById('photoOverlayHint');
+
+        isUploading = true;
+        saveBtn.disabled = true;
+        saveBtn.innerText = "A enviar imagem...";
+        labelBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A carregar...';
+
+        previewImg.src = URL.createObjectURL(file);
+        if (hint) hint.style.display = 'none';
+
+        try {
+            const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'profile_photos');
+            if (result.url) {
+                uploadedPhotoUrl = result.url;
+                window._photoPublicId = result.publicId || null;
+            }
+        } catch (error) {
+            console.error(error);
+            showGeniiToast("Erro ao enviar imagem.", "error");
+        } finally {
+            isUploading = false;
+            saveBtn.disabled = false;
+            saveBtn.innerText = "Guardar Alterações";
+            labelBtn.innerHTML = '<i class="fa-solid fa-image"></i> Escolher Outra';
+        }
+    });
+
+    function updatePreview() {
+        document.getElementById('preview-skin').src = `static/img/avatareditor/skins/${currentSelection.skin}.png`;
+        document.getElementById('preview-face').src = `static/img/avatareditor/faces/${currentSelection.face}.png`;
+        const hatEl = document.getElementById('preview-hat');
+        if (currentSelection.hat === 'none') hatEl.style.display = 'none';
+        else {
+            hatEl.style.display = 'block';
+            hatEl.src = `static/img/avatareditor/hats/${currentSelection.hat}.png`;
+        }
+    }
+
+    document.getElementById('saveAvatarBtn').addEventListener('click', async () => {
+        if (!currentUser || isUploading) return;
+        
+        const btn = document.getElementById('saveAvatarBtn');
+        btn.innerText = "A guardar...";
+        
+        try {
+            const updateData = {
+                profileType: currentProfileType,
+                bio: document.getElementById('bioInput').value.trim()
+            };
+
+            if (currentProfileType === 'avatar') {
+                updateData.avatar = currentSelection;
+
+                try {
+                    const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+                    const oldPublicId = userSnap.exists() ? userSnap.data().avatarPublicId : null;
+                    if (oldPublicId && _cloudinaryToken) {
+                        await window.deleteFromCloudinary(oldPublicId, _cloudinaryToken).catch(() => {});
+                    }
+                } catch (e) {
+                }
+
+                try {
+                    btn.innerText = "A renderizar...";
+                    const blob = await window.renderAvatarToCanvas(
+                        currentSelection.skin,
+                        currentSelection.face,
+                        currentSelection.hat,
+                        "static/img/avatareditor"
+                    );
+                    btn.innerText = "A enviar...";
+                    const result = await window.uploadToCloudinary(blob, _cloudinaryToken, 'avatars');
+                    if (result.url) {
+                        updateData.avatarRenderUrl = result.url;
+                        updateData.avatarPublicId = result.publicId || '';
+                    }
+                } catch (renderErr) {
+                    console.warn("Falha ao renderizar/upload avatar:", renderErr);
+                }
+            } 
+            else if (currentProfileType === 'photo' && uploadedPhotoUrl) {
+                updateData.customPhotoUrl = uploadedPhotoUrl;
+
+                try {
+                    const userSnap = await getDoc(doc(db, "users", currentUser.uid));
+                    const oldPublicId = userSnap.exists() ? userSnap.data().photoPublicId : null;
+                    if (oldPublicId && _cloudinaryToken) {
+                        await window.deleteFromCloudinary(oldPublicId, _cloudinaryToken).catch(() => {});
+                    }
+                } catch (e) {
+                }
+
+                if (window._photoPublicId) {
+                    updateData.photoPublicId = window._photoPublicId;
+                    window._photoPublicId = null;
+                }
+                updateData.avatarDeleteToken = '';
+                updateData.avatarRenderUrl = '';
+            }
+
+            await updateDoc(doc(db, "users", currentUser.uid), updateData);
+            
+            const freshSnap = await getDoc(doc(db, "users", currentUser.uid));
+            const freshData = freshSnap.exists() ? freshSnap.data() : {};
+            freshData.displayName = freshData.username || currentUser.email.split('@')[0];
+
+            saveUserToCache(freshData);
+
+            updatePageAvatarDisplay(freshData);
+
+            const bioText = freshData.bio || '';
+            const bioEl = document.getElementById('bio-text');
+            if (bioEl) {
+                bioEl.innerText = bioText || '...';
+                bioEl.classList.toggle('bio-placeholder', !bioText);
+            }
+
+            renderLayout('profile', freshData);
+
+            showGeniiToast("Perfil atualizado!", "success");
+            closeModal();
+
+        } catch (e) {
+            console.error(e);
+            showGeniiToast("Erro ao guardar perfil.", "error");
+        } finally {
+            btn.innerText = "Guardar Alterações";
+        }
+    });
+
+    function updatePageAvatarDisplay(data) {
+        const container = document.querySelector('.profile-pic-wrapper'); 
+        if(!container) return;
+
+        if (data.avatarRenderUrl) {
+            container.innerHTML = `
+                <img src="${data.avatarRenderUrl}" style="width:100%; height:100%; object-fit:contain; object-position:center 35%; border-radius:20px;">
+                <div class="edit-overlay" style="border-radius:20px;"><i class="fa-solid fa-pen"></i></div>
+            `;
+        } else if (data.profileType === 'photo' && data.customPhotoUrl) {
+            container.innerHTML = `
+                <img src="${data.customPhotoUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:20px;">
+                <div class="edit-overlay" style="border-radius:20px;"><i class="fa-solid fa-pen"></i></div>
+            `;
+        } else {
+            const sel = data.avatar || { skin:'001', face:'001', hat:'none' };
+            const hasHat = sel.hat && sel.hat !== 'none';
+            let hatHTML = hasHat ? `<img src="static/img/avatareditor/hats/${sel.hat}.png" style="z-index:3; position:absolute; inset:0; width:100%; height:100%; object-fit:contain;">` : '';
+            const scaleStyle = hasHat
+                ? 'transform:scale(0.75);transform-origin:center 58%;'
+                : 'transform:scale(0.88);transform-origin:center center;';
+            
+            container.innerHTML = `
+                <div style="position:absolute; inset:0; ${scaleStyle}">
+                    <img src="static/img/avatareditor/skins/${sel.skin}.png" style="z-index:1; position:absolute; inset:0; width:100%; height:100%; object-fit:contain;">
+                    <img src="static/img/avatareditor/faces/${sel.face}.png" style="z-index:2; position:absolute; inset:0; width:100%; height:100%; object-fit:contain;">
+                    ${hatHTML}
+                </div>
+                <div class="edit-overlay"><i class="fa-solid fa-pen"></i></div>
+            `;
+        }
+    }
+
+    document.getElementById('editModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+
+    document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+    document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+
+    document.querySelectorAll('.seg-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchMode(btn.dataset.mode));
+    });
+
+    document.querySelectorAll('.sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => switchSubTab(tab.dataset.cat));
+    });
+
+    const photoFrame = document.getElementById('photoPreviewFrame');
+    if (photoFrame) {
+        photoFrame.addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+    }
+
+
+    async function loadAndRenderMissions(uid) {
+        const container = document.getElementById('mission-list');
+        if (!container) return;
+
+        try {
+            const { missions } = await getDailyMissions(uid);
+
+            hideSkeleton(document.getElementById('missions-skeleton'));
+            container.style.display = '';
+
+            if (!missions || missions.length === 0) {
+                container.innerHTML = `
+                    <div class="mission-item" style="justify-content:center; opacity:0.5;">
+                        <div class="mission-info"><h4>Sem missões disponíveis</h4></div>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = missions.map(m => {
+                const isDone = m.completed;
+                const progressText = m.target > 1 ? ` (${Math.min(m.progress, m.target)}/${m.target})` : '';
+                return `
+                    <div class="mission-item ${isDone ? 'done' : ''}">
+                        <div class="mission-check">${isDone ? '<i class="fa-solid fa-check"></i>' : ''}</div>
+                        <div class="mission-info">
+                            <h4>${m.title}${progressText}</h4>
+                            <p>${m.description}</p>
+                        </div>
+                        <div class="mission-xp">${isDone ? '✓' : '+'} ${m.xpReward} XP</div>
+                    </div>`;
+            }).join('');
+
+        } catch (e) {
+            console.error("Erro ao carregar missões:", e);
+            hideSkeleton(document.getElementById('missions-skeleton'));
+            container.style.display = '';
+            container.innerHTML = `
+                <div class="mission-item" style="justify-content:center; opacity:0.5;">
+                    <div class="mission-info"><h4>Erro ao carregar missões</h4></div>
+                </div>`;
+        }
+    }
+
+    let missionTimerInterval = null;
+
+    function startMissionTimer() {
+        const timerEl = document.getElementById('mission-timer');
+        if (!timerEl) return;
+
+        function updateTimer() {
+            const { hours, minutes } = timeUntilReset();
+            timerEl.innerText = `Reinicia em ${hours}h ${String(minutes).padStart(2, '0')}m`;
+        }
+
+        updateTimer();
+        missionTimerInterval = setInterval(updateTimer, 60000);
+    }
+
+    const bioInputEl = document.getElementById('bioInput');
+    if (bioInputEl) {
+        bioInputEl.addEventListener('input', () => {
+            document.getElementById('bioCharCount').innerText = bioInputEl.value.length;
+        });
+    }
+
+
+    let allProfileQuizzes = [];
+
+    function buildProfileCards(quizzes) {
+        let html = '';
+        quizzes.forEach(docSnap => {
+            const data = docSnap.data ? docSnap.data() : docSnap;
+            const id = docSnap.id || data.id;
+            const qCount = data.questions ? data.questions.length : 0;
+
+            let imgHtml = '';
+            if (data.cover_image_url && data.cover_image_url.trim() !== '') {
+                imgHtml = `<img src="${data.cover_image_url}" alt="Capa" onerror="this.parentElement.innerHTML='<div class=\\'placeholder-art\\'>Genii</div>'">`;
+            } else {
+                imgHtml = `<div class="placeholder-art">Genii</div>`;
+            }
+
+            html += `
+                <a href="/quiz?id=${id}" class="quiz-card-link" style="width:320px; min-width:0; flex-shrink:0;">
+                    <div class="quiz-card">
+                        <div class="quiz-image-box">
+                            ${imgHtml}
+                            <div class="q-badge"><i class="fa-solid fa-layer-group"></i> ${qCount}</div>
+                        </div>
+                            <div class="quiz-content">
+                                <div class="q-footer" style="justify-content:space-between;">
+                                    <h3 class="q-title" style="flex:1; margin:0;">${data.title || 'Sem título'}</h3>
+                                    <div class="btn-play">JOGAR</div>
+                                </div>
+                            </div>
+                    </div>
+                </a>`;
+        });
+        return html;
+    }
+
+    async function loadShowcaseQuizzes(uid) {
+        const grid = document.getElementById('showcase-grid');
+        if (!grid) return;
+
+        try {
+            const q = query(
+                collection(db, "quizzes"),
+                where("creatorId", "==", uid),
+                where("isPublic", "==", true)
+            );
+            const snap = await getDocs(q);
+
+            if (snap.empty) {
+                grid.innerHTML = `
+                    <div class="showcase-empty">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 2.5rem; color: var(--secondary); opacity: 0.3;"></i>
+                        <p>Ainda não criou nenhum jogo</p>
+                        <a href="create_quiz.html" class="btn-create-first">
+                            <i class="fa-solid fa-plus"></i> Criar Primeiro Quiz
+                        </a>
+                    </div>`;
+                return;
+            }
+
+            allProfileQuizzes = [];
+            snap.forEach(docSnap => allProfileQuizzes.push(docSnap));
+
+            grid.innerHTML = buildProfileCards(allProfileQuizzes);
+
+            initShowcaseCarousel();
+
+        } catch (e) {
+            console.error("Erro vitrine:", e);
+            grid.innerHTML = `
+                <div class="showcase-empty">
+                    <p>Erro ao carregar jogos.</p>
+                </div>`;
+        }
+    }
+
+    function initShowcaseCarousel() {
+        const carousel = document.getElementById('showcase-grid');
+        const leftBtn = document.getElementById('showcaseLeft');
+        const rightBtn = document.getElementById('showcaseRight');
+        if (!carousel || !leftBtn || !rightBtn) return;
+
+        function updateArrows() {
+            const { scrollLeft, scrollWidth, clientWidth } = carousel;
+            leftBtn.style.display = scrollLeft > 10 ? 'flex' : 'none';
+            rightBtn.style.display = scrollLeft + clientWidth < scrollWidth - 10 ? 'flex' : 'none';
+        }
+
+        leftBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: -280, behavior: 'smooth' });
+        });
+        rightBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: 280, behavior: 'smooth' });
+        });
+
+        carousel.addEventListener('scroll', updateArrows);
+        requestAnimationFrame(updateArrows);
+        carousel.querySelectorAll('img').forEach(img => {
+            img.addEventListener('load', updateArrows);
+        });
+    }
+
+</script>
+</body>
+</html>

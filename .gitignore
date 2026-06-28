@@ -1,0 +1,37 @@
+# ---- Environment & Secrets ----
+.env
+.env.*
+*.env
+.env*.local
+
+# ---- Node ----
+node_modules/
+package-lock.json
+
+# ---- VS Code ----
+.vscode/
+
+# ---- Logs ----
+*.log
+logs/
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Firebase ----
+.firebase/
+.firebaserc
+firebase.json
+firebase-config.js
+firestore.rules
+
+# ---- Vercel ----
+.vercel
+.vercel/
+
+# ---- Misc ----
+*.local
+
+.vercel
+.env*.local

@@ -1,0 +1,294 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favoritos - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+    
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="favorites">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content">
+    <div class="sets-container">
+
+        <div class="header-section">
+            <div class="header-title">
+                <h1>Favoritos <span id="fav-count">0</span></h1>
+            </div>
+
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Pesquisar favoritos...">
+                </div>
+            </div>
+        </div>
+
+        <div id="favorites-skeleton" class="quiz-grid">
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:100%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:60%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-sm"></div></div></div></div>
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:65%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:90%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:50%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-sm"></div></div></div></div>
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:80%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:85%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:55%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-sm"></div></div></div></div>
+        </div>
+        <div class="quiz-grid" id="favoritesGrid" style="display:none;"></div>
+
+    </div>
+</main>
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, getDocs, query, limit, where, doc, getDoc, updateDoc, arrayRemove, documentId } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+
+    const cached = getCachedUser();
+    if (cached) {
+        document.body.style.opacity = "1";
+        renderLayout('favorites', cached);
+    }
+
+    document.addEventListener('app-logout', async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+    });
+
+    const grid = document.getElementById('favoritesGrid');
+    const countBadge = document.getElementById('fav-count');
+    const searchInput = document.getElementById('searchInput');
+
+    let allFavorites = [];
+
+    const CACHE_KEY_FAVS = 'genii_cached_favorites';
+
+    function getCachedFavorites() {
+        try {
+            const raw = sessionStorage.getItem(CACHE_KEY_FAVS);
+            return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
+    }
+
+    function saveCachedFavorites(favs) {
+        try { sessionStorage.setItem(CACHE_KEY_FAVS, JSON.stringify(favs)); } catch {}
+    }
+
+    const cachedFavs = getCachedFavorites();
+    if (cachedFavs) {
+        allFavorites = cachedFavs;
+        countBadge.innerText = allFavorites.length;
+        renderFavorites(allFavorites);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "login.html"; return; }
+
+        if (!cached) document.body.style.opacity = "1";
+
+        if (!isCacheFresh(getCachedUser())) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const d = docSnap.data();
+                    const userData = { ...d, displayName: d.username || user.email.split('@')[0] };
+                    saveUserToCache(userData);
+                    renderLayout('favorites', userData);
+                }
+            } catch(e) { console.error("Erro user data:", e); }
+        }
+
+        await loadFavorites(user.uid);
+    });
+
+    async function loadFavorites(userId) {
+        try {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
+            
+            if (!userSnap.exists()) return;
+            
+            const userData = userSnap.data();
+            const favoritesList = userData.favorites || [];
+
+            if (favoritesList.length === 0) {
+                allFavorites = [];
+                countBadge.innerText = "0";
+                saveCachedFavorites([]);
+                if (!cachedFavs || cachedFavs.length > 0) renderFavorites([]);
+                return;
+            }
+
+            const freshFavorites = [];
+            const returnedIds = new Set();
+            
+            const batches = [];
+            for (let i = 0; i < favoritesList.length; i += 10) {
+                batches.push(favoritesList.slice(i, i + 10));
+            }
+
+            for (const batch of batches) {
+                const q = query(collection(db, "quizzes"), where(documentId(), "in", batch));
+                const querySnapshot = await getDocs(q);
+                
+                querySnapshot.forEach(doc => {
+                    freshFavorites.push({ id: doc.id, ...doc.data() });
+                    returnedIds.add(doc.id);
+                });
+            }
+
+            const orphanIds = favoritesList.filter(id => !returnedIds.has(id));
+            if (orphanIds.length > 0) {
+                try {
+                    const userRef = doc(db, "users", userId);
+                    await updateDoc(userRef, {
+                        favorites: arrayRemove(...orphanIds)
+                    });
+                } catch (e) {
+                    console.warn("Lazy cleanup falhou (não crítico):", e);
+                }
+            }
+
+            const contentChanged = JSON.stringify(allFavorites) !== JSON.stringify(freshFavorites);
+
+            allFavorites = freshFavorites;
+            saveCachedFavorites(allFavorites);
+
+            if (contentChanged || !cachedFavs) {
+                countBadge.innerText = allFavorites.length;
+                renderFavorites(allFavorites);
+            }
+
+        } catch (error) {
+            console.error("Erro:", error);
+            if (!cachedFavs) {
+                hideSkeleton(document.getElementById('favorites-skeleton'));
+                grid.style.display = '';
+                grid.innerHTML = `<div class="loading-state">Erro ao carregar dados.</div>`;
+            }
+        }
+    }
+
+    function renderFavorites(list) {
+        hideSkeleton(document.getElementById('favorites-skeleton'));
+        grid.style.display = '';
+        grid.innerHTML = "";
+
+        if (list.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <img src="static/img/empty_state.png" style="width: 80px; opacity: 0.5; margin-bottom: 15px;">
+                    <h3>Nenhum favorito encontrado</h3>
+                    <p>Adicione sets à sua coleção para os ver aqui.</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.forEach((data) => {
+            let imgHtml;
+            if (data.cover_image_url && data.cover_image_url.trim() !== "") {
+                imgHtml = `<img src="${data.cover_image_url}" onerror="this.parentElement.innerHTML='<div class=\\'placeholder-art\\'>Genii</div>'">`;
+            } else {
+                imgHtml = `<div class="placeholder-art">Genii</div>`;
+            }
+
+            const qCount = data.questions ? data.questions.length : 0;
+            let desc = data.description || "Sem descrição disponível.";
+
+            const cardHTML = `
+                <div class="quiz-card" id="card-${data.id}" onclick="window.goToQuiz('${data.id}', event)">
+                    <div class="quiz-image-area">
+                        ${imgHtml}
+                        <button class="star-btn" onclick="event.stopPropagation(); removeFavorite('${data.id}')" title="Remover">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                        <div class="card-badge"><i class="fa-solid fa-layer-group"></i> ${qCount}</div>
+                    </div>
+
+                    <div class="card-body">
+                        <h3 class="card-title" title="${data.title}">${data.title}</h3>
+                        <p class="card-desc">${desc}</p>
+
+                        <div class="card-footer" onclick="event.stopPropagation()">
+                            <a href="/play_quiz?id=${data.id}" class="btn-play">
+                                JOGAR
+                            </a>
+                            <button class="btn-remove-text" onclick="removeFavorite('${data.id}')">
+                                Remover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += cardHTML;
+        });
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allFavorites.filter(q => 
+            q.title.toLowerCase().includes(term) || 
+            (q.description && q.description.toLowerCase().includes(term))
+        );
+        renderFavorites(filtered);
+    });
+
+    window.removeFavorite = async (id) => {
+        showGeniiConfirm("Remover este set dos favoritos?", async (confirmed) => {
+            if (!confirmed) return;
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, {
+                    favorites: arrayRemove(id)
+                });
+
+                const card = document.getElementById(`card-${id}`);
+                if (card) {
+                    card.style.opacity = "0";
+                    card.style.transform = "translateY(10px)";
+                    setTimeout(() => {
+                        allFavorites = allFavorites.filter(q => q.id !== id);
+                        countBadge.innerText = allFavorites.length;
+                        saveCachedFavorites(allFavorites);
+
+                        const term = searchInput.value.toLowerCase();
+                        if (term) {
+                            const filtered = allFavorites.filter(q => q.title.toLowerCase().includes(term));
+                            renderFavorites(filtered);
+                        } else {
+                            renderFavorites(allFavorites);
+                        }
+
+                    }, 300);
+                }
+                showGeniiToast("Removido dos Favoritos", "success");
+            } catch (error) {
+                console.error("Erro ao remover favorito:", error);
+                showGeniiToast("Erro ao remover favorito.", "error");
+            }
+        });
+    };
+
+    window.goToQuiz = (id, event) => {
+        if (event.target.closest('.card-footer') || event.target.closest('.star-btn')) return;
+        window.location.href = `/quiz?id=${id}`;
+    };
+
+</script>
+
+</body>
+</html>

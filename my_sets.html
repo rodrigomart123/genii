@@ -1,0 +1,311 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meus Sets - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+    
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="my-sets">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content">
+
+    <div class="sets-container">
+
+        <div class="header-section">
+            <div class="header-title">
+                <h1>Meus Sets <span id="set-count">0</span></h1>
+            </div>
+
+            <div class="header-actions">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Pesquisar na biblioteca...">
+                </div>
+
+                <a href="create_quiz.html" class="btn-create">
+                    <i class="fa-solid fa-plus"></i> Criar Set
+                </a>
+            </div>
+        </div>
+
+        <div id="quiz-list-skeleton" class="quiz-grid">
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:100%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:60%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-icon"></div><div class="skeleton skeleton-btn-icon"></div></div></div></div>
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:65%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:90%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:50%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-icon"></div><div class="skeleton skeleton-btn-icon"></div></div></div></div>
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:80%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:85%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:55%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-icon"></div><div class="skeleton skeleton-btn-icon"></div></div></div></div>
+            <div class="skeleton-card skeleton-card--vertical"><div class="skeleton-card-image"><div class="skeleton-card-badge"></div></div><div class="skeleton-card-body"><div class="skeleton skeleton-text skeleton-text-lg" style="width:70%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:95%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:45%;"></div><div class="skeleton-card-actions"><div class="skeleton skeleton-btn"></div><div class="skeleton skeleton-btn-icon"></div><div class="skeleton skeleton-btn-icon"></div></div></div></div>
+        </div>
+        <div id="quiz-list" class="quiz-grid" style="display:none;"></div>
+
+    </div>
+</main>
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, query, where, getDocs, deleteDoc, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+
+    const cached = getCachedUser();
+    if (cached) {
+        document.body.style.opacity = "1";
+        renderLayout('my_sets', cached);
+    }
+
+    let _cloudinaryToken = null;
+
+    const quizListEl = document.getElementById('quiz-list');
+    const searchInput = document.getElementById('searchInput');
+    const setCountEl = document.getElementById('set-count');
+    
+    let allQuizzes = [];
+
+    const CACHE_KEY_MYSETS = 'genii_cached_mysets';
+
+    function getCachedQuizzes() {
+        try {
+            const raw = sessionStorage.getItem(CACHE_KEY_MYSETS);
+            return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
+    }
+
+    function saveCachedQuizzes(quizzes) {
+        try { sessionStorage.setItem(CACHE_KEY_MYSETS, JSON.stringify(quizzes)); } catch {}
+    }
+
+    const cachedQuizzes = getCachedQuizzes();
+    if (cachedQuizzes) {
+        allQuizzes = cachedQuizzes;
+        setCountEl.innerText = allQuizzes.length;
+        renderQuizzes(allQuizzes);
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "login.html"; return; }
+        user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+
+        if (!cached) document.body.style.opacity = "1";
+
+        if (!isCacheFresh(getCachedUser())) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const d = docSnap.data();
+                    const userData = { ...d, displayName: d.username || user.email.split('@')[0] };
+                    saveUserToCache(userData);
+                    renderLayout('my_sets', userData);
+                }
+            } catch(e) { console.error("Erro user data:", e); }
+        }
+
+        await loadUserQuizzes(user);
+    });
+
+    document.addEventListener('app-logout', async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+    });
+
+    async function loadUserQuizzes(user) {
+        try {
+            const q = query(collection(db, "quizzes"), where("ownerId", "==", user.uid));
+            const querySnapshot = await getDocs(q);
+            
+            const freshQuizzes = [];
+            querySnapshot.forEach(doc => {
+                freshQuizzes.push({ id: doc.id, ...doc.data() });
+            });
+
+            const oldHash = JSON.stringify(allQuizzes.map(q => q.id).sort());
+            const newHash = JSON.stringify(freshQuizzes.map(q => q.id).sort());
+            const contentChanged = oldHash !== newHash ||
+                JSON.stringify(allQuizzes) !== JSON.stringify(freshQuizzes);
+
+            allQuizzes = freshQuizzes;
+            saveCachedQuizzes(allQuizzes);
+
+            if (contentChanged || !cachedQuizzes) {
+                setCountEl.innerText = allQuizzes.length;
+                renderQuizzes(allQuizzes);
+            }
+            
+        } catch (error) {
+            console.error("Erro:", error);
+            if (!cachedQuizzes) {
+                hideSkeleton(document.getElementById('quiz-list-skeleton'));
+                quizListEl.style.display = '';
+                quizListEl.innerHTML = `<div class="loading-state">Erro ao carregar dados.</div>`;
+            }
+        }
+    }
+
+    function renderQuizzes(quizzes) {
+        hideSkeleton(document.getElementById('quiz-list-skeleton'));
+        quizListEl.style.display = '';
+        quizListEl.innerHTML = "";
+
+        if (quizzes.length === 0) {
+            quizListEl.innerHTML = `
+                <div class="loading-state">
+                    <img src="static/img/empty_state.png" style="width: 100px; opacity: 0.5; margin-bottom: 20px;">
+                    <p style="font-size: 1.1rem; font-weight: 600;">Ainda não tem sets.</p>
+                    <p style="font-size: 0.9rem;">Crie o seu primeiro jogo agora!</p>
+                </div>`;
+            return;
+        }
+
+        quizzes.forEach(data => {
+            let imgHtml;
+            if (data.cover_image_url && data.cover_image_url.trim() !== "") {
+                imgHtml = `<img src="${data.cover_image_url}" onerror="this.parentElement.innerHTML='<div class=\\'placeholder-art\\'>Genii</div>'">`;
+            } else {
+                imgHtml = `<div class="placeholder-art">Genii</div>`;
+            }
+
+            let desc = data.description || "Sem descrição.";
+            const qCount = data.questions ? data.questions.length : 0;
+
+            const now = Date.now();
+            const FORTY_EIGHT_H = 48 * 60 * 60 * 1000;
+            let isRecent = false;
+            const updatedAt = data.updatedAt?.toDate ? data.updatedAt.toDate().getTime() : (data.updatedAt || 0);
+            const lastPlayedAt = data.lastPlayedAt?.toDate ? data.lastPlayedAt.toDate().getTime() : (data.lastPlayedAt || 0);
+            const createdAt = data.createdAt?.toDate ? data.createdAt.toDate().getTime() : (data.createdAt || 0);
+            const latestActivity = Math.max(updatedAt, lastPlayedAt, createdAt);
+            if (latestActivity && (now - latestActivity) < FORTY_EIGHT_H) {
+                isRecent = true;
+            }
+            const dateBadgeHtml = isRecent 
+                ? `<div class="date-badge"><i class="fa-regular fa-clock"></i> Recente</div>` 
+                : '';
+
+            const card = `
+                <div class="quiz-card" id="card-${data.id}" onclick="window.goToQuiz('${data.id}', event)">
+                    <div class="quiz-image-area">
+                        ${imgHtml}
+                        ${dateBadgeHtml}
+                        <div class="card-badge"><i class="fa-solid fa-layer-group"></i> ${qCount}</div>
+                    </div>
+
+                    <div class="card-body">
+                        <h3 class="card-title" title="${data.title}">${data.title}</h3>
+                        <p class="card-desc">${desc}</p>
+
+                        <div class="card-actions" onclick="event.stopPropagation()">
+                            <a href="/studio?id=${data.id}" class="btn-main-action">
+                                <i class="fa-solid fa-pen-to-square"></i> Editar
+                            </a>
+
+                            <div class="icon-actions">
+                                <a href="/play_quiz?id=${data.id}" class="btn-icon play" title="Jogar">
+                                    <i class="fa-solid fa-play"></i>
+                                </a>
+                                <a href="/edit_quiz?id=${data.id}" class="btn-icon" title="Slides">
+                                    <i class="fa-solid fa-gear"></i>
+                                </a>
+                                <button onclick="window.deleteQuizConfirm('${data.id}')" class="btn-icon delete" title="Apagar">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            quizListEl.innerHTML += card;
+        });
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = allQuizzes.filter(q => 
+            q.title.toLowerCase().includes(term) || 
+            (q.description && q.description.toLowerCase().includes(term))
+        );
+        renderQuizzes(filtered);
+    });
+
+    window.deleteQuizConfirm = async (id) => {
+        showGeniiConfirm("Tens a certeza? O set será apagado permanentemente.", async (confirmed) => {
+            if (!confirmed) return;
+            try {
+                const snap = await getDoc(doc(db, "quizzes", id));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const deleteTokens = [];
+                    if (data.coverDeleteToken) deleteTokens.push(data.coverDeleteToken);
+                    if (data.questions) {
+                        const deletePromises = [];
+                        for (const q of data.questions) {
+                            if (q.imagePublicId) {
+                                deletePromises.push(
+                                    window.deleteFromCloudinary(q.imagePublicId, _cloudinaryToken).catch(() => {})
+                                );
+                            }
+                            if (q.imageDeleteToken) {
+                                deleteTokens.push(q.imageDeleteToken);
+                            }
+                            if (q.answerImagePublicIds) {
+                                for (const key of Object.keys(q.answerImagePublicIds)) {
+                                    const pid = q.answerImagePublicIds[key];
+                                    if (pid) {
+                                        deletePromises.push(
+                                            window.deleteFromCloudinary(pid, _cloudinaryToken).catch(() => {})
+                                        );
+                                    }
+                                }
+                            }
+                            if (q.answerImageTokens) {
+                                for (const key of Object.keys(q.answerImageTokens)) {
+                                    const t = q.answerImageTokens[key];
+                                    if (t) deleteTokens.push(t);
+                                }
+                            }
+                        }
+                        await Promise.allSettled(deletePromises);
+                    }
+                    if (deleteTokens.length > 0) {
+                        try {
+                            await fetch('/api/delete-image', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    Authorization: `Bearer ${_cloudinaryToken}`
+                                },
+                                body: JSON.stringify({ deleteTokens })
+                            }).catch(() => {});
+                        } catch (e) {}
+                    }
+                }
+                await deleteDoc(doc(db, "quizzes", id));
+                allQuizzes = allQuizzes.filter(q => q.id !== id);
+                saveCachedQuizzes(allQuizzes);
+                setCountEl.innerText = allQuizzes.length;
+                renderQuizzes(allQuizzes);
+                showGeniiToast("Set apagado com sucesso.", "success");
+            } catch (e) { showGeniiToast("Erro ao apagar.", "error"); }
+        });
+    };
+
+    window.goToQuiz = (id, event) => {
+        if (event.target.closest('.card-actions')) return;
+        window.location.href = `/quiz?id=${id}`;
+    };
+
+</script>
+
+</body>
+</html>

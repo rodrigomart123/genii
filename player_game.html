@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Jogar - Genii</title>
+  
+  <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/style.css?v=3" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  
+  <script src="static/js/theme.js"></script>
+</head>
+<body data-page="player-game">
+
+  <div id="loading-overlay">
+      <i class="fa-solid fa-circle-notch fa-spin fa-4x" style="color:var(--primary); margin-bottom:20px;"></i>
+      <h2>A ligar ao jogo...</h2>
+  </div>
+
+  <div class="start-overlay-transparent" id="start-screen" style="display:none;">
+      <div id="start-title-container" class="start-title-container" style="display:none;">
+          <div id="loading-media-area" class="loading-media-area" style="display:none;"></div>
+          <h1 id="start-quiz-title" class="start-quiz-title">PrÃ³ximo slide...</h1>
+          <div class="question-loading-bar">
+              <div class="question-loading-fill" id="question-loading-fill"></div>
+          </div>
+          <span class="loading-text">Prepare-se!</span>
+      </div>
+      <div id="countdown-container" class="countdown-container" style="display:none;"></div>
+  </div>
+
+  <div class="game-header" id="main-header">
+      <div class="score-badge"><i class="fa-solid fa-list-ol"></i> <span id="q-counter">- / -</span></div>
+      <div class="brand-logo" id="header-title"></div>
+      <div class="header-right">
+          <div class="score-badge"><i class="fa-solid fa-star"></i> <span id="score-display">0</span></div>
+      </div>
+  </div>
+
+  <div class="stage-container" id="stage">
+      <div class="status-overlay" id="status-overlay">
+          <div class="status-card">
+              <div class="status-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+              <h2 id="status-title">A aguardar...</h2>
+              <p id="status-subtitle">Prepare-se para jogar!</p>
+              <div class="status-animation">
+                  <div class="dots-loader">
+                      <span></span><span></span><span></span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="fullscreen-layer" id="end-screen" style="display:none; z-index: 2000; background: var(--bg-color);">
+  </div>
+
+  <div class="footer-feedback-bar" id="footer-feedback">
+      <div class="feedback-left">
+          <div class="feedback-icon" id="feedback-icon-container">
+              <i class="fa-solid" id="feedback-icon-i"></i>
+          </div>
+          <div class="feedback-text-container">
+              <div class="feedback-title" id="feedback-title"></div>
+              <div class="feedback-subtitle" id="feedback-subtitle"></div>
+          </div>
+      </div>
+  </div>
+
+  <div class="lightbox-overlay" id="lightbox" onclick="window.closeLightbox()">
+      <button class="lightbox-close" onclick="event.stopPropagation(); window.closeLightbox();">&times;</button>
+      <img id="lightbox-img" src="" alt="Zoom">
+  </div>
+
+  <script src="static/js/components.js" type="module"></script>
+  <script type="module" src="player_game.js"></script>
+</body>
+</html>

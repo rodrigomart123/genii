@@ -1,0 +1,603 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Turmas - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+
+    
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="classes">
+
+
+<div id="sidebar-container"></div>
+
+
+<main class="main-content">
+    <div class="classes-container">
+        
+        <div class="header-section">
+            <div class="header-title">
+                <h1>Minhas Turmas</h1>
+            </div>
+            
+            <div class="header-actions">
+                <button onclick="openModal('joinModal')" class="btn-action btn-join">
+                     Entrar com Código
+                </button>
+                <button onclick="openModal('createModal')" class="btn-action btn-create">
+                    <i class="fa-solid fa-plus"></i> Criar Turma
+                </button>
+            </div>
+        </div>
+
+
+        <div id="classes-skeleton" class="classes-grid">
+            <div class="skeleton-class-card"><div class="skeleton-class-header"><div class="skeleton skeleton-text skeleton-text-lg" style="width:65%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:40%;"></div></div><div class="skeleton-class-avatar"></div><div class="skeleton-class-body"></div><div class="skeleton-class-footer"><div class="skeleton skeleton-text-sm" style="width:90px; margin:0;"></div><div class="skeleton-class-menu-btn"></div></div></div>
+            <div class="skeleton-class-card"><div class="skeleton-class-header"><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:50%;"></div></div><div class="skeleton-class-avatar"></div><div class="skeleton-class-body"></div><div class="skeleton-class-footer"><div class="skeleton skeleton-text-sm" style="width:110px; margin:0;"></div><div class="skeleton-class-menu-btn"></div></div></div>
+            <div class="skeleton-class-card"><div class="skeleton-class-header"><div class="skeleton skeleton-text skeleton-text-lg" style="width:60%;"></div><div class="skeleton skeleton-text skeleton-text-sm" style="width:45%;"></div></div><div class="skeleton-class-avatar"></div><div class="skeleton-class-body"></div><div class="skeleton-class-footer"><div class="skeleton skeleton-text-sm" style="width:80px; margin:0;"></div><div class="skeleton-class-menu-btn"></div></div></div>
+        </div>
+        <div id="classesList" class="classes-grid" style="display:none;"></div>
+
+
+    </div>
+</main>
+
+
+<div id="createModal" class="modal">
+    <div class="modal-content">
+        <h2>Criar Nova Turma</h2>
+        <input type="text" id="className" class="genii-input" placeholder="Nome da Turma (ex: 10º B)">
+        <input type="text" id="classSubject" class="genii-input" placeholder="Disciplina (ex: Matemática)">
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="closeModal('createModal')" class="btn-action btn-join" style="flex:1; justify-content:center;">Cancelar</button>
+            <button onclick="createClass()" class="btn-action btn-create" style="flex:1; justify-content:center;">Criar</button>
+        </div>
+    </div>
+</div>
+
+
+<div id="joinModal" class="modal">
+    <div class="modal-content">
+        <h2>Entrar numa Turma</h2>
+        <p style="color:var(--grey); margin-bottom:20px; font-size:0.95rem;">Insira o código de 6 caracteres fornecido pelo professor.</p>
+        <input type="text" id="classCode" class="genii-input" placeholder="CÓDIGO" maxlength="6" style="text-transform:uppercase; text-align:center; letter-spacing: 4px; font-weight:800; font-size: 1.5rem;">
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="closeModal('joinModal')" class="btn-action btn-join" style="flex:1; justify-content:center;">Cancelar</button>
+            <button onclick="joinClass()" class="btn-action btn-create" style="flex:1; justify-content:center;">Entrar</button>
+        </div>
+    </div>
+</div>
+
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, addDoc, query, where, getDocs, doc, updateDoc, arrayUnion, arrayRemove, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+
+
+    let currentUser = null;
+
+
+    function _buildCardAvatar(data) {
+        if (!data) data = {};
+
+
+        if (data.avatarRenderUrl) {
+            return `<img src="${data.avatarRenderUrl}" style="width:100%;height:100%;object-fit:contain;object-position:center 35%;">`;
+        }
+
+
+        const type = data.profileType || 'avatar';
+        const photo = data.customPhotoUrl || data.photoURL || '';
+
+
+        if (type === 'photo' && photo) {
+            return `<img src="${photo}" style="object-fit:cover;">`;
+        }
+
+
+        const avatar = data.avatar || {};
+        if (typeof avatar === 'object' && (avatar.skin || avatar.face)) {
+            const skin = avatar.skin || '001';
+            const face = avatar.face || '001';
+            const hat = avatar.hat || 'none';
+            const hasHat = hat && hat !== 'none';
+            const scaleStyle = hasHat
+                ? 'transform:scale(0.75);transform-origin:center 58%;'
+                : 'transform:scale(0.88);transform-origin:center center;';
+            let imgs = `<img src="static/img/avatareditor/skins/${skin}.png"><img src="static/img/avatareditor/faces/${face}.png">`;
+            if (hasHat) imgs += `<img src="static/img/avatareditor/hats/${hat}.png">`;
+            return `<div style="position:absolute;inset:0;${scaleStyle}">${imgs}</div>`;
+        }
+
+
+        const name = data.displayName || data.username || data.name || 'P';
+        const initial = name.charAt(0).toUpperCase();
+        const gradients =['linear-gradient(135deg,#6C5CE7,#a29bfe)','linear-gradient(135deg,#00D2BA,#55efc4)','linear-gradient(135deg,#FF4757,#ff6b81)','linear-gradient(135deg,#FFA502,#ffeaa7)'];
+        const idx = name.charCodeAt(0) % gradients.length;
+        return `<div style="position:absolute;inset:0;background:${gradients[idx]};display:flex;align-items:center;justify-content:center;color:white;font-family:Fredoka,sans-serif;font-weight:700;font-size:1.8rem;border-radius:16px;">${initial}</div>`;
+    }
+
+
+    const cached = getCachedUser();
+    if (cached) { document.body.style.opacity = "1"; renderLayout('classes', cached); }
+
+
+    const CACHE_KEY_CLASSES = 'genii_cached_classes';
+
+
+    function getCachedClasses() {
+        try {
+            const raw = sessionStorage.getItem(CACHE_KEY_CLASSES);
+            return raw ? JSON.parse(raw) : null;
+        } catch { return null; }
+    }
+
+
+    function saveCachedClasses(classes) {
+        try { sessionStorage.setItem(CACHE_KEY_CLASSES, JSON.stringify(classes)); } catch {}
+    }
+
+
+    let allClasses =[];
+    const cachedClasses = getCachedClasses();
+
+
+    if (cachedClasses && cachedClasses.length > 0) {
+        allClasses = cachedClasses;
+        renderClasses(allClasses);
+    }
+
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "login.html"; return; }
+
+
+        currentUser = user;
+        if (!cached) document.body.style.opacity = "1";
+
+
+        if (!isCacheFresh(getCachedUser())) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const d = docSnap.data();
+                    const userData = { ...d, displayName: d.username || user.email.split('@')[0] };
+                    saveUserToCache(userData);
+                    renderLayout('classes', userData);
+                }
+            } catch(e) { console.error(e); }
+        }
+
+
+        await loadClasses();
+    });
+
+
+    document.addEventListener('app-logout', async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+    });
+
+
+    window.openModal = (id) => document.getElementById(id).style.display = 'flex';
+    window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+
+
+    window.createClass = async () => {
+        const name = document.getElementById('className').value;
+        const subject = document.getElementById('classSubject').value;
+        if(!name) return showGeniiToast("O nome é obrigatório.", "error");
+
+
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+
+        try {
+            await addDoc(collection(db, "classrooms"), {
+                name: name,
+                subject: subject,
+                code: code,
+                ownerId: currentUser.uid,
+                ownerName: currentUser.displayName || "Professor",
+                members:[currentUser.uid], 
+                createdAt: serverTimestamp()
+            });
+            closeModal('createModal');
+            sessionStorage.removeItem(CACHE_KEY_CLASSES);
+            loadClasses();
+            showGeniiToast(`Turma criada com sucesso! Código: ${code}`, "success");
+        } catch(e) { 
+            console.error(e); 
+            showGeniiToast("Erro ao criar turma. Verifique as permissões.", "error"); 
+        }
+    };
+
+
+    window.joinClass = async () => {
+        const code = document.getElementById('classCode').value.toUpperCase();
+        if(code.length < 6) return showGeniiToast("Código inválido.", "error");
+
+
+        try {
+            const q = query(collection(db, "classrooms"), where("code", "==", code));
+            const snapshot = await getDocs(q);
+
+
+            if(snapshot.empty) return showGeniiToast("Turma não encontrada.", "error");
+
+
+            const classDoc = snapshot.docs[0];
+            
+            if(classDoc.data().members.includes(currentUser.uid)) {
+                return showGeniiToast("Já pertences a esta turma!", "error");
+            }
+
+
+            await updateDoc(doc(db, "classrooms", classDoc.id), {
+                members: arrayUnion(currentUser.uid)
+            });
+
+
+            closeModal('joinModal');
+            sessionStorage.removeItem(CACHE_KEY_CLASSES);
+            loadClasses();
+            showGeniiToast("Entraste na turma com sucesso!", "success");
+
+
+        } catch(e) { console.error(e); showGeniiToast("Erro ao entrar.", "error"); }
+    };
+
+
+    function renderClasses(classes) {
+        hideSkeleton(document.getElementById('classes-skeleton'));
+        const list = document.getElementById('classesList');
+        list.style.display = '';
+        list.innerHTML = "";
+
+
+        if (classes.length === 0) {
+            list.innerHTML = `
+                <div class="loading-state">
+                    <img src="static/img/empty_state.png" style="width: 100px; opacity: 0.5; margin-bottom: 20px;" onerror="this.style.display='none'">
+                    <p style="font-size: 1.1rem; font-weight: 600;">Ainda não tem turmas.</p>
+                    <p style="font-size: 0.9rem;">Crie uma ou peça um código ao seu professor!</p>
+                </div>`;
+            return;
+        }
+
+
+        let cardsHtml = '';
+        classes.forEach((data) => {
+            let headerStyle = '';
+            if (data.bannerUrl) {
+                headerStyle = `background-image: url('${data.bannerUrl}'); background-size:cover; background-position:center;`;
+            } else if (data.theme) {
+                headerStyle = `background: ${data.theme};`;
+            }
+
+
+            const memberCount = data.memberCount || 0;
+            
+            let subjectText = data.subject || '';
+            if (subjectText.length > 22) {
+                subjectText = subjectText.substring(0, 22) + '...';
+            }
+
+
+            const isOwner = currentUser && data.ownerId === currentUser.uid;
+            const menuItems = isOwner
+                ? `<button class="card-dropdown-item danger" onclick="event.stopPropagation(); deleteClass('${data.id}', '${data.name.replace(/'/g, "\\'")}')"><i class="fa-solid fa-trash"></i> Apagar Turma</button>`
+                : `<button class="card-dropdown-item danger" onclick="event.stopPropagation(); leaveClass('${data.id}', '${data.name.replace(/'/g, "\\'")}')"><i class="fa-solid fa-right-from-bracket"></i> Sair da Turma</button>`;
+
+
+            cardsHtml += `
+                <div class="class-card" draggable="true" data-class-id="${data.id}" onclick="location.href='/class?id=${data.id}'">
+                    <div class="class-card-header" style="${headerStyle}">
+                        <div class="header-text">
+                            <h3 class="class-card-title" title="${data.name}">${data.name}</h3>
+                            <p class="class-card-subtitle" title="${data.subject}">${subjectText}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="class-card-avatar">
+                        ${data.avatarHTML || ''}
+                    </div>
+                    
+                    <div class="class-body">
+                        
+                    </div>
+                    
+                    <div class="class-footer">
+                        <div class="class-teacher-info" title="${data.ownerName}">
+                            <i class="fa-regular fa-user"></i> ${data.ownerName || 'Professor'}
+                        </div>
+                        <div class="class-footer-icons">
+                            <div class="card-menu-container">
+                                <button class="card-menu-btn" onclick="event.stopPropagation(); toggleCardMenu('menu-${data.id}')" title="Opções">
+                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                </button>
+                                <div class="card-dropdown" id="menu-${data.id}">
+                                    ${menuItems}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = cardsHtml;
+        initDragAndDrop();
+    }
+
+
+    window.toggleCardMenu = (menuId) => {
+        document.querySelectorAll('.card-dropdown.show').forEach(m => {
+            if (m.id !== menuId) m.classList.remove('show');
+        });
+        const menu = document.getElementById(menuId);
+        if (menu) menu.classList.toggle('show');
+    };
+
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.card-menu-container')) {
+            document.querySelectorAll('.card-dropdown.show').forEach(m => m.classList.remove('show'));
+        }
+    });
+
+
+    window.leaveClass = (classId, className) => {
+        showGeniiConfirm(`Queres sair da turma "${className}"?`, async (confirmed) => {
+            if (!confirmed) return;
+            try {
+                await updateDoc(doc(db, "classrooms", classId), {
+                    members: arrayRemove(currentUser.uid)
+                });
+                sessionStorage.removeItem(CACHE_KEY_CLASSES);
+                showGeniiToast("Saíste da turma.", "success");
+                await loadClasses();
+            } catch(e) {
+                console.error(e);
+                showGeniiToast("Erro ao sair da turma.", "error");
+            }
+        });
+    };
+
+
+    window.deleteClass = (classId, className) => {
+        showGeniiConfirm(`Tem a certeza que quer apagar a turma "${className}"? Esta ação é irreversível.`, async (confirmed) => {
+            if (!confirmed) return;
+            try {
+                const postsSnap = await getDocs(collection(db, `classrooms/${classId}/posts`));
+                const postDeletePromises = [];
+                postsSnap.forEach((postDoc) => {
+                    const deletePostComments = async () => {
+                        const commentsSnap = await getDocs(collection(db, `classrooms/${classId}/posts/${postDoc.id}/comments`));
+                        const commentsDeletePromises = commentsSnap.docs.map(cDoc => deleteDoc(cDoc.ref));
+                        await Promise.all(commentsDeletePromises);
+                        await deleteDoc(postDoc.ref);
+                    };
+                    postDeletePromises.push(deletePostComments());
+                });
+                await Promise.all(postDeletePromises);
+
+
+                const submissionsSnap = await getDocs(collection(db, `classrooms/${classId}/submissions`));
+                const submissionsDeletePromises = submissionsSnap.docs.map(sDoc => deleteDoc(sDoc.ref));
+                await Promise.all(submissionsDeletePromises);
+
+
+                await deleteDoc(doc(db, "classrooms", classId));
+                
+                sessionStorage.removeItem(CACHE_KEY_CLASSES);
+                showGeniiToast("Turma apagada.", "success");
+                await loadClasses();
+            } catch(e) {
+                console.error(e);
+                showGeniiToast("Erro ao apagar a turma.", "error");
+            }
+        });
+    };
+
+
+    let draggedCard = null;
+
+
+    function initDragAndDrop() {
+        const cards = document.querySelectorAll('.class-card');
+
+
+        cards.forEach(card => {
+            card.addEventListener('dragstart', (e) => {
+                draggedCard = card;
+                card.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', card.dataset.classId);
+            });
+
+
+            card.addEventListener('dragend', () => {
+                card.classList.remove('dragging');
+                document.querySelectorAll('.class-card.drag-over').forEach(c => c.classList.remove('drag-over'));
+                draggedCard = null;
+            });
+
+
+            card.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (card !== draggedCard) {
+                    card.classList.add('drag-over');
+                }
+            });
+
+
+            card.addEventListener('dragleave', () => {
+                card.classList.remove('drag-over');
+            });
+
+
+            card.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                card.classList.remove('drag-over');
+
+
+                if (!draggedCard || draggedCard === card) return;
+
+
+                const grid = document.getElementById('classesList');
+                const allCards = [...grid.querySelectorAll('.class-card')];
+                const fromIdx = allCards.indexOf(draggedCard);
+                const toIdx = allCards.indexOf(card);
+
+
+                if (fromIdx < toIdx) {
+                    card.parentNode.insertBefore(draggedCard, card.nextSibling);
+                } else {
+                    card.parentNode.insertBefore(draggedCard, card);
+                }
+
+
+                const newOrder = [...grid.querySelectorAll('.class-card')].map(c => c.dataset.classId);
+                saveClassOrder(newOrder);
+            });
+        });
+    }
+
+
+    async function saveClassOrder(orderArray) {
+        if (!currentUser) return;
+        try {
+            await setDoc(doc(db, "users", currentUser.uid, "preferences", "classOrder"), {
+                order: orderArray,
+                updatedAt: serverTimestamp()
+            });
+        } catch(e) { console.log("Erro ao guardar ordem:", e); }
+    }
+
+
+    async function getClassOrder() {
+        if (!currentUser) return null;
+        try {
+            const snap = await getDoc(doc(db, "users", currentUser.uid, "preferences", "classOrder"));
+            if (snap.exists()) return snap.data().order || null;
+        } catch(e) { console.log("Erro ao carregar ordem:", e); }
+        return null;
+    }
+
+
+    function applyOrder(classes, savedOrder) {
+        if (!savedOrder || savedOrder.length === 0) return classes;
+        const map = new Map(classes.map(c => [c.id, c]));
+        const ordered = [];
+        for (const id of savedOrder) {
+            if (map.has(id)) {
+                ordered.push(map.get(id));
+                map.delete(id);
+            }
+        }
+        for (const c of map.values()) {
+            ordered.push(c);
+        }
+        return ordered;
+    }
+
+
+    async function loadClasses() {
+        const list = document.getElementById('classesList');
+        try {
+            const q = query(collection(db, "classrooms"), where("members", "array-contains", currentUser.uid));
+            const snapshot = await getDocs(q);
+
+
+            if(snapshot.empty) {
+                allClasses = [];
+                saveCachedClasses([]);
+                renderClasses([]);
+                return;
+            }
+
+
+            const freshClasses = [];
+
+
+            const ownerIds = snapshot.docs.map(d => d.data().ownerId).filter(Boolean);
+            const uniqueOwnerIds = [...new Set(ownerIds)];
+            const ownerMap = {};
+
+
+            const ownerPromises = uniqueOwnerIds.map(async (ownerId) => {
+                try {
+                    const ownerSnap = await getDoc(doc(db, "users", ownerId));
+                    if (ownerSnap.exists()) {
+                        ownerMap[ownerId] = ownerSnap.data() || {};
+                    }
+                } catch(err) { console.log("Erro avatar professor", err); }
+            });
+            await Promise.all(ownerPromises);
+
+
+            for (const classDoc of snapshot.docs) {
+                const data = classDoc.data();
+                let ownerName = data.ownerName || 'Professor';
+                let avatarHTML = _buildCardAvatar({ displayName: ownerName });
+
+
+                if (data.ownerId && ownerMap[data.ownerId]) {
+                    const ownerData = ownerMap[data.ownerId];
+                    ownerName = ownerData.username || ownerData.displayName || ownerName;
+                    avatarHTML = _buildCardAvatar(ownerData);
+                }
+
+
+                freshClasses.push({
+                    id: classDoc.id,
+                    name: data.name,
+                    subject: data.subject,
+                    ownerName: ownerName,
+                    ownerId: data.ownerId,
+                    theme: data.theme || '',
+                    bannerUrl: data.bannerUrl || '',
+                    memberCount: (data.members || []).length,
+                    avatarHTML: avatarHTML
+                });
+            }
+
+
+            const savedOrder = await getClassOrder();
+            allClasses = applyOrder(freshClasses, savedOrder);
+            saveCachedClasses(allClasses);
+
+
+            renderClasses(allClasses);
+
+
+        } catch(e) { 
+            console.error("Erro Firebase:", e); 
+            if (!allClasses || allClasses.length === 0) {
+                hideSkeleton(document.getElementById('classes-skeleton'));
+                list.style.display = '';
+                list.innerHTML = `<div class="loading-state" style="color:#FF6B6B;">Erro de permissão. Verifique as Regras do Firebase.</div>`; 
+            }
+        }
+    }
+</script>
+</body>
+</html>

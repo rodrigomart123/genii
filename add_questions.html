@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Slides - SABIO</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- LAYOUT GLOBAL (Igual às outras páginas) --- */
+        body { margin: 0; font-family: 'Nunito', sans-serif; opacity: 0; transition: opacity 0.5s; }
+        
+        .dashboard {
+          position: relative; display: flex; min-height: 100vh;
+          background-color: #EDF4FF; overflow: hidden;
+        }
+    
+        .dashboard::before {
+          content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; z-index: 0;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0 100%), url('/static/img/chessver2.png') 0 0 repeat;
+          background-size: 400px 400px; transform: rotate(10deg); transform-origin: center; opacity: 0.9;
+          background-color: rgb(190, 207, 235); background-blend-mode: soft-light;
+          animation: moveDiagonalUpRight 40s linear infinite;
+        }
+        @keyframes moveDiagonalUpRight { from { background-position: 0 0; } to { background-position: 400px -400px; } }
+        .dashboard > * { position: relative; z-index: 1; }
+    
+        .sidebar {
+          width: 250px; background: #4383db; box-shadow: 0.5px 0 5px 0 #555;
+          color: white; padding: 20px; display: flex; flex-direction: column; gap: 20px;
+          font-size: 1.1rem; position: fixed; left: 0; top: 0; bottom: 0;
+        }
+        .sidebar img { max-width: 100%; margin-bottom: 10px; }
+        .sidebar h2 { font-size: 1.6rem; display: flex; align-items: center; gap: 8px; padding-left: 15px; }
+        .sidebar ul { list-style-type: none; padding: 0; }
+        .sidebar a {
+          color: white; text-decoration: none; font-weight: 550; padding: 12px 5px;
+          margin: 8px 0; display: flex; align-items: center; gap: 10px; border-radius: 8px;
+          transition: all 0.2s ease-in-out;
+        }
+        .sidebar a:hover, .sidebar a.active {
+          color: #4D97FF; background-color: #ffffff;
+          transform: scale(1.05); margin-left: -10px; padding-left: 25px;
+        }
+    
+        .main { flex: 1; padding: 40px; overflow-y: auto; margin-left: 250px; }
+
+        /* --- EDITOR DE PERGUNTAS (ESTILO NOVO) --- */
+        .editor-container {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; /* Divide a tela: Form | Lista */
+        }
+
+        /* Coluna Esquerda: Formulário */
+        .form-card {
+            background: white; border-radius: 12px; padding: 30px; height: fit-content;
+        }
+
+        .header-title { font-size: 1.4rem; color: #333; margin-bottom: 20px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        .header-title span { color: #4383db; font-weight: bold; }
+
+        label { display: block; font-weight: 600; color: #555; margin-bottom: 5px; margin-top: 15px; }
+        
+        input[type="text"], select {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px;
+            font-size: 1rem; box-sizing: border-box; transition: 0.3s;
+        }
+        input[type="text"]:focus, select:focus { border-color: #4383db; outline: none; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        
+        .input-group { position: relative; }
+        .input-group i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #999; }
+        .input-group input { padding-left: 35px; } /* Espaço para o ícone */
+
+        .btn-add {
+            width: 100%; background: var(--secondary, #6C5CE7); color: white; border: none; padding: 14px;
+            border-radius: 16px; font-family: 'Fredoka', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 20px;
+            transition: transform 0.1s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 5px 0 #5a4bd4; text-transform: uppercase;
+        }
+        .btn-add:hover { filter: brightness(1.08); }
+        .btn-add:active { transform: translateY(5px); box-shadow: none; }
+
+        /* Coluna Direita: Lista de Perguntas */
+        .list-card {
+            background: rgba(255, 255, 255, 0.8); border-radius: 12px; padding: 25px; height: fit-content; min-height: 400px;
+        }
+
+        .questions-wrapper { max-height: 600px; overflow-y: auto; padding-right: 5px; }
+        
+        .q-item {
+            background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px;
+            border-left: 4px solid #4383db; position: relative;
+        }
+        .q-text { font-weight: bold; color: #333; margin-bottom: 5px; font-size: 1rem; }
+        .q-answer { font-size: 0.9rem; color: #2ecc71; font-weight: 600; }
+        .q-delete {
+            position: absolute; top: 10px; right: 10px; color: #e74c3c;
+            background: none; border: none; cursor: pointer; font-size: 1rem;
+        }
+        .q-delete:hover { color: #c0392b; }
+
+        .btn-finish {
+            width: 100%; background: var(--success, #0FBD8C); color: white; border: none; padding: 14px;
+            border-radius: 16px; font-family: 'Fredoka', sans-serif; font-size: 1.1rem; font-weight: 700; cursor: pointer; margin-top: 20px;
+            box-shadow: 0 5px 0 #0a9a70; text-transform: uppercase;
+            transition: transform 0.1s;
+        }
+        .btn-finish:hover { filter: brightness(1.08); }
+        .btn-finish:active { transform: translateY(5px); box-shadow: none; }
+
+        @media (max-width: 900px) {
+            .editor-container { grid-template-columns: 1fr; }
+        }
+    </style>
+<script src="static/js/theme.js"></script>
+    </head>
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <img src="static/img/logotoppagetransparent.png" alt="Logo SABIO">
+        <ul>
+            <li><a href="dashboard.html"><i class="fa-solid fa-play"></i> Jogar</a></li>
+            <li><a href="profile.html"><i class="fa-solid fa-gear"></i> Perfil</a></li>
+            <li><a href="#"><i class="fa-solid fa-sack-dollar"></i> Inventário</a></li>
+            <li><a href="discover.html"><i class="fa-solid fa-compass"></i> Descobrir</a></li>
+            <li><a href="my_sets.html" class="active"><i class="fa-solid fa-list-ul"></i> Meus Sets</a></li>
+            <li><a href="favorites.html"><i class="fa-solid fa-star"></i> Favoritos</a></li>
+            <li><a href="#" id="logout-btn"><i class="fa-solid fa-door-open"></i> Sair</a></li>
+        </ul>
+    </aside>
+
+    <div class="main">
+        <div class="editor-container">
+            
+            <div class="form-card">
+                <div class="header-title">
+                    Editar Set: <span id="quizTitleDisplay">Carregando...</span>
+                </div>
+
+                <form id="addQuestionForm">
+                    <label>Slide:</label>
+                    <input type="text" id="qText" required placeholder="Escreve a pergunta aqui...">
+
+                    <label>Opções de Resposta:</label>
+                    <div class="options-grid">
+                        <div class="input-group">
+                            <i class="fa-solid fa-a"></i>
+                            <input type="text" id="optA" required placeholder="Opção A">
+                        </div>
+                        <div class="input-group">
+                            <i class="fa-solid fa-b"></i>
+                            <input type="text" id="optB" required placeholder="Opção B">
+                        </div>
+                        <div class="input-group">
+                            <i class="fa-solid fa-c"></i>
+                            <input type="text" id="optC" required placeholder="Opção C">
+                        </div>
+                        <div class="input-group">
+                            <i class="fa-solid fa-d"></i>
+                            <input type="text" id="optD" required placeholder="Opção D">
+                        </div>
+                    </div>
+
+                    <label>Resposta Correta:</label>
+                    <select id="correctOpt" required>
+                        <option value="" disabled selected>Selecione a correta...</option>
+                        <option value="A">Opção A</option>
+                        <option value="B">Opção B</option>
+                        <option value="C">Opção C</option>
+                        <option value="D">Opção D</option>
+                    </select>
+
+                    <button type="submit" class="btn-add">
+                        <i class="fa-solid fa-plus-circle"></i> Adicionar Slide
+                    </button>
+                </form>
+            </div>
+
+            <div class="list-card">
+                <h3 style="margin-top:0; color:#444;"><i class="fa-solid fa-list-check"></i> Slides Adicionados (<span id="qCount">0</span>)</h3>
+                <div class="questions-wrapper" id="questionsList">
+                    <p style="text-align:center; color:#777; margin-top:20px;">Ainda não há slides neste set.</p>
+                </div>
+                <button class="btn-finish" onclick="window.location.href='my_sets.html'">
+                    <i class="fa-solid fa-check"></i> Concluir Edição
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script type="module">
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+
+    // Obter ID da URL
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('id');
+
+    if (!quizId) {
+        alert("Erro: ID do set não encontrado.");
+        window.location.href = "my_sets.html";
+    }
+
+    // Auth Check
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.body.style.opacity = "1";
+            loadQuizData();
+            setupRealtimeListener(); // Escutar mudanças nas perguntas
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    // 1. Carregar Título
+    async function loadQuizData() {
+        const docRef = doc(db, "quizzes", quizId);
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+            document.getElementById('quizTitleDisplay').innerText = snap.data().title;
+        }
+    }
+
+    // 2. Adicionar Pergunta
+    document.getElementById('addQuestionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.querySelector('.btn-add');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "<i class='fa-solid fa-spinner fa-spin'></i> A guardar...";
+        btn.disabled = true;
+
+        const newQuestion = {
+            id: Date.now().toString(), // ID simples para facilitar exclusão local
+            question_text: document.getElementById('qText').value,
+            options: {
+                A: document.getElementById('optA').value,
+                B: document.getElementById('optB').value,
+                C: document.getElementById('optC').value,
+                D: document.getElementById('optD').value
+            },
+            correct_option: document.getElementById('correctOpt').value
+        };
+
+        try {
+            const quizRef = doc(db, "quizzes", quizId);
+            await updateDoc(quizRef, {
+                questions: arrayUnion(newQuestion)
+            });
+
+            // Limpar formulário
+            document.getElementById('addQuestionForm').reset();
+            document.getElementById('qText').focus();
+
+        } catch (error) {
+            console.error(error);
+            alert("Erro ao adicionar slide.");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    // 3. Listener em Tempo Real (Mostra a lista atualizada)
+    function setupRealtimeListener() {
+        const quizRef = doc(db, "quizzes", quizId);
+        
+        onSnapshot(quizRef, (doc) => {
+            if (doc.exists()) {
+                const data = doc.data();
+                const questions = data.questions || [];
+                renderQuestions(questions);
+            }
+        });
+    }
+
+    function renderQuestions(questions) {
+        const listEl = document.getElementById('questionsList');
+        document.getElementById('qCount').innerText = questions.length;
+        
+        if (questions.length === 0) {
+            listEl.innerHTML = "<p style='text-align:center; color:#777; margin-top:20px;'>Ainda não há slides neste set.</p>";
+            return;
+        }
+
+        listEl.innerHTML = "";
+        // Mostrar as mais recentes no topo (reverse)
+        questions.slice().reverse().forEach((q) => {
+            const correctText = q.options[q.correct_option]; // Pega o texto da resposta correta
+            
+            const item = `
+                <div class="q-item">
+                    <div class="q-text">${q.question_text}</div>
+                    <div class="q-answer"><i class="fa-solid fa-check"></i> ${q.correct_option}: ${correctText}</div>
+                    <button class="q-delete" onclick="removeQuestion('${q.id}')"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `;
+            listEl.innerHTML += item;
+        });
+    }
+
+    // 4. Função Global para Remover Pergunta
+    // Nota: Remover item de array no Firestore requer o objeto EXATO.
+    // Para simplificar, neste código, apenas lemos o array todo, filtramos e salvamos de novo.
+    window.removeQuestion = async (qId) => {
+        showGeniiConfirm("Apagar este slide?", async (confirmed) => {
+            if (!confirmed) return;
+            const quizRef = doc(db, "quizzes", quizId);
+            const snap = await getDoc(quizRef);
+            
+            if (snap.exists()) {
+                const currentQuestions = snap.data().questions || [];
+                const updatedQuestions = currentQuestions.filter(q => q.id !== qId);
+                
+                await updateDoc(quizRef, { questions: updatedQuestions });
+            }
+        });
+    };
+
+    // Logout
+    document.getElementById('logout-btn').addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = "login.html");
+    });
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,674 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Set - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+     <link
+        rel="stylesheet"
+        href="https://site-assets.fontawesome.com/releases/v6.5.1/css/all.css"
+      >
+
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+<script src="static/js/theme.js"></script>
+    
+    </head>
+<body data-page="quiz">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content">
+    <div class="detail-container">
+        
+        <a href="javascript:history.back()" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Voltar
+        </a>
+
+        <div class="hero-card">
+            
+            <div class="cover-wrapper" id="coverContainer">
+                <div class="skeleton" style="width:100%; height:100%; border-radius:16px;"></div>
+            </div>
+
+            <div class="info-wrapper">
+                <div id="hero-skeleton">
+                    <div class="skeleton skeleton-text skeleton-text-lg" style="width:70%; height:32px;"></div>
+                    <div style="display:flex; gap:16px; margin:16px 0;">
+                        <div class="skeleton skeleton-circle" style="width:40px; height:40px;"></div>
+                        <div class="skeleton skeleton-text" style="width:120px;"></div>
+                    </div>
+                    <div class="skeleton skeleton-text" style="width:100%; height:60px; border-radius:12px;"></div>
+                    <div style="display:flex; gap:12px; margin-top:20px;">
+                        <div class="skeleton" style="flex:1; height:56px; border-radius:16px;"></div>
+                        <div class="skeleton" style="flex:1; height:56px; border-radius:16px;"></div>
+                    </div>
+                    <div style="display:flex; gap:12px; justify-content:center; margin-top:8px;">
+                        <div class="skeleton" style="width:50px; height:50px; border-radius:16px;"></div>
+                        <div class="skeleton" style="width:50px; height:50px; border-radius:16px;"></div>
+                    </div>
+                </div>
+                
+                <h1 class="quiz-title" id="quizTitle" style="display:none;"></h1>
+                
+                <div class="quiz-meta" id="quiz-meta" style="display:none;">
+                    <a class="creator-info" id="creatorLink" href="#" style="text-decoration:none; color:inherit; cursor:pointer; transition:opacity 0.2s;">
+                        <div class="creator-avatar-box" id="creatorAvatarBox">
+                        </div>
+                        <span id="creatorName">...</span>
+                    </a>
+                    <div style="width:1px; height:20px; background:var(--border);"></div>
+                    <div class="date-info">
+                        <i class="fa-regular fa-clock"></i> <span id="createdAt">...</span>
+                    </div>
+                    <div style="width:1px; height:20px; background:var(--border);"></div>
+                    <div class="quiz-genre-pill" id="quizGenrePill" style="display:none;">
+                        <i class="fa-solid fa-tag" style="font-size:0.8rem;"></i>
+                        <span id="quizGenreText"></span>
+                    </div>
+                    <div style="width:1px; height:20px; background:var(--border);" id="genreDivider" style="display:none;"></div>
+                    <div class="quiz-stats-inline">
+                        <span class="stat-pill"><i class="fa-solid fa-play" style="color:#00D2BA;"></i> <span id="playCounter">0</span></span>
+                        <span class="stat-pill"><i class="fa-solid fa-star" style="color:#FFAB00;"></i> <span id="favCounter">0</span></span>
+                    </div>
+                </div>
+
+                <p class="quiz-desc" id="quizDesc" style="display:none;"></p>
+
+                <div class="action-buttons" id="action-buttons" style="display:none;">
+                    <button class="game-btn btn-play" id="playBtn">
+                        <i class="fa-solid fa-play"></i> Jogar solo
+                    </button>
+
+                    <button class="game-btn btn-host" id="hostBtn">
+                        <i class="fa-solid fa-tv"></i> Hospedar
+                    </button>
+
+                    <div class="fav-row">
+                        <button class="btn-fav" id="shareBtn" title="Partilhar numa Turma" onclick="openShareModal()">
+                            <i class="fa-solid fa-share-nodes"></i>
+                        </button>
+
+                        <button class="btn-fav" id="favBtn" title="Favoritar">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <div class="preview-header">
+                <h3><span id="qCount">0</span> Perguntas</h3>
+            </div>
+            
+            <div id="questions-skeleton" class="questions-grid">
+                <div class="skeleton-preview-card"><div class="skeleton-preview-badges"><div class="skeleton-preview-index"></div><div class="skeleton-preview-timer"></div></div><div class="skeleton-preview-inner"><div class="skeleton" style="width:100%; height:56px; border-radius:16px;"></div><div class="skeleton" style="flex:1; border-radius:14px; min-height:60px;"></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div></div></div></div>
+                <div class="skeleton-preview-card"><div class="skeleton-preview-badges"><div class="skeleton-preview-index"></div><div class="skeleton-preview-timer"></div></div><div class="skeleton-preview-inner"><div class="skeleton" style="width:100%; height:56px; border-radius:16px;"></div><div class="skeleton" style="flex:1; border-radius:14px; min-height:60px;"></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div></div></div></div>
+                <div class="skeleton-preview-card"><div class="skeleton-preview-badges"><div class="skeleton-preview-index"></div><div class="skeleton-preview-timer"></div></div><div class="skeleton-preview-inner"><div class="skeleton" style="width:100%; height:56px; border-radius:16px;"></div><div class="skeleton" style="flex:1; border-radius:14px; min-height:60px;"></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;"><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div><div class="skeleton" style="height:36px; border-radius:14px;"></div></div></div></div>
+            </div>
+            
+            <div class="questions-grid" id="questionsList" style="display:none;"></div>
+        </div>
+
+    </div>
+</main>
+
+<div id="shareModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:3000; align-items:center; justify-content:center;">
+    <div style="background:var(--surface); width:90%; max-width:480px; border-radius:20px; padding:25px; display:flex; flex-direction:column; animation:popUp 0.3s; max-height:80vh; border:1px solid var(--border);">
+        <h3 style="margin:0 0 8px 0; font-family:'Fredoka'; font-size:1.4rem; color:var(--genii-dark);"><i class="fa-solid fa-share-nodes" style="color:#6C5CE7; margin-right:8px;"></i>Partilhar na Turma</h3>
+        <p style="color:var(--grey); font-size:0.9rem; margin:0 0 15px 0;">Escolha a turma para publicar este quiz automaticamente.</p>
+        <div id="shareClassList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:10px; min-height:120px;"></div>
+        
+        <button id="copyLinkBtn" onclick="copyQuizLink()" style="margin-top:12px; padding:14px; background:linear-gradient(135deg, #00D2BA, #6C5CE7); border:none; border-radius:16px; cursor:pointer; font-family:'Fredoka',sans-serif; font-weight:700; color:white; font-size:0.95rem; display:flex; align-items:center; justify-content:center; gap:10px; box-shadow:0 4px 0 #5243C0; transition: transform 0.1s; text-transform:uppercase; width:100%;">
+            <i class="fa-solid fa-link"></i> Copiar Link do Set
+        </button>
+
+        <button onclick="document.getElementById('shareModal').style.display='none'" style="margin-top:8px; padding:12px; background:var(--bg-elevated); border:none; border-radius:16px; cursor:pointer; font-family:'Fredoka',sans-serif; font-weight:700; box-shadow:0 4px 0 var(--cancel-shadow); text-transform:uppercase; width:100%; color:var(--grey);">Cancelar</button>
+    </div>
+</div>
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js"
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, setDoc, deleteDoc, addDoc, collection, serverTimestamp, query, where, getDocs, writeBatch, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { ref, set as rtdbSet, get as rtdbGet, query as rtdbQuery, orderByChild, equalTo, update as rtdbUpdate, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { auth, db, rtdb } from "./firebase-config.js";
+
+    const cached = getCachedUser();
+    if (cached) {
+        document.body.style.opacity = "1";
+        renderLayout('dashboard', cached);
+    }
+
+    let currentUser = null;
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user; 
+            if (!cached) document.body.style.opacity = "1";
+
+            if (!isCacheFresh(getCachedUser())) {
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const d = docSnap.data();
+                        let userData = { ...d, displayName: d.username || user.email.split('@')[0] };
+                        saveUserToCache(userData);
+                        renderLayout('dashboard', userData);
+                    }
+                } catch(e) { console.error(e); }
+            }
+
+            await loadQuizDetails();
+            await checkFavoriteStatus();
+
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    document.addEventListener('app-logout', async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('id');
+    if (!quizId) window.location.href = "discover.html";
+
+    function darkenColor(hex, amount = 40) {
+        let c = hex.replace('#', '');
+        if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+        const r = Math.max(0, parseInt(c.substring(0,2), 16) - amount);
+        const g = Math.max(0, parseInt(c.substring(2,4), 16) - amount);
+        const b = Math.max(0, parseInt(c.substring(4,6), 16) - amount);
+        return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`;
+    }
+
+    function getContrastTextColor(hex) {
+        if (!hex) return '#2D3436';
+        let c = hex.replace('#', '');
+        if (c.length === 3) c = c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+        const r = parseInt(c.substring(0,2), 16);
+        const g = parseInt(c.substring(2,4), 16);
+        const b = parseInt(c.substring(4,6), 16);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return luminance > 0.6 ? '#2D3436' : '#FFFFFF';
+    }
+
+    async function loadQuizDetails() {
+        try {
+            const docRef = doc(db, "quizzes", quizId);
+            const snap = await getDoc(docRef);
+
+            if (snap.exists()) {
+                const data = snap.data();
+                
+                document.getElementById('hero-skeleton').style.display = 'none';
+                document.getElementById('quizTitle').style.display = '';
+                document.getElementById('quiz-meta').style.display = '';
+                document.getElementById('quizDesc').style.display = '';
+                document.getElementById('action-buttons').style.display = '';
+                hideSkeleton(document.getElementById('questions-skeleton'));
+                document.getElementById('questionsList').style.display = '';
+                
+                document.getElementById('quizTitle').innerText = data.title;
+                document.getElementById('quizDesc').innerText = data.description || "Sem descrição.";
+                document.getElementById('creatorName').innerText = data.creatorName || "Mestre";
+                
+                if(data.createdAt) {
+                    const date = data.createdAt.toDate ? data.createdAt.toDate() : new Date();
+                    document.getElementById('createdAt').innerText = date.toLocaleDateString('pt-PT');
+                }
+
+                if (data.creatorId) {
+                    loadCreatorAvatar(data.creatorId);
+                    document.getElementById('creatorLink').href = `/profile?uid=${data.creatorId}`;
+                }
+
+                document.getElementById('playCounter').innerText = data.playCount || 0;
+                document.getElementById('favCounter').innerText = data.favoriteCount || 0;
+
+                if (data.genre) {
+                    document.getElementById('quizGenrePill').style.display = 'inline-flex';
+                    document.getElementById('quizGenreText').innerText = data.genre;
+                    document.getElementById('genreDivider').style.display = '';
+                }
+
+                const coverContainer = document.getElementById('coverContainer');
+                if (data.cover_image_url && data.cover_image_url.trim() !== "") {
+                    coverContainer.innerHTML = `<img src="${data.cover_image_url}" alt="Capa">`;
+                } else {
+                    coverContainer.innerHTML = `<div class="placeholder-art" style="border-radius:16px; font-size:2.8rem;">Genii</div>`;
+                }
+                
+                const questions = data.questions || [];
+                document.getElementById('qCount').innerText = questions.length;
+
+                const colorClassMap = {
+                    'color-blue':   { bg: '#1268CE', shadow: '#005291' },
+                    'color-red':    { bg: '#E31A3C', shadow: '#9e0e0e' },
+                    'color-green':  { bg: '#25890C', shadow: '#115c39' },
+                    'color-orange': { bg: '#EA670F', shadow: '#b45309' },
+                    'color-yellow': { bg: '#FFA602', shadow: '#d97706' },
+                    'color-purple': { bg: '#864DBF', shadow: '#5b21b6' },
+                    'color-violet': { bg: '#fa93b7', shadow: '#a56178' },
+                };
+                const defaultColors = [
+                    { bg: '#FFFFFF', shadow: '#CBD5E1' },
+                    { bg: '#FFFFFF', shadow: '#CBD5E1' },
+                    { bg: '#FFFFFF', shadow: '#CBD5E1' },
+                    { bg: '#FFFFFF', shadow: '#CBD5E1' },
+                ];
+
+                let themeColors = defaultColors;
+                if (data.theme_colors && Array.isArray(data.theme_colors) && data.theme_colors.length >= 4) {
+                    themeColors = data.theme_colors.map(cls => colorClassMap[cls] || { bg: '#FFFFFF', shadow: '#CBD5E1' });
+                }
+
+                const listEl = document.getElementById('questionsList');
+                listEl.innerHTML = "";
+
+                if (questions.length === 0) {
+                    listEl.innerHTML = `<div style="text-align:center; padding:30px; color:var(--grey); font-weight:700; width:100%; grid-column: 1/-1;">Vazio... O Mestre ainda não criou perguntas!</div>`;
+                } else {
+                    questions.forEach((q, index) => {
+                        const qText = q.question_text || "Sem texto...";
+                        
+                        let imageHtml = `<i class="fa-regular fa-image"></i>`;
+                        if(q.imageUrl) imageHtml = `<img src="${q.imageUrl}">`;
+
+                        let answersHtml = ``;
+                        let answersGridClass = 'gp-answers-grid';
+                        const letters = ['A', 'B', 'C', 'D'];
+                        const isNeutral = themeColors === defaultColors;
+                        if (q.type === 'quiz') {
+                            answersHtml = letters.map((key, i) => {
+                                const perBtnColor = (q.answerColors && q.answerColors[key]) ? q.answerColors[key] : null;
+                                const themeC = themeColors[i] || defaultColors[i];
+                                const styles = (q.answerStyles && q.answerStyles[key]) ? q.answerStyles[key] : {};
+                                const text = q.options?.[key] || '-';
+
+                                if (perBtnColor) {
+                                    const shadow = darkenColor(perBtnColor);
+                                    const textColor = styles.textColor || getContrastTextColor(perBtnColor);
+                                    const fw = styles.bold ? 'font-weight:900;' : '';
+                                    const fi = styles.italic ? 'font-style:italic;' : '';
+                                    const iconBg = textColor === '#FFFFFF' ? 'rgba(255,255,255,0.25)' : '#F1F5F9';
+                                    const iconColor = textColor === '#FFFFFF' ? 'white' : '#64748B';
+                                    return `<div class="gp-ans" style="background:${perBtnColor};box-shadow:0 3px 0 ${shadow};color:${textColor};${fw}${fi}"><span class="gp-ans-icon" style="background:${iconBg};color:${iconColor};">${key}</span> <span>${text}</span></div>`;
+                                } else if (!isNeutral) {
+                                    return `<div class="gp-ans gp-ans-colored" style="background:${themeC.bg};box-shadow:0 3px 0 ${themeC.shadow};"><span class="gp-ans-icon">${key}</span> <span>${text}</span></div>`;
+                                } else {
+                                    const fw = styles.bold ? 'font-weight:900;' : '';
+                                    const fi = styles.italic ? 'font-style:italic;' : '';
+                                    const extraStyle = (fw || fi) ? `style="${fw}${fi}"` : '';
+                                    return `<div class="gp-ans gp-ans-neutral" ${extraStyle}><span class="gp-ans-icon">${key}</span> <span>${text}</span></div>`;
+                                }
+                            }).join('');                        } else if (q.type === 'boolean') {
+                            answersGridClass += ' gp-boolean';
+                            answersHtml = `
+                                <div class="gp-ans gp-bool-btn gp-bool-true"><span class="gp-ans-icon"><i class="fa-solid fa-check"></i></span> Verdadeiro</div>
+                                <div class="gp-ans gp-bool-btn gp-bool-false"><span class="gp-ans-icon"><i class="fa-solid fa-xmark"></i></span> Falso</div>
+                            `;
+                        } else if (q.type === 'slide') {
+                            let bodyPreview = (q.body || '').replace(/<[^>]*>?/gm, '').substring(0, 80);
+                            if ((q.body || '').length > 80) bodyPreview += '...';
+                            answersHtml = `
+                                <div class="gp-slide-preview" style="grid-column:1/-1;background:linear-gradient(135deg,#6c5ce7 0%,#a270f4 100%);border-radius:12px;padding:12px 16px;color:white;display:flex;align-items:center;gap:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;box-shadow:0 4px 0 #5a4bd4;">
+                                    <i class="fa-solid fa-presentation-screen" style="font-size:1rem;"></i>
+                                    <span>${bodyPreview || 'Slide de apresentação'}</span>
+                                </div>
+                            `;
+                        } else {
+                            answersHtml = `<div class="gp-typing-mock"><i class="fa-solid fa-keyboard"></i> Digitar resposta...</div>`;
+                        }
+
+                        listEl.innerHTML += `
+                            <div class="game-preview-card" oncontextmenu="return false;">
+                                <div class="gp-index">${index + 1}</div>
+                                ${q.type === 'slide' ? '<div class="gp-timer" style="background:var(--purple);color:white;"><i class="fa-solid fa-presentation-screen"></i> Slide</div>' : `<div class="gp-timer"><i class="fa-solid fa-clock"></i> ${q.timeLimit || 20}s</div>`}
+                                
+                                <div class="gp-question-box"><span>${qText}</span></div>
+                                <div class="gp-image-area">${imageHtml}</div>
+                                <div class="${answersGridClass}">${answersHtml}</div>
+                            </div>
+                        `;
+                    });
+                }
+
+                document.getElementById('playBtn').onclick = () => window.location.href = `/play_quiz?id=${quizId}`;
+                document.getElementById('hostBtn').onclick = createGameSession;
+
+            } else {
+                showGeniiToast("Set desaparecido!", "error");
+                setTimeout(() => window.location.href = "discover.html", 2000);
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('hero-skeleton').style.display = 'none';
+            hideSkeleton(document.getElementById('questions-skeleton'));
+            document.getElementById('questionsList').style.display = '';
+            showGeniiToast("Erro ao invocar o set.", "error");
+        }
+    }
+
+    function _buildCreatorAvatar(data) {
+        if (!data) data = {};
+
+        if (data.avatarRenderUrl) {
+            return `<img src="${data.avatarRenderUrl}" style="width:100%;height:100%;object-fit:contain;object-position:center 35%;">`;
+        }
+
+        const type = data.profileType || 'avatar';
+        const photo = data.customPhotoUrl || data.photoURL || '';
+
+        if (type === 'photo' && photo) {
+            return `<img src="${photo}" style="object-fit:cover;">`;
+        }
+
+        const avatar = data.avatar || {};
+        if (typeof avatar === 'object' && (avatar.skin || avatar.face)) {
+            const skin = avatar.skin || '001';
+            const face = avatar.face || '001';
+            const hat = avatar.hat || 'none';
+            const hasHat = hat && hat !== 'none';
+            const scaleStyle = hasHat
+                ? 'transform:scale(0.75);transform-origin:center 58%;'
+                : 'transform:scale(0.88);transform-origin:center center;';
+            let imgs = `<img src="static/img/avatareditor/skins/${skin}.png"><img src="static/img/avatareditor/faces/${face}.png">`;
+            if (hasHat) imgs += `<img src="static/img/avatareditor/hats/${hat}.png">`;
+            return `<div style="position:absolute;inset:0;${scaleStyle}">${imgs}</div>`;
+        }
+
+        const name = data.displayName || data.username || data.name || 'G';
+        const initial = name.charAt(0).toUpperCase();
+        const gradients = ['linear-gradient(135deg,#6C5CE7,#a29bfe)','linear-gradient(135deg,#00D2BA,#55efc4)','linear-gradient(135deg,#FF4757,#ff6b81)','linear-gradient(135deg,#FFA502,#ffeaa7)'];
+        const idx = name.charCodeAt(0) % gradients.length;
+        return `<div style="position:absolute;inset:0;background:${gradients[idx]};display:flex;align-items:center;justify-content:center;color:white;font-family:Fredoka,sans-serif;font-weight:700;font-size:1rem;border-radius:12px;">${initial}</div>`;
+    }
+
+    async function loadCreatorAvatar(uid) {
+        const box = document.getElementById('creatorAvatarBox');
+        try {
+            const userSnap = await getDoc(doc(db, "users", uid));
+            if(userSnap.exists()) {
+                const u = userSnap.data();
+                box.innerHTML = _buildCreatorAvatar(u);
+                const nameEl = document.getElementById('creatorName');
+                if (nameEl) nameEl.innerText = u.username || u.displayName || nameEl.innerText;
+            }
+        } catch(e) { 
+            console.log("Erro avatar criador", e);
+            box.innerHTML = _buildCreatorAvatar({});
+        }
+    }
+
+    async function createGameSession() {
+        if(!currentUser) return showGeniiToast("Precisa de fazer login!", "error");
+
+        try {
+            const gamesRef = ref(rtdb, "live_games");
+            const hostQuery = rtdbQuery(gamesRef, orderByChild("hostId"), equalTo(currentUser.uid));
+            const existingSnap = await rtdbGet(hostQuery);
+            if (existingSnap.exists()) {
+                const games = existingSnap.val();
+                for (const pin of Object.keys(games)) {
+                    const g = games[pin];
+                    if (g.status === "waiting") {
+                        const shouldRejoin = await new Promise(resolve => {
+                            window.showGeniiConfirm(
+                                `Já tem uma sala aberta (PIN: ${pin}). Quer voltar a entrar?`,
+                                (answer) => resolve(answer)
+                            );
+                        });
+                        if (shouldRejoin) {
+                            window.location.href = `/host_lobby?gameId=${pin}`;
+                            return;
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao verificar salas ativas:", e);
+        }
+
+        const btn = document.getElementById('hostBtn');
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> A CRIAR...`;
+        btn.disabled = true;
+
+        try {
+            const gamesRef = ref(rtdb, "live_games");
+            const hostQuery = rtdbQuery(gamesRef, orderByChild("hostId"), equalTo(currentUser.uid));
+            const existingSnap = await rtdbGet(hostQuery);
+            const cleanupUpdates = {};
+            if (existingSnap.exists()) {
+                const games = existingSnap.val();
+                Object.keys(games).forEach(key => {
+                    const g = games[key];
+                    if (g.status === "waiting" || g.status === "active" || g.status === "question_active") {
+                        cleanupUpdates[`live_games/${key}`] = null;
+                    }
+                });
+            }
+            if (Object.keys(cleanupUpdates).length > 0) {
+                await rtdbUpdate(ref(rtdb), cleanupUpdates);
+            }
+
+            const pin = Math.floor(100000 + Math.random() * 900000).toString();
+            const allColors = ['color-blue', 'color-red', 'color-green', 'color-orange', 'color-yellow', 'color-purple', 'color-violet'];
+            for (let i = allColors.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allColors[i], allColors[j]] = [allColors[j], allColors[i]];
+            }
+            const gameColors = allColors.slice(0, 4);
+            await rtdbSet(ref(rtdb, `live_games/${pin}`), {
+                pin: pin,
+                hostId: currentUser.uid,
+                quizId: quizId,
+                status: "waiting",
+                currentQuestionIndex: 0,
+                theme_colors: gameColors,
+                createdAt: Date.now()
+            });
+            window.location.href = `/host_lobby?gameId=${pin}`;
+        } catch (error) {
+            console.error(error);
+            showGeniiToast("Erro ao criar sala.", "error");
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+        }
+    }
+
+    const favBtn = document.getElementById('favBtn');
+    async function checkFavoriteStatus() {
+        if(!currentUser) return;
+        try {
+            const userRef = doc(db, "users", currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                if (userData.favorites && userData.favorites.includes(quizId)) {
+                    favBtn.classList.add('active');
+                }
+            }
+        } catch(e) { console.log("Erro check fav", e); }
+    }
+
+    favBtn.addEventListener('click', async () => {
+        if (!currentUser) return showGeniiToast("Faz login para favoritar!", "error");
+        const userRef = doc(db, "users", currentUser.uid);
+        const quizRef = doc(db, "quizzes", quizId);
+        const isActive = favBtn.classList.contains('active');
+        favBtn.classList.toggle('active');
+
+        const counterEl = document.getElementById('favCounter');
+        if (counterEl) {
+            let c = parseInt(counterEl.innerText) || 0;
+            counterEl.innerText = isActive ? Math.max(0, c - 1) : c + 1;
+        }
+
+        try {
+            if (isActive) {
+                await updateDoc(userRef, { favorites: arrayRemove(quizId) });
+                const snap = await getDoc(quizRef);
+                const currentFavs = snap.data()?.favoriteCount || 0;
+                await updateDoc(quizRef, { favoriteCount: Math.max(0, currentFavs - 1) });
+                showGeniiToast("Removido dos Favoritos", "success");
+            } else {
+                await updateDoc(userRef, { favorites: arrayUnion(quizId) });
+                const snap = await getDoc(quizRef);
+                const currentFavs = snap.data()?.favoriteCount || 0;
+                await updateDoc(quizRef, { favoriteCount: currentFavs + 1 });
+                showGeniiToast("Adicionado aos Favoritos!", "success");
+            }
+        } catch (error) {
+            console.error("Erro favorito:", error);
+            favBtn.classList.toggle('active');
+            if (counterEl) {
+                let c = parseInt(counterEl.innerText) || 0;
+                counterEl.innerText = isActive ? c + 1 : Math.max(0, c - 1);
+            }
+            showGeniiToast("Erro ao favoritar.", "error");
+        }
+    });
+
+    window.openShareModal = async () => {
+        if (!currentUser) return showGeniiToast("Faz login primeiro!", "error");
+        const modal = document.getElementById('shareModal');
+        const list = document.getElementById('shareClassList');
+        modal.style.display = 'flex';
+        list.innerHTML = '<div style="text-align:center; padding:30px; color:var(--grey);"><i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem;"></i></div>';
+
+        try {
+            const q = query(collection(db, "classrooms"), where("ownerId", "==", currentUser.uid));
+            const snap = await getDocs(q);
+
+            if (snap.empty) {
+                list.innerHTML = '<div style="text-align:center; padding:30px; color:var(--grey);"><i class="fa-solid fa-school" style="font-size:1.5rem; margin-bottom:10px; display:block;"></i>Não tem turmas como professor.<br><a href="classes.html" style="color:#00D2BA; font-weight:700;">Criar turma</a></div>';
+                return;
+            }
+
+            list.innerHTML = '';
+            const gradients = ['#00D2BA','#6C5CE7','#FF6680','#FFCE00','#0FBD8C','#2F80ED','#E84393'];
+            let i = 0;
+            snap.forEach(d => {
+                const cls = d.data();
+                const color = cls.theme || gradients[i % gradients.length];
+                const initial = (cls.name || 'T').charAt(0).toUpperCase();
+                const memberCount = (cls.members || []).length;
+
+                const item = document.createElement('div');
+                item.className = 'share-class-item';
+                item.innerHTML = `
+                    <div class="share-class-dot" style="background:${color};">${initial}</div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:700; color:var(--genii-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${cls.name}</div>
+                        <div style="font-size:0.8rem; color:var(--grey);">${cls.subject || 'Geral'} • ${memberCount} membros</div>
+                    </div>
+                    <i class="fa-solid fa-paper-plane" style="color:var(--grey); font-size:1rem;"></i>
+                `;
+                item.onclick = () => shareQuizToClass(d.id, cls.name, item);
+                list.appendChild(item);
+                i++;
+            });
+        } catch(e) {
+            console.error(e);
+            list.innerHTML = '<div style="text-align:center; padding:30px; color:#FF6B6B;">Erro ao carregar turmas.</div>';
+        }
+    };
+
+    async function shareQuizToClass(classroomId, className, itemEl) {
+        itemEl.classList.add('sharing');
+        itemEl.querySelector('.fa-paper-plane')?.classList.replace('fa-paper-plane', 'fa-spinner');
+        itemEl.querySelector('.fa-spinner')?.classList.add('fa-spin');
+
+        try {
+            const quizSnap = await getDoc(doc(db, "quizzes", quizId));
+            const quizData = quizSnap.exists() ? quizSnap.data() : {};
+            const userName = currentUser.displayName || 'Professor';
+
+            let userDbData = {};
+            try {
+                const uSnap = await getDoc(doc(db, "users", currentUser.uid));
+                if (uSnap.exists()) userDbData = uSnap.data();
+            } catch(e) {}
+
+            await addDoc(collection(db, `classrooms/${classroomId}/posts`), {
+                content: `Vejam este quiz sobre ${quizData.title || 'Quiz'}!`,
+                authorId: currentUser.uid,
+                authorName: userDbData.username || userName,
+                authorProfileType: userDbData.profileType || 'avatar',
+                authorPhoto: userDbData.photoURL || null,
+                authorSkin: userDbData.avatar?.skin || '001',
+                authorFace: userDbData.avatar?.face || '001',
+                authorHat: userDbData.avatar?.hat || 'none',
+                createdAt: serverTimestamp(),
+                quizId: quizId,
+                quizTitle: quizData.title || 'Quiz',
+                quizCover: quizData.cover_image_url || quizData.coverImage || null,
+                type: 'post',
+                dueDate: null
+            });
+
+            document.getElementById('shareModal').style.display = 'none';
+            showGeniiToast(`Set partilhado na turma "${className}"!`, "success");
+        } catch(e) {
+            console.error(e);
+            showGeniiToast("Erro ao partilhar.", "error");
+            itemEl.classList.remove('sharing');
+            itemEl.querySelector('.fa-spinner')?.classList.replace('fa-spinner', 'fa-paper-plane');
+            itemEl.querySelector('.fa-spin')?.classList.remove('fa-spin');
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target.id === 'shareModal') e.target.style.display = 'none';
+    });
+
+    window.copyQuizLink = async () => {
+        const url = `${window.location.origin}/quiz?id=${quizId}`;
+        const btn = document.getElementById('copyLinkBtn');
+        try {
+            await navigator.clipboard.writeText(url);
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Link copiado!`;
+            btn.style.background = '#0FBD8C';
+            btn.style.boxShadow = '0 4px 0 #0a9b70';
+            showGeniiToast("Link copiado para a área de transferência!", "success");
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fa-solid fa-link"></i> Copiar Link do Set`;
+                btn.style.background = 'linear-gradient(135deg, #00D2BA, #6C5CE7)';
+                btn.style.boxShadow = '0 4px 0 #5243C0';
+            }, 2500);
+        } catch (err) {
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            btn.innerHTML = `<i class="fa-solid fa-check"></i> Link copiado!`;
+            showGeniiToast("Link copiado!", "success");
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fa-solid fa-link"></i> Copiar Link do Set`;
+            }, 2500);
+        }
+    };
+
+</script>
+
+</body>
+</html>

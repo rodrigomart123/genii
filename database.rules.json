@@ -1,0 +1,27 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    "live_games": {
+      ".indexOn": "hostId",
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$pin": {
+        ".read": "auth.uid != null",
+        ".write": "auth.uid != null && (!data.exists() || data.child('hostId').val() === auth.uid)",
+        "players": {
+          "$uid": {
+            ".read": "auth.uid != null",
+            ".write": "auth.uid != null && auth.uid === $uid",
+            "score": {
+              ".validate": "root.child('live_games').child($pin).child('hostId').val() === auth.uid"
+            },
+            "correctCount": {
+              ".validate": "root.child('live_games').child($pin).child('hostId').val() === auth.uid"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,594 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Novo - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+    <script>if(localStorage.getItem('genii_ai_disabled')==='true'){document.documentElement.setAttribute('data-ai-disabled','true');var _s=document.createElement('style');_s.textContent='html[data-ai-disabled="true"] #tab-ai,html[data-ai-disabled="true"] #btn-gen-cover-ai,html[data-ai-disabled="true"] #ai-cover-loading{display:none!important}';document.head.appendChild(_s)}</script>
+
+    
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="create-quiz">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content">
+    <div class="creation-container">
+        
+        <div class="top-nav">
+            <a href="my_sets.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+            <h1 class="page-title"><i class="fa-solid fa-plus" style="color:var(--genii-purple)"></i>Novo Set</h1>
+            <div style="width: 85px;"></div>
+        </div>
+
+        <form id="createForm" class="genii-card">
+
+            <div class="form-top-row">
+                <div class="cover-section">
+                    <label class="form-label">Capa do Set</label>
+                    <div class="cover-wrapper" id="coverClickArea">
+                        <div class="cover-content" id="emptyCoverState">
+                            <i class="fa-solid fa-image cover-icon"></i>
+                            <span class="cover-label">Carregar Capa</span>
+                            <span class="cover-hint">Arraste ou clique</span>
+                        </div>
+
+                        <img id="coverPreview" class="cover-image">
+
+                        <div class="cover-overlay"><i class="fa-solid fa-pen"></i> Alterar</div>
+
+                        <input type="file" id="coverInput" accept="image/*" hidden>
+                    </div>
+                    <div class="remove-btn" id="removeCoverBtn" title="Remover Capa">
+                        <i class="fa-solid fa-trash"></i>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <div class="form-group">
+                        <label class="form-label">Título</label>
+                        <input type="text" id="quizTitle" class="genii-input" placeholder="Ex: Capitais do Mundo" maxlength="22" required autocomplete="off">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descrição (Opcional)</label>
+                        <textarea id="quizDesc" class="genii-input" placeholder="Sobre o que é este set?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Género</label>
+                        <select id="quizGenre" class="genii-input">
+                            <option value="">Sem género</option>
+                            <option value="Cultura Geral">Cultura Geral</option>
+                            <option value="Ciências">Ciências</option>
+                            <option value="Matemática">Matemática</option>
+                            <option value="História">História</option>
+                            <option value="Geografia">Geografia</option>
+                            <option value="Espaço & Astronomia">Espaço & Astronomia</option>
+                            <option value="Desporto">Desporto</option>
+                            <option value="Música">Música</option>
+                            <option value="Cinema & Filmes">Cinema & Filmes</option>
+                            <option value="TV & Séries">TV & Séries</option>
+                            <option value="Jogos Video">Jogos Video</option>
+                            <option value="E-Sports">E-Sports</option>
+                            <option value="Tecnologia">Tecnologia</option>
+                            <option value="Programação">Programação</option>
+                            <option value="Inteligência Artificial">Inteligência Artificial</option>
+                            <option value="Animais">Animais</option>
+                            <option value="Natureza">Natureza</option>
+                            <option value="Comida & Bebida">Comida & Bebida</option>
+                            <option value="Gastronomia">Gastronomia</option>
+                            <option value="Viagens">Viagens</option>
+                            <option value="Arte & Design">Arte & Design</option>
+                            <option value="Fotografia">Fotografia</option>
+                            <option value="Literatura">Literatura</option>
+                            <option value="Línguas">Línguas</option>
+                            <option value="Filosofia">Filosofia</option>
+                            <option value="Mitologia">Mitologia</option>
+                            <option value="Religião">Religião</option>
+                            <option value="Política">Política</option>
+                            <option value="Economia">Economia</option>
+                            <option value="Finanças">Finanças</option>
+                            <option value="Saúde & Bem-Estar">Saúde & Bem-Estar</option>
+                            <option value="Medicina">Medicina</option>
+                            <option value="Carros & Veículos">Carros & Veículos</option>
+                            <option value="Moda">Moda</option>
+                            <option value="Animação & Anime">Animação & Anime</option>
+                            <option value="Quadrinhos & Manga">Quadrinhos & Manga</option>
+                            <option value="Ciência-Ficção">Ciência-Ficção</option>
+                            <option value="Terror">Terror</option>
+                            <option value="Comédia">Comédia</option>
+                            <option value="Curiosidades">Curiosidades</option>
+                            <option value="Xadrez">Xadrez</option>
+                            <option value="Puzzle & Lógica">Puzzle & Lógica</option>
+                            <option value="Riddles & Adivinhas">Riddles & Adivinhas</option>
+                            <option value="Emojis">Emojis</option>
+                            <option value="Bandas & Artistas">Bandas & Artistas</option>
+                            <option value="Personalidades">Personalidades</option>
+                            <option value="Fórmula 1">Fórmula 1</option>
+                            <option value="Futebol">Futebol</option>
+                            <option value="Olimpíadas">Olimpíadas</option>
+                            <option value="Engenharia">Engenharia</option>
+                            <option value="Arquitetura">Arquitetura</option>
+                            <option value="Ecologia">Ecologia</option>
+                            <option value="Biologia">Biologia</option>
+                            <option value="Química">Química</option>
+                            <option value="Física">Física</option>
+                            <option value="Geologia">Geologia</option>
+                            <option value="Arqueologia">Arqueologia</option>
+                            <option value="Direito">Direito</option>
+                            <option value="Empreendedorismo">Empreendedorismo</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Robótica">Robótica</option>
+                            <option value="Cybersegurança">Cybersegurança</option>
+                            <option value="Redes Sociais">Redes Sociais</option>
+                            <option value="Youtubers">Youtubers</option>
+                            <option value="Memes">Memes</option>
+                            <option value="Dinossauros">Dinossauros</option>
+                            <option value="Exploração">Exploração</option>
+                            <option value="Inventos">Inventos</option>
+                            <option value="Capitais & Bandeiras">Capitais & Bandeiras</option>
+                            <option value="Países & Culturas">Países & Culturas</option>
+                        </select>
+                    </div>
+
+                    <label class="public-toggle">
+                        <div class="toggle-text">
+                            <h4 style="margin:0; font-size:1rem; color:var(--genii-dark);">Set Público</h4>
+                            <span style="font-size:0.85rem; color:var(--grey);">Visível na biblioteca da comunidade</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="isPublic" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mode-section">
+                <label class="form-label" style="font-size:1.1rem; margin-bottom:15px;">Como quer começar?</label>
+                
+                <div class="mode-grid">
+                    <div class="mode-card active" id="card-manual" onclick="setMode('manual')">
+                        <i class="fa-solid fa-pen-nib"></i>
+                        <span class="mode-title">Manual</span>
+                        <span class="mode-sub">Criar do zero</span>
+                    </div>
+                    <div class="mode-card" id="card-ai" onclick="setMode('ai')">
+                        <img src="static/img/geno/genoicon.png" alt="Geno" class="mode-icon-img">
+                        <span class="mode-title">Automático</span>
+                        <span class="mode-sub">Gerar com Geno AI</span>
+                    </div>
+                </div>
+
+                <div id="ai-panel">
+                    <label class="form-label"><i class="fa-solid fa-lightbulb" style="color:var(--genii-purple)"></i> O que quer criar?</label>
+                    <input type="text" id="aiTopic" class="genii-input" placeholder="Ex: Sistema Solar, Verbos em Inglês..." style="margin-bottom:15px;">
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div>
+                            <label class="form-label">Perguntas</label>
+                            <select id="aiCount" class="genii-input">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="15">15</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Dificuldade</label>
+                            <select id="aiDiff" class="genii-input">
+                                <option value="Fácil">Fácil</option>
+                                <option value="Médio" selected>Médio</option>
+                                <option value="Difícil">Difícil</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top:15px; display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="aiImages" checked style="width:18px; height:18px; accent-color:var(--genii-purple);">
+                        <label for="aiImages" style="font-weight:700; color:var(--grey); font-size:0.95rem; cursor:pointer;">Gerar imagens com IA</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span>Criar Set</span> <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+        </form>
+
+        <div id="cover-modal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-title">
+                    <i class="fa-solid fa-image" style="color: var(--genii-purple);"></i> Escolher Capa
+                </div>
+
+                <div class="image-modal-tabs">
+                    <button class="img-tab active" onclick="switchCoverTab('upload')"><i class="fa-solid fa-computer"></i><br>Computador</button>
+                    <button class="img-tab" onclick="switchCoverTab('unsplash')"><i class="fa-brands fa-unsplash"></i><br>Unsplash</button>
+                    <button class="img-tab" onclick="switchCoverTab('ai')"><i class="fa-solid fa-wand-magic-sparkles"></i><br>Gerar com IA</button>
+                </div>
+
+                <div class="img-tab-content active" id="tab-upload">
+                    <label for="modal-cover-input" class="cover-upload-area">
+                        <i class="fa-solid fa-cloud-arrow-up fa-2x" style="color: var(--primary);"></i>
+                        <span style="font-weight:700; color:var(--dark); font-size:1.05rem;">Clique para procurar</span>
+                        <span style="color: var(--grey); font-size: 0.85rem;">PNG, JPG ou GIF (Max. 2MB)</span>
+                    </label>
+                    <input type="file" id="modal-cover-input" accept="image/*" style="display:none;">
+                </div>
+
+                <div class="img-tab-content" id="tab-unsplash">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="unsplash-cover-search" class="modal-input" placeholder="Pesquisar fotos (ex: space, math)..." style="margin:0;">
+                        <button class="submit-btn" style="width:auto; padding:0 18px; font-size:1rem;" onclick="searchCoverUnsplash()">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                    <div id="unsplash-cover-grid" class="image-grid"></div>
+                    <div id="unsplash-cover-loading" style="display:none; text-align:center; padding: 20px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; color:var(--genii-purple);"></i>
+                        <p style="font-weight:700; color:var(--dark); margin-top:8px;">A procurar...</p>
+                    </div>
+                </div>
+
+                <div class="img-tab-content" id="tab-ai">
+                    <p style="color:var(--grey); font-size:0.9rem; margin-bottom:12px; font-weight:600; text-align:center;">
+                        Descreve a capa que imaginas!
+                    </p>
+                    <textarea id="ai-cover-prompt" class="modal-input" rows="2" placeholder="Ex: Capa colorida sobre o sistema solar..." style="resize:none; font-size: 1rem; padding: 14px; border-radius: 16px;"></textarea>
+                    <button id="btn-gen-cover-ai" class="submit-btn ai-mode" style="font-size:1rem; padding:14px;" onclick="generateCoverAI()">
+                        <i class="fa-solid fa-bolt"></i> Gerar
+                    </button>
+                    <div id="ai-cover-loading" style="display:none; text-align:center; padding: 15px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; color:var(--genii-purple);"></i>
+                        <p style="font-weight:700; color:var(--genii-purple); margin-top:8px;">A pintar...</p>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="submit-btn" style="background:var(--grey); box-shadow:0 4px 0 var(--border); font-size:0.95rem; padding:12px;" onclick="closeCoverModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+    import { getAuthHeaders, updateCreditsAfterSpend, showCreditsWarning } from "./static/js/credits.js";
+
+    let currentUser = null;
+    let _cloudinaryToken = null;
+    let coverUrl = "";
+    let isUploading = false;
+    let currentMode = 'manual';
+
+    const cached = getCachedUser();
+    if (cached) {
+        document.body.style.opacity = "1";
+        renderLayout('', cached);
+        if(localStorage.getItem('genii_ai_disabled')==='true') hideAIElements();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+            document.body.style.opacity = "1";
+
+            if (!isCacheFresh(getCachedUser())) {
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const d = docSnap.data();
+                        const userData = { ...d, displayName: d.username || d.displayName || user.email.split('@')[0] };
+                        saveUserToCache(userData);
+                        renderLayout('', userData);
+                    } else {
+                        renderLayout('', { displayName: user.displayName || user.email.split('@')[0] });
+                    }
+                } catch(e) {
+                    console.error("Erro user data:", e);
+                    renderLayout('', { displayName: user.displayName || 'User' });
+                }
+            }
+            if(localStorage.getItem('genii_ai_disabled')==='true') setTimeout(hideAIElements, 50);
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    document.addEventListener('app-logout', async () => { await signOut(auth); window.location.href="login.html"; });
+
+    function hideAIElements() {
+        document.querySelectorAll('#card-ai, #ai-panel, .widget-credits, .mobile-credits').forEach(el => el.style.display = 'none');
+        const tabs = document.querySelectorAll('#cover-modal .image-modal-tabs .img-tab');
+        if(tabs.length === 3) tabs[2].style.display = 'none';
+        ['tab-ai','btn-gen-cover-ai','ai-cover-loading'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'none';
+        });
+    }
+
+    window.setMode = (mode) => {
+        if(mode === 'ai' && localStorage.getItem('genii_ai_disabled') === 'true') {
+            showGeniiToast('Funcionalidades IA desativadas nas Definições.', 'error');
+            return;
+        }
+        currentMode = mode;
+        document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('active'));
+        document.getElementById(`card-${mode}`).classList.add('active');
+
+        const aiPanel = document.getElementById('ai-panel');
+        const btn = document.getElementById('submitBtn');
+
+        if (mode === 'ai') {
+            aiPanel.style.display = 'block';
+            setTimeout(() => {
+                aiPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.getElementById('aiTopic').focus();
+            }, 100);
+            btn.classList.add('ai-mode');
+            btn.querySelector('span').innerText = "Gerar Set";
+            btn.querySelector('i').className = "fa-solid fa-wand-magic-sparkles";
+        } else {
+            aiPanel.style.display = 'none';
+            btn.classList.remove('ai-mode');
+            btn.querySelector('span').innerText = "Criar Set";
+            btn.querySelector('i').className = "fa-solid fa-arrow-right";
+        }
+    };
+
+    const coverInput = document.getElementById('coverInput');
+    const preview = document.getElementById('coverPreview');
+    const emptyState = document.getElementById('emptyCoverState');
+    const removeBtn = document.getElementById('removeCoverBtn');
+
+    document.getElementById('coverClickArea').onclick = (e) => {
+        if (e.target.closest('.remove-btn')) return;
+        document.getElementById('cover-modal').style.display = 'flex';
+    };
+
+    const coverWrapper = document.getElementById('coverClickArea');
+    coverWrapper.addEventListener('dragover', (e) => { e.preventDefault(); coverWrapper.classList.add('drag-over'); });
+    coverWrapper.addEventListener('dragleave', () => { coverWrapper.classList.remove('drag-over'); });
+    coverWrapper.addEventListener('drop', (e) => {
+        e.preventDefault();
+        coverWrapper.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) handleCoverFile(file);
+    });
+
+    window.closeCoverModal = () => {
+        document.getElementById('cover-modal').style.display = 'none';
+    };
+
+    document.getElementById('cover-modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeCoverModal();
+    });
+
+    window.switchCoverTab = (tab) => {
+        document.querySelectorAll('#cover-modal .img-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#cover-modal .img-tab-content').forEach(c => c.classList.remove('active'));
+        const idx = tab === 'upload' ? 0 : (tab === 'unsplash' ? 1 : 2);
+        document.querySelectorAll('#cover-modal .image-modal-tabs .img-tab')[idx].classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+    };
+
+    document.getElementById('modal-cover-input').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        handleCoverFile(file);
+        closeCoverModal();
+    };
+
+    coverInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        handleCoverFile(file);
+    };
+
+    async function handleCoverFile(file) {
+        if (file.size > 2*1024*1024) return showGeniiToast("Imagem muito grande! Máximo 2MB.", "error");
+
+        isUploading = true;
+        const originalHtml = emptyState.innerHTML;
+        emptyState.innerHTML = `<i class="fa-solid fa-spinner spinner" style="font-size:1.5rem;"></i><span class="cover-label">A enviar...</span>`;
+
+        try {
+            const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'cover_images');
+            if (result.url) {
+                setCover(result.url, result.publicId || '');
+            }
+        } catch(err) {
+            console.error(err);
+            showGeniiToast("Erro no upload.", "error");
+        } finally {
+            isUploading = false;
+            if (!coverUrl) emptyState.innerHTML = originalHtml;
+        }
+    }
+
+    function setCover(url, publicId = '') {
+        coverUrl = url;
+        if (publicId) window._coverPublicId = publicId;
+        preview.src = coverUrl;
+        preview.style.display = 'block';
+        emptyState.style.display = 'none';
+        removeBtn.style.display = 'flex';
+    }
+
+    removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        coverUrl = "";
+        preview.style.display = 'none';
+        emptyState.style.display = 'flex';
+        removeBtn.style.display = 'none';
+        coverInput.value = "";
+    };
+
+    window.searchCoverUnsplash = async () => {
+        const query = document.getElementById('unsplash-cover-search').value.trim();
+        if (!query) return;
+        document.getElementById('unsplash-cover-loading').style.display = 'block';
+        document.getElementById('unsplash-cover-grid').innerHTML = '';
+        try {
+            const res = await fetch(`/api/unsplash?query=${encodeURIComponent(query)}`, { headers: await getAuthHeaders() });
+            if (!res.ok) throw new Error("Erro ao procurar imagens.");
+            const data = await res.json();
+            document.getElementById('unsplash-cover-loading').style.display = 'none';
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(imgData => {
+                    const img = document.createElement('img');
+                    img.src = imgData.urls.regular;
+                    img.onclick = () => { setCover(imgData.urls.regular); closeCoverModal(); };
+                    document.getElementById('unsplash-cover-grid').appendChild(img);
+                });
+            } else {
+                document.getElementById('unsplash-cover-grid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--grey);">Nenhuma imagem encontrada.</p>';
+            }
+        } catch (e) {
+            document.getElementById('unsplash-cover-loading').style.display = 'none';
+            showGeniiToast(e.message || "Erro ao procurar.", "error");
+        }
+    };
+
+    window.generateCoverAI = async () => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const prompt = document.getElementById('ai-cover-prompt').value.trim();
+        if (!prompt) return showGeniiToast("Escreve o que imaginas!", "error");
+
+        const btn = document.getElementById('btn-gen-cover-ai');
+        const loading = document.getElementById('ai-cover-loading');
+        btn.style.display = 'none';
+        loading.style.display = 'block';
+
+        try {
+            const response = await fetch("/api/generate_image", {
+                method: "POST",
+                headers: await getAuthHeaders(),
+                body: JSON.stringify({ prompt })
+            });
+            if (response.status === 429) {
+                showCreditsWarning();
+                throw new Error("Créditos insuficientes.");
+            }
+            if (!response.ok) throw new Error("Erro ao gerar imagem.");
+            const remaining = response.headers.get('X-Credits-Remaining');
+            if (remaining !== null) updateCreditsAfterSpend(parseInt(remaining));
+            const blob = await response.blob();
+
+            const result = await window.uploadToCloudinary(blob, _cloudinaryToken, 'cover_images');
+
+            if (result.url) {
+                setCover(result.url, result.publicId || '');
+                closeCoverModal();
+            } else {
+                throw new Error("Falha no upload.");
+            }
+        } catch (e) {
+            console.error("Erro IA:", e);
+            showGeniiToast("Erro na geração. A procurar fotos...", "error");
+            switchCoverTab('unsplash');
+            document.getElementById('unsplash-cover-search').value = prompt;
+            searchCoverUnsplash();
+        } finally {
+            btn.style.display = 'flex';
+            loading.style.display = 'none';
+        }
+    };
+
+    document.getElementById('unsplash-cover-search').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); searchCoverUnsplash(); }
+    });
+
+    document.getElementById('createForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if(isUploading) return;
+
+        const title = document.getElementById('quizTitle').value.trim();
+        const desc = document.getElementById('quizDesc').value.trim();
+        const isPublic = document.getElementById('isPublic').checked;
+        const btn = document.getElementById('submitBtn');
+
+        let aiParams = null;
+        if (currentMode === 'ai') {
+            const topic = document.getElementById('aiTopic').value.trim();
+            if(!topic) {
+                showGeniiToast("Por favor escreva um tema para a IA.", "error");
+                document.getElementById('aiTopic').focus();
+                return;
+            }
+            aiParams = {
+                topic: topic,
+                count: document.getElementById('aiCount').value,
+                difficulty: document.getElementById('aiDiff').value,
+                useImages: document.getElementById('aiImages').checked
+            };
+        }
+
+        btn.disabled = true;
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch spinner"></i> A preparar tudo...`;
+
+        try {
+            const docRef = await addDoc(collection(db, "quizzes"), {
+                title: title,
+                description: desc,
+                genre: document.getElementById('quizGenre').value || '',
+                isPublic: isPublic,
+                cover_image_url: coverUrl,
+                coverPublicId: window._coverPublicId || '',
+                ownerId: currentUser.uid,
+                creatorId: currentUser.uid,
+                creatorName: currentUser.displayName || "Genii",
+                createdAt: serverTimestamp(),
+                questions: []
+            });
+
+            if (currentMode === 'manual') {
+                window.location.href = `/studio?id=${docRef.id}`;
+            } else {
+                const params = new URLSearchParams({
+                    id: docRef.id,
+                    autoGen: 'true',
+                    topic: aiParams.topic,
+                    count: aiParams.count,
+                    diff: aiParams.difficulty,
+                    imgs: aiParams.useImages
+                });
+                window.location.href = `studio.html?${params.toString()}`;
+            }
+
+        } catch (error) {
+            console.error("Erro Firebase:", error);
+            if (error.code === 'permission-denied') {
+                showGeniiToast("Permissão negada! Verifique se está logado.", "error");
+            } else {
+                showGeniiToast("Erro ao criar set: " + error.message, "error");
+            }
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+        }
+    };
+
+</script>
+
+</body>
+</html>

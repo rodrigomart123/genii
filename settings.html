@@ -1,0 +1,455 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Definições - Genii</title>
+    <link rel="icon" href="static/img/favicon.ico" type="image/x-icon"/>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+    
+    
+<script src="static/js/theme.js"></script>
+    <script>if(localStorage.getItem('genii_ai_disabled')==='true'){document.documentElement.setAttribute('data-ai-disabled','true');var s=document.createElement('style');s.textContent='[data-ai-disabled="true"] .widget-credits,[data-ai-disabled="true"] .mobile-credits{display:none!important}';document.head.appendChild(s)}</script>
+    </head>
+<body data-page="settings">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content">
+    <div class="settings-content">
+        
+        <div class="settings-header">
+            <h1><i class="fa-solid fa-gear" style="color:var(--purple);"></i> Definições</h1>
+        </div>
+
+        <div class="settings-tabs">
+            <button class="settings-tab active" onclick="switchTab('tab-general')"><i class="fa-solid fa-sliders"></i> Geral</button>
+            <button class="settings-tab" onclick="switchTab('tab-history')"><i class="fa-solid fa-clock-rotate-left"></i> Histórico de Jogos</button>
+        </div>
+
+        <div id="tab-general" class="tab-panel active">
+            <div class="settings-card">
+                <h3>Preferências da Conta</h3>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Nome de Utilizador</h4>
+                        <p id="current-username-display">-</p>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <input type="text" id="username-input" style="padding:8px 12px; border-radius:12px; border:2px solid var(--border); background:var(--input-bg, var(--surface)); font-family:'Nunito'; font-size:1rem; color:var(--dark); outline:none; width:160px; font-weight:600;" placeholder="Novo username">
+                        <button onclick="changeUsername()" style="background:var(--purple); color:white; border-radius:12px; border:none; padding:8px 16px; font-weight:700; cursor:pointer; font-family:'Fredoka'; text-transform:uppercase; font-size:0.85rem; box-shadow:0 4px 0 #824dd6; transition:transform 0.1s;">Guardar</button>
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Tema</h4>
+                        <p>Alterna o aspeto visual da plataforma</p>
+                    </div>
+                    <div>
+                        <select id="theme-select" onchange="changeTheme(this.value)" style="padding: 8px 12px; border-radius: 12px; border: 2px solid var(--border); background-color: var(--surface); font-family: 'Fredoka', sans-serif; font-size: 1rem; color: var(--dark); outline: none; cursor: pointer; font-weight: 600;">
+                            <option value="system">Sistema</option>
+                            <option value="light">Claro</option>
+                            <option value="dark">Escuro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Funcionalidades IA</h4>
+                        <p>Mostrar opções de IA (Geno AI, gerar imagens, créditos)</p>
+                    </div>
+                    <div>
+                        <button id="btn-ai" class="btn" onclick="toggleSetting('ai')" style="background:#00b894; color:white; border-radius:12px; border:none; padding:8px 16px; font-weight:700; width: 110px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-check"></i></button>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Sons do Jogo</h4>
+                        <p>Ativar efeitos sonoros da plataforma</p>
+                    </div>
+                    <div>
+                        <button id="btn-sounds" class="btn" onclick="toggleSetting('sounds')" style="background:#00b894; color:white; border-radius:12px; border:none; padding:8px 16px; font-weight:700; width: 110px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-check"></i></button>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Música de Fundo</h4>
+                        <p>Tocar música instrumental nos lobbies e sets</p>
+                    </div>
+                    <div>
+                        <button id="btn-music" class="btn" onclick="toggleSetting('music')" style="background:#00b894; color:white; border-radius:12px; border:none; padding:8px 16px; font-weight:700; width: 110px; cursor: pointer; transition: all 0.2s;"><i class="fa-solid fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-card">
+                <h3>Zona de Perigo</h3>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <h4>Sair da Conta</h4>
+                        <p>Terminar sessão neste dispositivo</p>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="logout()" style="background:#ff7675; color:white; border-radius:12px; border:none; padding:8px 16px; font-weight:700; cursor:pointer;"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-history" class="tab-panel">
+            <div id="history-skeleton" class="history-grid">
+                <div class="skeleton-card" style="padding:20px;"><div class="skeleton skeleton-text" style="width:40%; height:12px;"></div><div class="skeleton skeleton-text skeleton-text-lg" style="width:70%; margin-top:10px;"></div><div style="display:flex; gap:15px; margin-top:15px; padding-top:15px; border-top:2px dashed var(--border);"><div class="skeleton skeleton-text-sm" style="width:60px; margin:0;"></div><div class="skeleton skeleton-text-sm" style="width:80px; margin:0;"></div></div></div>
+                <div class="skeleton-card" style="padding:20px;"><div class="skeleton skeleton-text" style="width:35%; height:12px;"></div><div class="skeleton skeleton-text skeleton-text-lg" style="width:65%; margin-top:10px;"></div><div style="display:flex; gap:15px; margin-top:15px; padding-top:15px; border-top:2px dashed var(--border);"><div class="skeleton skeleton-text-sm" style="width:70px; margin:0;"></div><div class="skeleton skeleton-text-sm" style="width:90px; margin:0;"></div></div></div>
+                <div class="skeleton-card" style="padding:20px;"><div class="skeleton skeleton-text" style="width:45%; height:12px;"></div><div class="skeleton skeleton-text skeleton-text-lg" style="width:60%; margin-top:10px;"></div><div style="display:flex; gap:15px; margin-top:15px; padding-top:15px; border-top:2px dashed var(--border);"><div class="skeleton skeleton-text-sm" style="width:55px; margin:0;"></div><div class="skeleton skeleton-text-sm" style="width:75px; margin:0;"></div></div></div>
+                <div class="skeleton-card" style="padding:20px;"><div class="skeleton skeleton-text" style="width:38%; height:12px;"></div><div class="skeleton skeleton-text skeleton-text-lg" style="width:75%; margin-top:10px;"></div><div style="display:flex; gap:15px; margin-top:15px; padding-top:15px; border-top:2px dashed var(--border);"><div class="skeleton skeleton-text-sm" style="width:65px; margin:0;"></div><div class="skeleton skeleton-text-sm" style="width:85px; margin:0;"></div></div></div>
+            </div>
+            
+            <div id="history-empty" style="display:none; text-align:center; padding:40px; color:var(--grey);">
+                <p style="margin-top:15px; font-family:'Fredoka'; font-size:1.5rem;">Ainda não participaste em nenhum jogo.</p>
+            </div>
+
+            <div class="history-grid" id="history-grid" style="display:none;">
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<div class="modal-overlay" id="report-modal">
+    <div class="report-modal">
+        <div class="rm-header">
+            <h2 id="rm-title">Relatório do Jogo</h2>
+            <button class="rm-close" onclick="closeReport()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="rm-body">
+            <div class="rm-stat-row">
+                <div class="rm-stat-box"><div class="sc-lbl">Jogadores</div><div class="sc-val" id="rm-players">0</div></div>
+                <div class="rm-stat-box"><div class="sc-lbl">Corretas</div><div class="sc-val" id="rm-correct" style="color:#00b894;">0</div></div>
+                <div class="rm-stat-box"><div class="sc-lbl">Incorretas</div><div class="sc-val" id="rm-incorrect" style="color:#ff7675;">0</div></div>
+            </div>
+            
+            <h3 style="font-family:'Fredoka'; margin: 0 0 15px 0;">Tabela Classificativa</h3>
+            <div id="rm-leaderboard">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { auth, db } from "./firebase-config.js";
+    import { hideSkeleton } from "./static/js/skeleton.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { collection, query, where, getDocs, or } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    window.switchTab = (tabId) => {
+        document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.settings-tab').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        if(tabId === 'tab-history') {
+            loadHistory();
+        }
+    };
+
+    window.logout = async () => {
+        try {
+            await signOut(auth);
+            window.location.href = "login.html";
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    let historyLoaded = false;
+    let gamesMap = {};
+
+    window.closeReport = () => {
+        document.getElementById('report-modal').style.display = 'none';
+    };
+
+    window.openReport = (gameId) => {
+        const game = gamesMap[gameId];
+        if(!game) return;
+
+        document.getElementById('rm-title').textContent = game.quizTitle || 'Relatório';
+        document.getElementById('rm-players').textContent = game.players ? game.players.length : 0;
+        document.getElementById('rm-correct').textContent = game.globalTotalCorrect || 0;
+        document.getElementById('rm-incorrect').textContent = game.globalTotalIncorrect || 0;
+
+        let lbHtml = '';
+        if(game.players && Array.isArray(game.players)) {
+            const sorted = [...game.players].sort((a,b) => (b.score || 0) - (a.score || 0));
+            sorted.forEach((p, i) => {
+                lbHtml += `
+                    <div class="lb-row">
+                        <div class="lb-rank">${i+1}º</div>
+                        <div class="lb-name">${p.name}</div>
+                        <div class="lb-score">${new Intl.NumberFormat('pt-PT').format(p.score)} pts</div>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('rm-leaderboard').innerHTML = lbHtml || '<p style="color:#888;">Sem registos.</p>';
+        document.getElementById('report-modal').style.display = 'flex';
+    };
+
+    async function loadHistory() {
+        if(historyLoaded || !auth.currentUser) return;
+        const uid = auth.currentUser.uid;
+        
+        try {
+            const q = query(collection(db, "game_history"), or(
+                where("hostId", "==", uid),
+                where("playerIds", "array-contains", uid)
+            ));
+
+            const snapshot = await getDocs(q);
+            
+            hideSkeleton(document.getElementById('history-skeleton'));
+            
+            if(snapshot.empty) {
+                document.getElementById('history-empty').style.display = 'block';
+                document.getElementById('history-grid').style.display = 'none';
+                historyLoaded = true;
+                return;
+            }
+
+            const grid = document.getElementById('history-grid');
+            grid.style.display = 'grid';
+            let html = '';
+
+            let games = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                games.push(data);
+                gamesMap[data.id] = data;
+            });
+
+            games.sort((a,b) => {
+                const tA = a.date ? a.date.toMillis() : 0;
+                const tB = b.date ? b.date.toMillis() : 0;
+                return tB - tA;
+            });
+
+            games.forEach(data => {
+                const isHost = data.hostId === uid;
+                const isPlayer = !isHost;
+                
+                const roleClass = isHost ? 'role-host' : 'role-player';
+                const roleName = isHost ? '<i class="fa-solid fa-crown"></i> Fui o Host' : '<i class="fa-solid fa-gamepad"></i> Joguei';
+
+                let dateStr = "";
+                if(data.date && data.date.toDate) {
+                    dateStr = new Intl.DateTimeFormat('pt-PT', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }).format(data.date.toDate());
+                }
+
+                let statHtml = '';
+                if(isHost) {
+                    const count = data.players ? data.players.length : 0;
+                    statHtml = `
+                        <div class="hc-stat"><span>Jogadores</span><span>${count}</span></div>
+                        <div class="hc-stat"><span>Total Respostas</span><span>${(data.globalTotalCorrect||0) + (data.globalTotalIncorrect||0)}</span></div>
+                    `;
+                } else {
+                    const me = data.players ? data.players.find(p => p.uid === uid) : null;
+                    const myScore = me ? me.score : 0;
+                    
+                    let rank = "-";
+                    if(data.players) {
+                        const sorted = [...data.players].sort((a,b) => (b.score||0) - (a.score||0));
+                        const i = sorted.findIndex(p => p.uid === uid);
+                        if(i !== -1) rank = (i+1) + "º";
+                    }
+
+                    statHtml = `
+                        <div class="hc-stat"><span>Meu Perfil</span><span>${rank} Lugar</span></div>
+                        <div class="hc-stat"><span>Pontos</span><span>${new Intl.NumberFormat('pt-PT').format(myScore)}</span></div>
+                    `;
+                }
+
+                html += `
+                    <div class="history-card" onclick="window.openReport('${data.id}')">
+                        <div class="hc-header">
+                            <span class="hc-role ${roleClass}">${roleName}</span>
+                            <span class="hc-date">${dateStr}</span>
+                        </div>
+                        <h3 class="hc-title">${data.quizTitle || 'Jogo Live'}</h3>
+                        <div class="hc-stats">${statHtml}</div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+            historyLoaded = true;
+
+        } catch(e) {
+            console.error("Erro ao carregar histórico", e);
+            hideSkeleton(document.getElementById('history-skeleton'));
+            const grid = document.getElementById('history-grid');
+            grid.style.display = 'grid';
+            grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#ff7675;">Erro ao obter histórico.</div>';
+        }
+    }
+
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { doc, getDoc, setDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    let currentUserData = null;
+
+    window.changeUsername = async () => {
+        const input = document.getElementById('username-input');
+        const newUsername = input.value.trim();
+
+        if (!newUsername) return showGeniiToast("Escreve um nome de utilizador.", "error");
+        if (newUsername.length < 3) return showGeniiToast("Mínimo de 3 caracteres.", "error");
+        if (newUsername.length > 20) return showGeniiToast("Máximo de 20 caracteres.", "error");
+        if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) return showGeniiToast("Só letras, números e underscores.", "error");
+
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const oldUsername = currentUserData?.username || '';
+
+        try {
+            input.disabled = true;
+
+            const newUsernameDoc = await getDoc(doc(db, "usernames", newUsername.toLowerCase()));
+            if (newUsernameDoc.exists() && newUsername.toLowerCase() !== oldUsername.toLowerCase()) {
+                showGeniiToast("Esse nome de utilizador já está em uso.", "error");
+                input.disabled = false;
+                return;
+            }
+
+            await updateDoc(doc(db, "users", user.uid), {
+                username: newUsername,
+                displayName: newUsername
+            });
+
+            if (oldUsername) {
+                await deleteDoc(doc(db, "usernames", oldUsername.toLowerCase())).catch(() => {});
+            }
+            await setDoc(doc(db, "usernames", newUsername.toLowerCase()), { email: user.email });
+
+            if (currentUserData) {
+                currentUserData.username = newUsername;
+                currentUserData.displayName = newUsername;
+                saveUserToCache(currentUserData);
+            }
+
+            document.getElementById('current-username-display').textContent = '@' + newUsername;
+            input.value = '';
+            renderLayout('', currentUserData);
+            showGeniiToast("Nome de utilizador atualizado!", "success");
+        } catch (e) {
+            console.error(e);
+            showGeniiToast("Erro ao atualizar nome.", "error");
+        }
+        input.disabled = false;
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const cachedUser = getCachedUser();
+        if (cachedUser) {
+            currentUserData = cachedUser;
+            renderLayout('', cachedUser);
+            document.getElementById('current-username-display').textContent = '@' + (cachedUser.username || '');
+        }
+
+        if (!isCacheFresh(cachedUser)) {
+            try {
+                const docRef = doc(db, "users", user.uid);
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const userData = { ...docSnap.data(), displayName: docSnap.data().username || user.email.split('@')[0] };
+                    currentUserData = userData;
+                    saveUserToCache(userData);
+                    renderLayout('', userData);
+                    document.getElementById('current-username-display').textContent = '@' + (userData.username || '');
+                }
+            } catch(e) {
+                console.error("Erro ao ler utlizador: ", e);
+            }
+        }
+        
+        const soundsEnabled = localStorage.getItem('genii_sounds') !== 'false';
+        const musicEnabled = localStorage.getItem('genii_music') !== 'false';
+        const aiEnabled = localStorage.getItem('genii_ai_disabled') !== 'true';
+        const currentTheme = localStorage.getItem('genii_theme') || 'system';
+        
+        updateToggleBtn('btn-ai', aiEnabled);
+        updateToggleBtn('btn-sounds', soundsEnabled);
+        updateToggleBtn('btn-music', musicEnabled);
+        
+        const themeSelect = document.getElementById('theme-select');
+        if(themeSelect) themeSelect.value = currentTheme;
+    });
+
+    window.changeTheme = (value) => {
+        localStorage.setItem('genii_theme', value);
+        
+        if (value === 'dark' || (value === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+        
+        if(window.showGeniiToast) window.showGeniiToast('Tema atualizado!', 'success');
+    };
+
+    window.toggleSetting = (settingType) => {
+        if(settingType === 'ai') {
+            const current = localStorage.getItem('genii_ai_disabled') === 'true';
+            localStorage.setItem('genii_ai_disabled', current ? 'false' : 'true');
+            updateToggleBtn('btn-ai', current);
+            if(current) {
+                document.documentElement.removeAttribute('data-ai-disabled');
+                document.querySelectorAll('.widget-credits, .mobile-credits').forEach(el => el.style.display = '');
+                if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA Ligadas', 'success');
+            } else {
+                document.documentElement.setAttribute('data-ai-disabled', 'true');
+                document.querySelectorAll('.widget-credits, .mobile-credits').forEach(el => el.style.display = 'none');
+                if(window.showGeniiToast) window.showGeniiToast('Funcionalidades IA Desligadas', 'error');
+            }
+        } else if(settingType === 'sounds') {
+            const current = localStorage.getItem('genii_sounds') !== 'false';
+            localStorage.setItem('genii_sounds', !current);
+            updateToggleBtn('btn-sounds', !current);
+            if(!current && window.showGeniiToast) window.showGeniiToast('Sons do Jogo Ligados', 'success');
+            else if(window.showGeniiToast) window.showGeniiToast('Sons do Jogo Desligados', 'error');
+        } else if (settingType === 'music') {
+            const current = localStorage.getItem('genii_music') !== 'false';
+            localStorage.setItem('genii_music', !current);
+            updateToggleBtn('btn-music', !current);
+            if(!current && window.showGeniiToast) window.showGeniiToast('Música de Fundo Ligada', 'success');
+            else if(window.showGeniiToast) window.showGeniiToast('Música de Fundo Desligada', 'error');
+        }
+    };
+
+    function updateToggleBtn(id, isActive) {
+        const btn = document.getElementById(id);
+        if(!btn) return;
+        if(isActive) {
+            btn.style.background = '#00b894';
+            btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        } else {
+            btn.style.background = '#ff7675';
+            btn.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+        }
+    }
+
+</script>
+</body>
+</html>

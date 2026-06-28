@@ -1,0 +1,531 @@
+﻿<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Set - Genii</title>
+    
+    <link rel="icon" href="static/img/favicon.ico?v=2" type="image/x-icon"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="static/css/style.css?v=3">
+
+    
+<script src="static/js/theme.js"></script>
+    </head>
+<body data-page="edit-quiz">
+
+<div id="sidebar-container"></div>
+
+<main class="main-content">
+    <div class="creation-container">
+        
+        <div class="top-nav">
+            <a href="#" class="back-btn" id="smartBackLink"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+            <h1 class="page-title"><i class="fa-solid fa-pen-to-square" style="color:var(--genii-purple)"></i> Editar</h1>
+            <div style="width: 85px;"></div>
+        </div>
+
+        <form id="editForm" class="genii-card">
+
+            <div class="form-top-row">
+
+                <div class="cover-section">
+                    <label class="form-label">Capa do Set</label>
+                    <div class="cover-wrapper" id="coverClickArea">
+                        <div class="cover-content" id="emptyCoverState">
+                            <i class="fa-solid fa-image cover-icon"></i>
+                            <span class="cover-label">Carregar Capa</span>
+                            <span class="cover-hint">Arraste ou clique</span>
+                        </div>
+
+                        <img id="coverPreview" class="cover-image">
+
+                        <div class="cover-overlay"><i class="fa-solid fa-pen"></i> Alterar</div>
+
+                        <input type="file" id="coverInput" accept="image/*" hidden>
+                    </div>
+                    <div class="remove-btn" id="removeCoverBtn" title="Remover Capa">
+                        <i class="fa-solid fa-trash"></i>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <div class="form-group">
+                        <label class="form-label">Título</label>
+                        <input type="text" id="titleInput" class="genii-input" maxlength="22" required placeholder="Nome do set">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Descrição</label>
+                        <textarea id="descInput" class="genii-input" placeholder="Sobre o que é?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Género</label>
+                        <select id="genreInput" class="genii-input">
+                            <option value="">Sem género</option>
+                            <option value="Cultura Geral">Cultura Geral</option>
+                            <option value="Ciências">Ciências</option>
+                            <option value="Matemática">Matemática</option>
+                            <option value="História">História</option>
+                            <option value="Geografia">Geografia</option>
+                            <option value="Espaço & Astronomia">Espaço & Astronomia</option>
+                            <option value="Desporto">Desporto</option>
+                            <option value="Música">Música</option>
+                            <option value="Cinema & Filmes">Cinema & Filmes</option>
+                            <option value="TV & Séries">TV & Séries</option>
+                            <option value="Jogos Video">Jogos Video</option>
+                            <option value="E-Sports">E-Sports</option>
+                            <option value="Tecnologia">Tecnologia</option>
+                            <option value="Programação">Programação</option>
+                            <option value="Inteligência Artificial">Inteligência Artificial</option>
+                            <option value="Animais">Animais</option>
+                            <option value="Natureza">Natureza</option>
+                            <option value="Comida & Bebida">Comida & Bebida</option>
+                            <option value="Gastronomia">Gastronomia</option>
+                            <option value="Viagens">Viagens</option>
+                            <option value="Arte & Design">Arte & Design</option>
+                            <option value="Fotografia">Fotografia</option>
+                            <option value="Literatura">Literatura</option>
+                            <option value="Línguas">Línguas</option>
+                            <option value="Filosofia">Filosofia</option>
+                            <option value="Mitologia">Mitologia</option>
+                            <option value="Religião">Religião</option>
+                            <option value="Política">Política</option>
+                            <option value="Economia">Economia</option>
+                            <option value="Finanças">Finanças</option>
+                            <option value="Saúde & Bem-Estar">Saúde & Bem-Estar</option>
+                            <option value="Medicina">Medicina</option>
+                            <option value="Carros & Veículos">Carros & Veículos</option>
+                            <option value="Moda">Moda</option>
+                            <option value="Animação & Anime">Animação & Anime</option>
+                            <option value="Quadrinhos & Manga">Quadrinhos & Manga</option>
+                            <option value="Ciência-Ficção">Ciência-Ficção</option>
+                            <option value="Terror">Terror</option>
+                            <option value="Comédia">Comédia</option>
+                            <option value="Curiosidades">Curiosidades</option>
+                            <option value="Xadrez">Xadrez</option>
+                            <option value="Puzzle & Lógica">Puzzle & Lógica</option>
+                            <option value="Riddles & Adivinhas">Riddles & Adivinhas</option>
+                            <option value="Emojis">Emojis</option>
+                            <option value="Bandas & Artistas">Bandas & Artistas</option>
+                            <option value="Personalidades">Personalidades</option>
+                            <option value="Fórmula 1">Fórmula 1</option>
+                            <option value="Futebol">Futebol</option>
+                            <option value="Olimpíadas">Olimpíadas</option>
+                            <option value="Engenharia">Engenharia</option>
+                            <option value="Arquitetura">Arquitetura</option>
+                            <option value="Ecologia">Ecologia</option>
+                            <option value="Biologia">Biologia</option>
+                            <option value="Química">Química</option>
+                            <option value="Física">Física</option>
+                            <option value="Geologia">Geologia</option>
+                            <option value="Arqueologia">Arqueologia</option>
+                            <option value="Direito">Direito</option>
+                            <option value="Empreendedorismo">Empreendedorismo</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Robótica">Robótica</option>
+                            <option value="Cybersegurança">Cybersegurança</option>
+                            <option value="Redes Sociais">Redes Sociais</option>
+                            <option value="Youtubers">Youtubers</option>
+                            <option value="Memes">Memes</option>
+                            <option value="Dinossauros">Dinossauros</option>
+                            <option value="Exploração">Exploração</option>
+                            <option value="Inventos">Inventos</option>
+                            <option value="Capitais & Bandeiras">Capitais & Bandeiras</option>
+                            <option value="Países & Culturas">Países & Culturas</option>
+                        </select>
+                    </div>
+
+                    <label class="public-toggle">
+                        <div class="toggle-text">
+                            <h4 style="margin:0; font-size:1rem; color:var(--genii-dark);">Set Público</h4>
+                            <span style="font-size:0.85rem; color:var(--grey);">Visível na biblioteca da comunidade</span>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="publicSwitch">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="action-footer">
+                <button type="button" class="btn-cancel" id="cancelBtn">Cancelar</button>
+                <button type="submit" class="btn-save" id="saveBtn">
+                    Guardar Alterações <i class="fa-solid fa-check"></i>
+                </button>
+            </div>
+
+        </form>
+
+        <div id="cover-modal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-title">
+                    <i class="fa-solid fa-image" style="color: var(--genii-purple);"></i> Escolher Capa
+                </div>
+
+                <div class="image-modal-tabs">
+                    <button class="img-tab active" onclick="switchCoverTab('upload')"><i class="fa-solid fa-computer"></i><br>Computador</button>
+                    <button class="img-tab" onclick="switchCoverTab('unsplash')"><i class="fa-brands fa-unsplash"></i><br>Unsplash</button>
+                    <button class="img-tab" id="cover-tab-ai" onclick="switchCoverTab('ai')"><i class="fa-solid fa-wand-magic-sparkles"></i><br>Gerar com IA</button>
+                </div>
+
+                <div class="img-tab-content active" id="tab-upload">
+                    <label for="modal-cover-input" class="cover-upload-area">
+                        <i class="fa-solid fa-cloud-arrow-up fa-2x" style="color: var(--primary);"></i>
+                        <span style="font-weight:700; color:var(--dark); font-size:1.05rem;">Clique para procurar</span>
+                        <span style="color: var(--grey); font-size: 0.85rem;">PNG, JPG ou GIF (Max. 2MB)</span>
+                    </label>
+                    <input type="file" id="modal-cover-input" accept="image/*" style="display:none;">
+                </div>
+
+                <div class="img-tab-content" id="tab-unsplash">
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="unsplash-cover-search" class="modal-input" placeholder="Pesquisar fotos (ex: space, math)..." style="margin:0;">
+                        <button class="btn-save" style="width:auto; padding:0 18px; font-size:1rem;" onclick="searchCoverUnsplash()">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </button>
+                    </div>
+                    <div id="unsplash-cover-grid" class="image-grid"></div>
+                    <div id="unsplash-cover-loading" style="display:none; text-align:center; padding: 20px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; color:var(--genii-purple);"></i>
+                        <p style="font-weight:700; color:var(--dark); margin-top:8px;">A procurar...</p>
+                    </div>
+                </div>
+
+                <div class="img-tab-content" id="tab-ai">
+                    <p style="color:var(--grey); font-size:0.9rem; margin-bottom:12px; font-weight:600; text-align:center;">
+                        Descreve a capa que imaginas!
+                    </p>
+                    <textarea id="ai-cover-prompt" class="modal-input" rows="2" placeholder="Ex: Capa colorida sobre o sistema solar..." style="resize:none; font-size: 1rem; padding: 14px; border-radius: 16px;"></textarea>
+                    <button id="btn-gen-cover-ai" class="btn-save" style="font-size:1rem; padding:14px;" onclick="generateCoverAI()">
+                        <i class="fa-solid fa-bolt"></i> Gerar
+                    </button>
+                    <div id="ai-cover-loading" style="display:none; text-align:center; padding: 15px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size:1.5rem; color:var(--genii-purple);"></i>
+                        <p style="font-weight:700; color:var(--genii-purple); margin-top:8px;">A pintar...</p>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn-cancel" style="padding:12px 24px; font-size:0.95rem;" onclick="closeCoverModal()">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<script type="module">
+    import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { auth, db } from "./firebase-config.js";
+    import { getAuthHeaders, updateCreditsAfterSpend, showCreditsWarning } from "./static/js/credits.js";
+
+    const params = new URLSearchParams(window.location.search);
+    const quizId = params.get('id');
+    const sourcePage = params.get('source');
+
+    if (!quizId) window.location.href = "my_sets.html";
+
+    const backLink = document.getElementById('smartBackLink');
+    const cancelBtn = document.getElementById('cancelBtn');
+    
+    let destinationUrl = "my_sets.html";
+    if (sourcePage === 'studio') {
+        destinationUrl = `/studio?id=${quizId}`;
+        backLink.innerHTML = `<i class="fa-solid fa-arrow-left"></i> Studio`;
+    }
+
+    backLink.href = destinationUrl;
+    cancelBtn.onclick = () => window.location.href = destinationUrl;
+
+    let currentUser = null;
+    let _cloudinaryToken = null;
+    let coverUrl = null;
+    let newCoverPublicId = '';
+    let oldCoverPublicId = null;
+    let isUploading = false;
+
+    const cached = getCachedUser();
+    if (cached) {
+        document.body.style.opacity = "1";
+        renderLayout('', cached);
+        if(localStorage.getItem('genii_ai_disabled')==='true') hideAIElements();
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
+            document.body.style.opacity = "1";
+
+            if (!isCacheFresh(getCachedUser())) {
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const d = docSnap.data();
+                        const userData = { ...d, displayName: d.username || d.displayName || user.email.split('@')[0] };
+                        saveUserToCache(userData);
+                        renderLayout('', userData);
+                    } else {
+                        renderLayout('', { displayName: user.displayName || user.email.split('@')[0] });
+                    }
+                } catch(e) {
+                    console.error("Erro user data:", e);
+                    renderLayout('', { displayName: user.displayName || 'User' });
+                }
+            }
+            if(localStorage.getItem('genii_ai_disabled')==='true') setTimeout(hideAIElements, 50);
+            loadQuizData();
+        } else {
+            window.location.href = "login.html";
+        }
+    });
+
+    document.addEventListener('app-logout', async () => { await signOut(auth); window.location.href="login.html"; });
+
+    function hideAIElements() {
+        const aiTab = document.getElementById('cover-tab-ai');
+        if(aiTab) aiTab.style.display = 'none';
+        ['tab-ai','btn-gen-cover-ai','ai-cover-loading'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.style.display = 'none';
+        });
+    }
+
+    async function loadQuizData() {
+        try {
+            const docRef = doc(db, "quizzes", quizId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                oldCoverPublicId = data.coverPublicId || null;
+                document.getElementById('titleInput').value = data.title;
+                document.getElementById('descInput').value = data.description || "";
+                document.getElementById('publicSwitch').checked = data.isPublic || false;
+                if (data.genre) document.getElementById('genreInput').value = data.genre;
+                
+                if (data.cover_image_url) {
+                    setCover(data.cover_image_url, data.coverPublicId || '');
+                }
+            } else {
+                showGeniiToast("Set não encontrado.", "error");
+                setTimeout(() => window.location.href = "my_sets.html", 2000);
+            }
+        } catch (error) { console.error(error); }
+    }
+
+    const coverInput = document.getElementById('coverInput');
+    const preview = document.getElementById('coverPreview');
+    const emptyState = document.getElementById('emptyCoverState');
+    const removeBtn = document.getElementById('removeCoverBtn');
+
+    document.getElementById('coverClickArea').onclick = (e) => {
+        if (e.target.closest('.remove-btn')) return;
+        document.getElementById('cover-modal').style.display = 'flex';
+    };
+
+    const coverWrapper = document.getElementById('coverClickArea');
+    coverWrapper.addEventListener('dragover', (e) => { e.preventDefault(); coverWrapper.classList.add('drag-over'); });
+    coverWrapper.addEventListener('dragleave', () => { coverWrapper.classList.remove('drag-over'); });
+    coverWrapper.addEventListener('drop', (e) => {
+        e.preventDefault();
+        coverWrapper.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) handleCoverFile(file);
+    });
+
+    window.closeCoverModal = () => {
+        document.getElementById('cover-modal').style.display = 'none';
+    };
+
+    document.getElementById('cover-modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeCoverModal();
+    });
+
+    window.switchCoverTab = (tab) => {
+        document.querySelectorAll('#cover-modal .img-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#cover-modal .img-tab-content').forEach(c => c.classList.remove('active'));
+        const idx = tab === 'upload' ? 0 : (tab === 'unsplash' ? 1 : 2);
+        document.querySelectorAll('#cover-modal .image-modal-tabs .img-tab')[idx].classList.add('active');
+        document.getElementById(`tab-${tab}`).classList.add('active');
+    };
+
+    document.getElementById('modal-cover-input').onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        handleCoverFile(file);
+        closeCoverModal();
+    };
+
+    coverInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        handleCoverFile(file);
+    };
+
+    async function handleCoverFile(file) {
+        if (file.size > 2*1024*1024) return showGeniiToast("Imagem muito grande! Máximo 2MB.", "error");
+
+        isUploading = true;
+        const originalHtml = emptyState.innerHTML;
+        emptyState.innerHTML = `<i class="fa-solid fa-spinner spinner" style="font-size:1.5rem;"></i><span class="cover-label">A enviar...</span>`;
+
+        try {
+            const result = await window.uploadToCloudinary(file, _cloudinaryToken, 'cover_images');
+            if (result.url) {
+                setCover(result.url, result.publicId || '');
+            }
+        } catch(err) {
+            console.error(err);
+            showGeniiToast("Erro no upload.", "error");
+        } finally {
+            isUploading = false;
+            if (!coverUrl) emptyState.innerHTML = originalHtml;
+        }
+    }
+
+    function setCover(url, publicId = '') {
+        coverUrl = url;
+        if (publicId) newCoverPublicId = publicId;
+        preview.src = url;
+        preview.style.display = 'block';
+        emptyState.style.display = 'none';
+        removeBtn.style.display = 'flex';
+    }
+
+    removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        coverUrl = "";
+        preview.style.display = 'none';
+        emptyState.style.display = 'flex';
+        removeBtn.style.display = 'none';
+        coverInput.value = "";
+    };
+
+    window.searchCoverUnsplash = async () => {
+        const query = document.getElementById('unsplash-cover-search').value.trim();
+        if (!query) return;
+        document.getElementById('unsplash-cover-loading').style.display = 'block';
+        document.getElementById('unsplash-cover-grid').innerHTML = '';
+        try {
+            const res = await fetch(`/api/unsplash?query=${encodeURIComponent(query)}`, { headers: await getAuthHeaders() });
+            if (!res.ok) throw new Error("Erro ao procurar imagens.");
+            const data = await res.json();
+            document.getElementById('unsplash-cover-loading').style.display = 'none';
+            if (data.results && data.results.length > 0) {
+                data.results.forEach(imgData => {
+                    const img = document.createElement('img');
+                    img.src = imgData.urls.regular;
+                    img.onclick = () => { setCover(imgData.urls.regular); closeCoverModal(); };
+                    document.getElementById('unsplash-cover-grid').appendChild(img);
+                });
+            } else {
+                document.getElementById('unsplash-cover-grid').innerHTML = '<p style="grid-column:1/-1;text-align:center;color:var(--grey);">Nenhuma imagem encontrada.</p>';
+            }
+        } catch (e) {
+            document.getElementById('unsplash-cover-loading').style.display = 'none';
+            showGeniiToast(e.message || "Erro ao procurar.", "error");
+        }
+    };
+
+    window.generateCoverAI = async () => {
+        if(localStorage.getItem('genii_ai_disabled') === 'true') { showGeniiToast('Funcionalidades IA desativadas.', 'error'); return; }
+        const prompt = document.getElementById('ai-cover-prompt').value.trim();
+        if (!prompt) return showGeniiToast("Escreve o que imaginas!", "error");
+
+        const btn = document.getElementById('btn-gen-cover-ai');
+        const loading = document.getElementById('ai-cover-loading');
+        btn.style.display = 'none';
+        loading.style.display = 'block';
+
+        try {
+            const response = await fetch("/api/generate_image", {
+                method: "POST",
+                headers: await getAuthHeaders(),
+                body: JSON.stringify({ prompt })
+            });
+            if (response.status === 429) {
+                showCreditsWarning();
+                throw new Error("Créditos insuficientes.");
+            }
+            if (!response.ok) throw new Error("Erro ao gerar imagem.");
+            const remaining = response.headers.get('X-Credits-Remaining');
+            if (remaining !== null) updateCreditsAfterSpend(parseInt(remaining));
+            const blob = await response.blob();
+
+            const result = await window.uploadToCloudinary(blob, _cloudinaryToken, 'cover_images');
+
+            if (result.url) {
+                setCover(result.url, result.publicId || '');
+                closeCoverModal();
+            } else {
+                throw new Error("Falha no upload.");
+            }
+        } catch (e) {
+            console.error("Erro IA:", e);
+            showGeniiToast("Erro na geração. A procurar fotos...", "error");
+            switchCoverTab('unsplash');
+            document.getElementById('unsplash-cover-search').value = prompt;
+            searchCoverUnsplash();
+        } finally {
+            btn.style.display = 'flex';
+            loading.style.display = 'none';
+        }
+    };
+
+    document.getElementById('unsplash-cover-search').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); searchCoverUnsplash(); }
+    });
+
+    document.getElementById('editForm').onsubmit = async (e) => {
+        e.preventDefault();
+        if(isUploading) return;
+        
+        const btn = document.getElementById('saveBtn');
+        btn.innerHTML = `<i class="fa-solid fa-circle-notch spinner"></i> A guardar...`;
+        btn.disabled = true;
+
+        try {
+            const updates = {
+                title: document.getElementById('titleInput').value,
+                description: document.getElementById('descInput').value,
+                genre: document.getElementById('genreInput').value || '',
+                isPublic: document.getElementById('publicSwitch').checked
+            };
+
+            if (coverUrl !== null) {
+                updates.cover_image_url = coverUrl;
+                updates.coverPublicId = newCoverPublicId;
+                if (oldCoverPublicId && _cloudinaryToken) {
+                    window.deleteFromCloudinary(oldCoverPublicId, _cloudinaryToken).catch(() => {});
+                }
+            }
+
+            await updateDoc(doc(db, "quizzes", quizId), updates);
+            
+            showGeniiToast("Alterações guardadas!", "success");
+            setTimeout(() => window.location.href = destinationUrl, 1500);
+
+        } catch (error) {
+            console.error(error);
+            showGeniiToast("Erro ao guardar.", "error");
+            btn.disabled = false;
+            btn.innerHTML = `Guardar Alterações <i class="fa-solid fa-check"></i>`;
+        }
+    };
+
+</script>
+
+</body>
+</html>
