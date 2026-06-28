@@ -58,6 +58,16 @@ vercel dev
 
 O Genii vai estar disponível em `http://localhost:3000`.
 
+### Configuração do Firebase
+
+O Genii usa Firebase (Authentication, Firestore e Realtime Database). A configuração está em **`firebase-config.js`**:
+
+- O ficheiro atual usa o projeto Firebase do autor (`playgenii`).
+- Se quiseres usar o teu **próprio Firebase**, cria um projeto em https://console.firebase.google.com, copia as credenciais Web e substitui o ficheiro.
+- Podes usar o template em `firebase-config.example.js` como ponto de partida.
+
+**Nota:** As credenciais do Firebase Web (`apiKey`, `authDomain`, etc.) são concebidas para serem públicas — a segurança está nas **Firestore Security Rules** (`firestore.rules`).
+
 ### Variáveis de ambiente necessárias (.env)
 
 | Variável | Descrição |
@@ -102,7 +112,8 @@ genii/
 │   ├── img/              # Imagens, ícones, mascotes
 │   └── audio/            # Efeitos sonoros
 ├── *.html                # Páginas (index, login, studio, etc.)
-├── firebase-config.js    # Config do Firebase (pública)
+├── firebase-config.js         # Config do Firebase (pública)
+├── firebase-config.example.js # Template para quem quer usar o próprio Firebase
 ├── firestore.rules       # Regras de segurança
 ├── vercel.json           # Configuração da Vercel
 └── package.json          # Dependências
