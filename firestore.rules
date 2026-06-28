@@ -1,0 +1,206 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    //  HELPER FUNCTIONS
+    // ============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isQuizOwner(quizId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/quizzes/$(quizId)).data.ownerId == request.auth.uid;
+    }
+
+    function isClassroomOwner(classId) {
+      return isAuthenticated() && get(/databases/$(database)/documents/classrooms/$(classId)).data.ownerId == request.auth.uid;
+    }
+
+    function isClassroomMember(classId) {
+      let classDoc = get(/databases/$(database)/documents/classrooms/$(classId));
+      return classDoc != null && classDoc.data.get('members', []).hasAny([request.auth.uid]);
+    }
+
+    function isClassroomOwnerOrMember(classId) {
+      return isClassroomOwner(classId) || isClassroomMember(classId);
+    }
+
+    // ============================================================
+    //  0. USERNAME → EMAI (público para login, escrita só cria novos)
+    // ============================================================
+    match /usernames/{username} {
+      allow read: if true;
+      allow create: if isAuthenticated() && !exists(/databases/$(database)/documents/usernames/$(username));
+      allow update: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    // ============================================================
+    //  1. UTILIZADORES
+    // ============================================================
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+
+      match /favorites/{favId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+      }
+
+      match /preferences/{prefId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ============================================================
+    //  2. QUIZZES
+    // ============================================================
+    match /quizzes/{quizId} {
+
+      // Ler: público se isPublic=true OU se for o dono
+      allow read: if isAuthenticated() && (
+        resource.data.get('isPublic', false) == true ||
+        resource.data.visibility == 'public' ||
+        resource.data.ownerId == request.auth.uid
+      );
+
+      // Criar: o ownerId no documento tem de ser o UID do request
+      allow create: if isAuthenticated() && request.resource.data.ownerId == request.auth.uid;
+
+      // Apagar: só o dono
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+
+      // Atualizar: APENAS o dono (corrige vulnerabilidade crítica)
+      allow update: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+
+      match /answers/{answerId} {
+        // Subcoleção secreta: apenas validação server-side (não acessível do cliente)
+        allow read, write: if false;
+      }
+    }
+
+    // ============================================================
+    //  3. TURMAS (CLASSROOMS)
+    // ============================================================
+    match /classrooms/{classId} {
+      allow create: if isAuthenticated();
+      allow read: if isAuthenticated();
+
+      allow update: if isAuthenticated() && (
+        resource.data.ownerId == request.auth.uid ||
+        (
+          // Membros só podem alterar o array members (ex: juntar-se à turma)
+          request.resource.data.get('members', []).hasAny([request.auth.uid]) &&
+          diff(resource.data, request.resource.data).affectedKeys().hasOnly(['members'])
+        )
+      );
+
+      allow delete: if isAuthenticated() && resource.data.ownerId == request.auth.uid;
+
+      // --- POSTS ---
+      match /posts/{postId} {
+        allow read: if isClassroomOwnerOrMember(classId);
+        allow create: if isClassroomOwnerOrMember(classId);
+
+        allow update: if isAuthenticated() && (
+          resource.data.authorId == request.auth.uid ||
+          isClassroomOwner(classId)
+        );
+
+        allow delete: if isAuthenticated() && (
+          resource.data.authorId == request.auth.uid ||
+          isClassroomOwner(classId)
+        );
+
+        // --- COMENTÁRIOS ---
+        match /comments/{commentId} {
+          allow read: if isClassroomOwnerOrMember(classId);
+          allow create: if isClassroomOwnerOrMember(classId);
+
+          allow update: if isAuthenticated() && (
+            resource.data.authorId == request.auth.uid ||
+            isClassroomOwner(classId)
+          );
+
+          allow delete: if isAuthenticated() && (
+            resource.data.authorId == request.auth.uid ||
+            isClassroomOwner(classId)
+          );
+        }
+      }
+
+      // --- SUBMISSÕES ---
+      match /submissions/{subId} {
+        allow read: if isAuthenticated() && (
+          isClassroomOwner(classId) ||
+          resource.data.userId == request.auth.uid
+        );
+
+        allow create: if isAuthenticated() &&
+          isClassroomMember(classId) &&
+          request.resource.data.userId == request.auth.uid;
+
+        allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+        allow delete: if isClassroomOwner(classId);
+      }
+    }
+
+    // ============================================================
+    //  4. JOGOS AO VIVO (Realtime Database - regras no Firebase Console)
+    //    NOTA: As regras abaixo são para Firestore.
+    //    O jogo ao vivo usa Realtime Database, cujas regras estão
+    //    no Firebase Console (database.rules.json).
+    //    Mantemos aqui apenas para consistência.
+    // ============================================================
+    match /live_games/{pin} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.hostId == request.auth.uid;
+      // CRÍTICO: só o host pode alterar o estado do jogo (perguntas, status, etc.)
+      allow update: if isAuthenticated() && resource.data.hostId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.hostId == request.auth.uid;
+
+      match /players/{playerId} {
+        // CRÍTICO: cada jogador só pode escrever os SEUS próprios dados
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && playerId == request.auth.uid;
+      }
+    }
+
+    // ============================================================
+    //  5. HISTÓRICO DE JOGOS
+    // ============================================================
+    match /game_history/{gameId} {
+      allow create: if isAuthenticated() && request.resource.data.hostId == request.auth.uid;
+
+      allow read: if isAuthenticated() && (
+        resource.data.hostId == request.auth.uid ||
+        request.auth.uid in resource.data.get('playerIds', [])
+      );
+
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    //  6. GAMES (coleção alternativa - legado)
+    // ============================================================
+    match /games/{gameId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      // CRÍTICO: só o host pode alterar o estado do jogo
+      allow update: if isAuthenticated() && resource.data.hostId == request.auth.uid;
+
+      match /players/{playerId} {
+        allow read: if isAuthenticated();
+        allow write: if isAuthenticated() && playerId == request.auth.uid;
+      }
+    }
+  }
+}

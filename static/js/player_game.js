@@ -1,9 +1,9 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { ref, onValue, update as rtdbUpdate, get as rtdbGet } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-import { auth, db, rtdb } from "./firebase-config.js";
-import { recordGame, updateStreak } from "./static/js/gamification.js";
-import { checkMissionsAfterGame, progressMission } from "./static/js/daily-missions.js";
+import { auth, db, rtdb } from "../firebase-config.js";
+import { recordGame, updateStreak } from "./gamification.js";
+import { checkMissionsAfterGame, progressMission } from "./daily-missions.js";
 const params = new URLSearchParams(window.location.search);
 const pin = params.get('pin');
 if (!pin) {

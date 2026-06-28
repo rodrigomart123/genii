@@ -24,7 +24,6 @@ Thumbs.db
 .firebaserc
 firebase.json
 firebase-config.js
-firestore.rules
 
 # ---- Vercel ----
 .vercel
