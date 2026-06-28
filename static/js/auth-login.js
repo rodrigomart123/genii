@@ -1,6 +1,6 @@
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { auth, db } from "../firebase-config.js";
+import { auth, db } from "../../firebase-config.js";
 import { saveUserToCache } from "./components.js";
 import { updateStreak } from "./gamification.js";
 import { progressMission } from "./daily-missions.js";

@@ -1,4 +1,4 @@
-import { auth, db, rtdb } from "../firebase-config.js";
+import { auth, db, rtdb } from "../../firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs, deleteDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { ref, get as rtdbGet, update as rtdbUpdate, remove, set as rtdbSet, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";

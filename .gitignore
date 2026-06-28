@@ -23,7 +23,7 @@ Thumbs.db
 .firebase/
 .firebaserc
 firebase.json
-firebase-config.js
+
 
 # ---- Vercel ----
 .vercel
