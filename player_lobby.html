@@ -21,10 +21,14 @@
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 12px 32px rgba(0,0,0,0.08);
-            transition: flex 0.3s ease, max-height 0.3s ease;
         }
-        body[data-page="player-lobby"] .chat-panel.expanded .chat-messages {
-            max-height: 400px;
+        body[data-page="player-lobby"] .chat-panel .chat-messages,
+        body[data-page="player-lobby"] .chat-panel .chat-input-container {
+            display: flex;
+        }
+        body[data-page="player-lobby"] .chat-panel:not(.expanded) .chat-messages,
+        body[data-page="player-lobby"] .chat-panel:not(.expanded) .chat-input-container {
+            display: none;
         }
         [data-theme="dark"] body[data-page="player-lobby"] .chat-panel {
             background: rgba(0,0,0,0.2);
@@ -268,7 +272,7 @@
     </main>
 
 
-    <div class="chat-panel">
+    <div class="chat-panel expanded">
         <div class="chat-handle" id="chatHandle">
             <i class="fa-solid fa-comment-dots"></i> Chat
             <i class="fa-solid fa-chevron-up chat-handle-icon" id="chatHandleIcon"></i>
