@@ -83,6 +83,16 @@
         </div>
     </div>
 
+    <div class="player-preview-overlay" id="playerPreviewOverlay">
+        <div class="player-preview-modal" id="playerPreviewModal">
+            <button class="player-preview-close" id="previewCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+            <div class="player-preview-avatar" id="previewAvatar"></div>
+            <div class="player-preview-name" id="previewName">---</div>
+            <div class="player-preview-status" id="previewStatus">Jogador</div>
+            <button class="btn btn-danger player-preview-kick" id="previewKickBtn"><i class="fa-solid fa-ban"></i> Remover da Sala</button>
+        </div>
+    </div>
+
 <script type="module">
     import { ref, get as rtdbGet, update as rtdbUpdate, remove, onChildAdded, onChildRemoved, off, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     import { auth, rtdb } from "./firebase-config.js";
@@ -145,11 +155,14 @@
 
     const playerElements = {};
     const playerNames = {};
+    const playerDataMap = {};
+    const kickingUids = new Set();
 
     onChildAdded(playersRef, (snap) => {
         const uid = snap.key;
         const p = snap.val();
         playerNames[uid] = p.name || 'Jogador';
+        playerDataMap[uid] = p;
         const count = Object.keys(playerElements).length + 1;
         if (countEl) countEl.innerText = count;
         btnStart.disabled = false;
@@ -180,7 +193,6 @@
         }
 
         div.innerHTML = `
-            <button class="btn-kick" data-uid="${uid}" title="Remover jogador"><i class="fa-solid fa-xmark"></i></button>
             <div class="player-card-avatar-container">
                 <div class="player-card-bg-shape"></div>
                 ${avatarHtml}
@@ -191,24 +203,7 @@
             </div>
         `;
 
-        const kickBtn = div.querySelector('.btn-kick');
-        kickBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            const doKick = async () => {
-                try {
-                    await remove(ref(rtdb, `live_games/${gameId}/players/${uid}`));
-                } catch (err) {
-                    console.error('Erro ao remover jogador:', err);
-                }
-            };
-            if (window.showGeniiConfirm) {
-                window.showGeniiConfirm(`Remover ${p.name || 'Jogador'} da sala?`, (confirmed) => {
-                    if (confirmed) doKick();
-                });
-            } else {
-                doKick();
-            }
-        });
+        div.addEventListener('click', () => openPlayerPreview(uid, p));
 
         listEl.appendChild(div);
         playerElements[uid] = div;
@@ -218,13 +213,17 @@
     onChildRemoved(playersRef, (snap) => {
         const uid = snap.key;
         const name = playerNames[uid] || 'Jogador';
-        push(chatRef, {
-            sender: '',
-            text: `${name} saiu da sala.`,
-            senderId: '__system__',
-            timestamp: Date.now()
-        });
+        if (!kickingUids.has(uid)) {
+            push(chatRef, {
+                sender: '',
+                text: `${name} saiu da sala.`,
+                senderId: '__system__',
+                timestamp: Date.now()
+            });
+        }
+        kickingUids.delete(uid);
         delete playerNames[uid];
+        delete playerDataMap[uid];
         const el = playerElements[uid];
         if (el) {
             el.remove();
@@ -368,6 +367,74 @@
             });
         }
     }
+
+    const previewOverlay = document.getElementById('playerPreviewOverlay');
+    const previewModal = document.getElementById('playerPreviewModal');
+    const previewAvatar = document.getElementById('previewAvatar');
+    const previewName = document.getElementById('previewName');
+    const previewStatus = document.getElementById('previewStatus');
+    const previewKickBtn = document.getElementById('previewKickBtn');
+    const previewCloseBtn = document.getElementById('previewCloseBtn');
+
+    let previewUid = null;
+
+    window.openPlayerPreview = function(uid, p) {
+        previewUid = uid;
+        previewName.innerText = p.name || 'Jogador';
+        previewStatus.innerText = 'À espera...';
+
+        if (p.avatarRenderUrl) {
+            previewAvatar.innerHTML = `<img src="${p.avatarRenderUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`;
+        } else if (window.renderGeniiAvatar) {
+            previewAvatar.innerHTML = window.renderGeniiAvatar(p, '140px');
+        } else if (p.customPhotoUrl || p.photoURL) {
+            previewAvatar.innerHTML = `<img src="${p.customPhotoUrl || p.photoURL}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;">`;
+        } else {
+            previewAvatar.innerHTML = '<i class="fa-solid fa-user" style="font-size:3.5rem;color:var(--genii-purple);"></i>';
+        }
+
+        previewOverlay.classList.add('open');
+    };
+
+    function closePlayerPreview() {
+        previewOverlay.classList.remove('open');
+        previewUid = null;
+    }
+
+    previewCloseBtn.addEventListener('click', closePlayerPreview);
+    previewOverlay.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closePlayerPreview();
+    });
+
+    previewKickBtn.addEventListener('click', async () => {
+        const uid = previewUid;
+        const name = playerNames[uid] || 'Jogador';
+        if (!uid) return;
+        closePlayerPreview();
+
+        const doKick = async () => {
+            push(chatRef, {
+                sender: '',
+                text: `${name} foi removido da sala.`,
+                senderId: '__system__',
+                timestamp: Date.now()
+            });
+            kickingUids.add(uid);
+            try {
+                await remove(ref(rtdb, `live_games/${gameId}/players/${uid}`));
+            } catch (err) {
+                console.error('Erro ao remover jogador:', err);
+            }
+        };
+
+        if (window.showGeniiConfirm) {
+            window.showGeniiConfirm(`Remover ${name} da sala?`, (confirmed) => {
+                if (confirmed) doKick();
+            });
+        } else {
+            doKick();
+        }
+    });
 
 </script>
 </body>
