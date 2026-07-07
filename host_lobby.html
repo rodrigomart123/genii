@@ -265,8 +265,8 @@
         if (chatHandle) {
             chatHandle.addEventListener('click', () => {
                 chatExpanded = !chatExpanded;
-                chatPanel.classList.toggle('expanded', chatExpanded);
-                chatHandleIcon.classList.toggle('collapsed', chatExpanded);
+                if (chatPanel) chatPanel.classList.toggle('expanded', chatExpanded);
+                if (chatHandleIcon) chatHandleIcon.classList.toggle('collapsed', chatExpanded);
                 if (chatExpanded) {
                     setTimeout(() => chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight, 150);
                 }
