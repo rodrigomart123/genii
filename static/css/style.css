@@ -11142,6 +11142,12 @@ body[data-page="host-lobby"] .sidebar-top {
     height: 80px;
 }
 
+body[data-page="host-lobby"] .btn-leave-lobby {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    gap: 6px;
+}
+
 body[data-page="host-lobby"] .chat-panel {
     flex: 1;
     background: #ece9fc;
