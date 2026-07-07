@@ -11131,6 +11131,10 @@ body[data-page="host-lobby"] .lobby-sidebar {
     overflow: hidden;
 }
 
+body[data-page="host-lobby"] .chat-handle {
+    display: none;
+}
+
 body[data-page="host-lobby"] .sidebar-top {
     display: flex;
     align-items: center;
@@ -11195,6 +11199,22 @@ body[data-page="host-lobby"] .chat-sender {
     background: rgba(255, 255, 255, 0.1);
     color: #ffffff;
     box-shadow: none;
+}
+
+body[data-page="host-lobby"] .host-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: #f1c40f;
+    color: #2c3e50;
+    padding: 1px 8px;
+    border-radius: 20px;
+    margin-left: 6px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+[data-theme="dark"] body[data-page="host-lobby"] .host-badge {
+    background: #f39c12;
+    color: #1a1a2e;
 }
 
 body[data-page="host-lobby"] .chat-text {
@@ -11645,6 +11665,41 @@ body[data-page="host-lobby"] .desktop-only-flex { display: flex; }
         margin: 0 15px 15px 15px;
         border-radius: 20px;
         flex: none;
+        transition: flex 0.3s ease, height 0.3s ease;
+        overflow: hidden;
+    }
+    body[data-page="host-lobby"] .chat-panel.expanded {
+        flex: 1;
+        height: auto;
+        min-height: 240px;
+    }
+    body[data-page="host-lobby"] .chat-handle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        font-family: 'Fredoka', sans-serif;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #3a3a3a;
+        cursor: pointer;
+        user-select: none;
+        background: rgba(255,255,255,0.5);
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    [data-theme="dark"] body[data-page="host-lobby"] .chat-handle {
+        color: #e0e0e0;
+        background: rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    body[data-page="host-lobby"] .chat-handle-icon {
+        margin-left: auto;
+        transition: transform 0.3s;
+        font-size: 0.8rem;
+        color: #7f8c8d;
+    }
+    body[data-page="host-lobby"] .chat-handle-icon.collapsed {
+        transform: rotate(180deg);
     }
     body[data-page="host-lobby"] .lobby-header {
         flex-direction: column;

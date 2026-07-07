@@ -32,6 +32,10 @@
             </div>
             
             <div class="chat-panel">
+                <div class="chat-handle" id="chatHandle">
+                    <i class="fa-solid fa-comment-dots"></i> Chat
+                    <i class="fa-solid fa-chevron-up chat-handle-icon" id="chatHandleIcon"></i>
+                </div>
                 <div class="chat-messages" id="chatMessages">
                 </div>
                 <div class="chat-input-container">
@@ -80,7 +84,7 @@
     </div>
 
 <script type="module">
-    import { ref, get as rtdbGet, update as rtdbUpdate, remove, onChildAdded, onChildRemoved, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { ref, get as rtdbGet, update as rtdbUpdate, remove, onChildAdded, onChildRemoved, off, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     import { auth, rtdb } from "./firebase-config.js";
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import "./static/js/components.js";
@@ -111,8 +115,13 @@
 
     const gameRef = ref(rtdb, `live_games/${gameId}`);
     rtdbGet(gameRef).then(snap => {
-        if(snap.exists()) pinEl.innerText = snap.val().pin;
-        else window.location.href = "dashboard.html";
+        if(snap.exists()) {
+            const data = snap.val();
+            pinEl.innerText = data.pin;
+            initChat(data.hostId);
+        } else {
+            window.location.href = "dashboard.html";
+        }
     });
 
     if (btnLeaveElements.length > 0) {
@@ -217,6 +226,7 @@
         isNavigatingToGame = true;
         try {
             await rtdbUpdate(gameRef, { status: 'active' });
+            await remove(ref(rtdb, `live_games/${gameId}/chat`));
             window.removeEventListener('beforeunload', handleBeforeUnload);
             window.location.href = `/host_game?pin=${pinEl.innerText}`;
         } catch (e) {
@@ -243,59 +253,93 @@
 
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    const chatMessagesEl = document.getElementById('chatMessages');
-    const chatInputEl = document.getElementById('chatInput');
-    const chatSendBtnEl = document.getElementById('chatSendBtn');
+    function initChat(hostId) {
+        const chatMessagesEl = document.getElementById('chatMessages');
+        const chatInputEl = document.getElementById('chatInput');
+        const chatSendBtnEl = document.getElementById('chatSendBtn');
+        const chatPanel = document.querySelector('.chat-panel');
+        const chatHandle = document.getElementById('chatHandle');
+        const chatHandleIcon = document.getElementById('chatHandleIcon');
 
-    let hostName = "Host";
-    try {
-        const cachedUser = JSON.parse(localStorage.getItem('genii_user_cache'));
-        if (cachedUser && (cachedUser.name || cachedUser.displayName)) {
-            hostName = cachedUser.name || cachedUser.displayName;
+        let chatExpanded = false;
+        if (chatHandle) {
+            chatHandle.addEventListener('click', () => {
+                chatExpanded = !chatExpanded;
+                chatPanel.classList.toggle('expanded', chatExpanded);
+                chatHandleIcon.classList.toggle('collapsed', chatExpanded);
+                if (chatExpanded) {
+                    setTimeout(() => chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight, 150);
+                }
+            });
         }
-    } catch (e) {}
 
-    function escapeHtml(text) {
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+        let hostName = "Host";
+        try {
+            const cachedUser = JSON.parse(localStorage.getItem('genii_user_cache'));
+            if (cachedUser && (cachedUser.name || cachedUser.displayName)) {
+                hostName = cachedUser.name || cachedUser.displayName;
+            }
+        } catch (e) {}
 
-    function addChatMessage(sender, text, isHost = false) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = 'chat-message';
-        if (isHost) {
-            msgDiv.classList.add('is-host');
+        function escapeHtml(text) {
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
-        
-        msgDiv.innerHTML = `
-            <div class="chat-sender">${escapeHtml(sender)}</div>
-            <div class="chat-text">${escapeHtml(text)}</div>
-        `;
-        chatMessagesEl.appendChild(msgDiv);
-        chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-    }
 
-    function handleSendChat() {
-        const text = chatInputEl.value.trim();
-        if (!text) return;
-        
-        addChatMessage(hostName, text, true);
-        chatInputEl.value = '';
-        
+        function addChatMessage(sender, text, isHost = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-message';
+            if (isHost) {
+                msgDiv.classList.add('is-host');
+            }
 
-    }
+            msgDiv.innerHTML = `
+                <div class="chat-sender">${escapeHtml(sender)}${isHost ? ' <span class="host-badge">Dono</span>' : ''}</div>
+                <div class="chat-text">${escapeHtml(text)}</div>
+            `;
+            chatMessagesEl.appendChild(msgDiv);
+            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+        }
 
-    if (chatSendBtnEl) {
-        chatSendBtnEl.addEventListener('click', handleSendChat);
-    }
-    if (chatInputEl) {
-        chatInputEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') handleSendChat();
+        const chatRef = ref(rtdb, `live_games/${gameId}/chat`);
+
+        onChildAdded(chatRef, (snap) => {
+            const msg = snap.val();
+            if (msg) {
+                addChatMessage(
+                    msg.sender || 'Desconhecido',
+                    msg.text || '',
+                    msg.senderId === hostId
+                );
+            }
         });
+
+        function handleSendChat() {
+            const text = chatInputEl.value.trim();
+            if (!text) return;
+
+            push(chatRef, {
+                sender: hostName,
+                senderId: auth.currentUser?.uid || 'host',
+                text: text,
+                timestamp: Date.now()
+            });
+
+            chatInputEl.value = '';
+        }
+
+        if (chatSendBtnEl) {
+            chatSendBtnEl.addEventListener('click', handleSendChat);
+        }
+        if (chatInputEl) {
+            chatInputEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') handleSendChat();
+            });
+        }
     }
 
 </script>
