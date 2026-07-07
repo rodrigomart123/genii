@@ -11364,6 +11364,12 @@ body[data-page="host-lobby"] .lobby-pin-card {
     font-family: 'Fredoka', sans-serif;
     min-width: 140px;
     z-index: 10;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+body[data-page="host-lobby"] .lobby-pin-card:active {
+    transform: translateY(-50%) scale(0.96);
+    box-shadow: 0 2px 0 var(--accent-dark) !important;
 }
 body[data-page="host-lobby"] .lobby-pin-label {
     font-size: 0.75rem;

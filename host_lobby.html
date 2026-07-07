@@ -116,6 +116,13 @@
     }
 
     const pinEl = document.getElementById('displayPin');
+    pinEl.parentElement.addEventListener('click', () => {
+        navigator.clipboard.writeText(pinEl.innerText).then(() => {
+            if (window.showGeniiToast) window.showGeniiToast("PIN copiado!", "success");
+        }).catch(() => {
+            if (window.showGeniiToast) window.showGeniiToast("Erro ao copiar PIN.", "error");
+        });
+    });
     const listEl = document.getElementById('playersList');
     const countEl = document.getElementById('playerCount');
     const btnStart = document.getElementById('btnStart');
