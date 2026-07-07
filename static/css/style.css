@@ -11673,7 +11673,27 @@ body[data-page="host-lobby"] .desktop-only-flex { display: flex; }
         height: auto;
         min-height: 240px;
     }
-    body[data-page="host-lobby"] .chat-handle {
+body[data-page="host-lobby"] .chat-message.is-system {
+    justify-content: center;
+    padding: 2px 0;
+}
+body[data-page="host-lobby"] .chat-system-text {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: #7f8c8d;
+    text-align: center;
+    font-style: italic;
+    background: none;
+    border: none;
+    box-shadow: none;
+    flex: none;
+}
+[data-theme="dark"] body[data-page="host-lobby"] .chat-system-text {
+    color: #95a5a6;
+}
+
+body[data-page="host-lobby"] .chat-handle {
         display: flex;
         align-items: center;
         gap: 8px;

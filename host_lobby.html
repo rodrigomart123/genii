@@ -141,15 +141,25 @@
     }
 
     const playersRef = ref(rtdb, `live_games/${gameId}/players`);
+    const chatRef = ref(rtdb, `live_games/${gameId}/chat`);
 
     const playerElements = {};
+    const playerNames = {};
 
     onChildAdded(playersRef, (snap) => {
         const uid = snap.key;
         const p = snap.val();
+        playerNames[uid] = p.name || 'Jogador';
         const count = Object.keys(playerElements).length + 1;
         if (countEl) countEl.innerText = count;
         btnStart.disabled = false;
+
+        push(chatRef, {
+            sender: '',
+            text: `${p.name || 'Jogador'} entrou na sala.`,
+            senderId: '__system__',
+            timestamp: Date.now()
+        });
 
         const placeholder = listEl.querySelector('.placeholder-msg');
         if (placeholder) placeholder.remove();
@@ -207,6 +217,14 @@
 
     onChildRemoved(playersRef, (snap) => {
         const uid = snap.key;
+        const name = playerNames[uid] || 'Jogador';
+        push(chatRef, {
+            sender: '',
+            text: `${name} saiu da sala.`,
+            senderId: '__system__',
+            timestamp: Date.now()
+        });
+        delete playerNames[uid];
         const el = playerElements[uid];
         if (el) {
             el.remove();
@@ -290,31 +308,40 @@
                 .replace(/'/g, "&#039;");
         }
 
-        function addChatMessage(sender, text, isHost = false) {
+        function addChatMessage(sender, text, isHost = false, isSystem = false) {
             const msgDiv = document.createElement('div');
             msgDiv.className = 'chat-message';
-            if (isHost) {
+            if (isSystem) {
+                msgDiv.classList.add('is-system');
+            } else if (isHost) {
                 msgDiv.classList.add('is-host');
             }
 
-            msgDiv.innerHTML = `
-                <div class="chat-sender">${escapeHtml(sender)}${isHost ? ' <span class="host-badge">Dono</span>' : ''}</div>
-                <div class="chat-text">${escapeHtml(text)}</div>
-            `;
+            if (isSystem) {
+                msgDiv.innerHTML = `<div class="chat-text chat-system-text">${escapeHtml(text)}</div>`;
+            } else {
+                msgDiv.innerHTML = `
+                    <div class="chat-sender">${escapeHtml(sender)}${isHost ? ' <span class="host-badge">Dono</span>' : ''}</div>
+                    <div class="chat-text">${escapeHtml(text)}</div>
+                `;
+            }
             chatMessagesEl.appendChild(msgDiv);
             chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
         }
 
-        const chatRef = ref(rtdb, `live_games/${gameId}/chat`);
-
         onChildAdded(chatRef, (snap) => {
             const msg = snap.val();
             if (msg) {
-                addChatMessage(
-                    msg.sender || 'Desconhecido',
-                    msg.text || '',
-                    msg.senderId === hostId
-                );
+                if (msg.senderId === '__system__') {
+                    addChatMessage('', msg.text || '', false, true);
+                } else {
+                    addChatMessage(
+                        msg.sender || 'Desconhecido',
+                        msg.text || '',
+                        msg.senderId === hostId,
+                        false
+                    );
+                }
             }
         });
 
