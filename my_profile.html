@@ -263,7 +263,8 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
+        if (user && !user.isAnonymous) {
+            localStorage.removeItem("genii_user_cache");
             currentUser = user;
             user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
             if(!cached) document.body.style.opacity = "1";
@@ -277,16 +278,25 @@
                         data = snap.data();
                         data.displayName = data.username || user.email.split('@')[0];
                         saveUserToCache(data);
-                        renderLayout('profile', data);
-                        populateProfileUI(data);
-                        currentProfileType = data.profileType || 'avatar';
-                        if (data.avatar) currentSelection = { ...currentSelection, ...data.avatar };
-                        if (data.customPhotoUrl) uploadedPhotoUrl = data.customPhotoUrl;
                     }
                 } catch (e) { console.error("Erro perfil:", e); }
             }
 
-            if (!data) return;
+            if (!data) {
+                data = {
+                    displayName: user.displayName || user.email.split('@')[0],
+                    uid: user.uid,
+                    photoURL: user.photoURL,
+                    profileType: 'avatar',
+                    avatar: {}
+                };
+            }
+
+            renderLayout('profile', data);
+            populateProfileUI(data);
+            currentProfileType = data.profileType || 'avatar';
+            if (data.avatar) currentSelection = { ...currentSelection, ...data.avatar };
+            if (data.customPhotoUrl) uploadedPhotoUrl = data.customPhotoUrl;
 
             const streakResult = await updateStreak(user.uid);
             if (streakResult.isNewDay) {
@@ -304,6 +314,7 @@
     });
 
     document.addEventListener('app-logout', async () => {
+        localStorage.removeItem("genii_user_cache");
         await signOut(auth);
         window.location.href = "login.html";
     });

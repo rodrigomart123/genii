@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt">
     <head>
         <meta charset="UTF-8" />
@@ -24,6 +24,100 @@
 
         
         <link rel="stylesheet" href="static/css/style.css?v=3" />
+        <style>
+            .nav-text-link {
+                font-family: 'Fredoka', sans-serif;
+                font-weight: 700;
+                font-size: 0.9rem;
+                color: var(--text-muted, #7f8c8d);
+                text-decoration: none;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                transition: color 0.3s ease;
+                padding: 6px 12px;
+                display: inline-block;
+            }
+            .nav-text-link:hover {
+                color: var(--primary, #824dd6);
+            }
+            [data-theme="dark"] .nav-text-link {
+                color: rgba(255, 255, 255, 0.7);
+            }
+            [data-theme="dark"] .nav-text-link:hover {
+                color: var(--primary, #a270f4);
+            }
+
+            /* Hamburger mobile styles */
+            .mobile-menu-toggle {
+                display: none;
+                background: none;
+                border: none;
+                color: var(--primary, #824dd6);
+                font-size: 1.8rem;
+                cursor: pointer;
+                padding: 4px 8px;
+                transition: transform 0.2s;
+            }
+            .mobile-menu-toggle:active {
+                transform: scale(0.9);
+            }
+
+            @media (max-width: 900px) {
+                .mobile-menu-toggle {
+                    display: block;
+                }
+                
+                #navLinks {
+                    display: none; /* hidden by default on mobile */
+                    position: absolute;
+                    top: 80px;
+                    right: 24px;
+                    background: var(--surface, #ffffff);
+                    border: 3px solid var(--border, #f1f2f6);
+                    border-radius: 20px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 8px 0 var(--border-dark, #e4e7eb);
+                    padding: 20px;
+                    flex-direction: column;
+                    align-items: stretch !important;
+                    min-width: 200px;
+                    z-index: 9999;
+                    gap: 15px;
+                }
+                
+                [data-theme="dark"] #navLinks {
+                    background: #1e1e30;
+                    border-color: #3f3f5a;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 8px 0 #151522;
+                }
+
+                #navLinks.active {
+                    display: flex !important;
+                }
+
+                #nav-user, #nav-guest {
+                    flex-direction: column;
+                    align-items: stretch !important;
+                    width: 100%;
+                    gap: 12px !important;
+                }
+
+                .nav-text-link {
+                    text-align: center;
+                    padding: 8px 0;
+                    width: 100%;
+                    border-bottom: 1px solid rgba(0,0,0,0.05);
+                }
+                
+                [data-theme="dark"] .nav-text-link {
+                    border-bottom-color: rgba(255,255,255,0.05);
+                }
+
+                #navLinks .btn {
+                    width: 100%;
+                    justify-content: center;
+                }
+            }
+        </style>
     <script src="static/js/theme.js"></script>
     </head>
     <body data-page="index">
@@ -34,19 +128,29 @@
                     <span>Genii</span>
                 </a>
 
-                <nav>
+                <button class="mobile-menu-toggle" id="mobileMenuBtn" aria-label="Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <nav id="navLinks">
                     <div
                         id="nav-user"
                         class="auth-hidden"
-                        style="display: flex; gap: 10px"
+                        style="display: flex; align-items: center; gap: 15px"
                     >
                         <a class="btn btn-primary btn-sm" href="join.html"
                             >ACEDER</a
                         >
                     </div>
-                    <div id="nav-guest" style="display: flex; gap: 10px">
-                        <a href="login.html" class="btn btn-outline btn-sm"
+                    <div id="nav-guest" style="display: flex; align-items: center; gap: 15px">
+                        <a href="register.html" class="nav-text-link"
+                            >REGISTAR</a
+                        >
+                        <a href="login.html" class="nav-text-link"
                             >ENTRAR</a
+                        >
+                        <a href="join.html?mode=guest" class="btn btn-primary btn-sm"
+                            >JOGAR</a
                         >
                     </div>
                 </nav>
@@ -82,9 +186,18 @@
                             COMEÇAR GRÁTIS
                         </a>
                         <a
+                            class="btn btn-secondary"
+                            id="hero-play"
+                            href="join.html?mode=guest"
+                            style="font-weight: 700;"
+                        >
+                            JOGAR COM PIN
+                        </a>
+                        <a
                             class="btn btn-outline"
                             id="hero-secondary"
                             href="login.html"
+                            style="display: none;"
                         >
                             ENTRAR AGORA
                         </a>
@@ -179,10 +292,10 @@
                         <div class="eyebrow purple">Professores</div>
                         <h3>Crie sets incríveis em minutos com IA!</h3>
                         <p>
-                            Cole os seus apontamentos, um PDF ou até um link - a
-                            IA do Genii gera slides num instante. Depois é só
-                            personalizar, lançar para a turma e acompanhar tudo
-                            em tempo real.
+                            Escreva o seu tema ou cole os seus apontamentos - a
+                            IA do Genii gera perguntas e slides num instante.
+                            Depois é só personalizar, lançar para a turma e
+                            acompanhar tudo em tempo real.
                         </p>
                         <ul class="feat-list">
                             <li>
@@ -770,12 +883,6 @@
                 <div class="footer-particle p3"></div>
                 <div class="footer-particle p4"></div>
 
-                <img
-                    src="static/img/footer-mascot.png"
-                    alt="Mascote footer"
-                    class="footer-ghost-img"
-                    onerror="this.style.display = 'none'"
-                />
 
                 <div class="footer-grid">
                     <div class="footer-brand">
@@ -884,10 +991,27 @@
 
             document.getElementById("ano").innerText = new Date().getFullYear();
 
+            const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+            const navLinks = document.getElementById("navLinks");
+
+            if (mobileMenuBtn && navLinks) {
+                mobileMenuBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    navLinks.classList.toggle("active");
+                });
+
+                document.addEventListener("click", (e) => {
+                    if (!navLinks.contains(e.target) && e.target !== mobileMenuBtn) {
+                        navLinks.classList.remove("active");
+                    }
+                });
+            }
+
             const navUser = document.getElementById("nav-user");
             const navGuest = document.getElementById("nav-guest");
             const heroCta = document.getElementById("hero-cta");
             const heroSecondary = document.getElementById("hero-secondary");
+            const heroPlay = document.getElementById("hero-play");
 
             const header = document.getElementById("main-header");
             window.addEventListener("scroll", () => {
@@ -900,6 +1024,7 @@
 
             window.handleLogout = async () => {
                 try {
+                    localStorage.removeItem("genii_user_cache");
                     await signOut(auth);
                     navGuest.classList.remove("auth-hidden");
                     navUser.classList.add("auth-hidden");
@@ -913,8 +1038,18 @@
                 }
             };
 
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async (user) => {
                 if (user) {
+                    if (user.isAnonymous) {
+                        localStorage.removeItem("genii_user_cache");
+                        try {
+                            await user.delete();
+                        } catch (e) {
+                            console.error(e);
+                        }
+                        return;
+                    }
+
                     navGuest.classList.add("auth-hidden");
                     navUser.classList.remove("auth-hidden");
 
@@ -924,6 +1059,8 @@
                     heroSecondary.href = "#";
                     heroSecondary.innerText = "TERMINAR SESSÃO";
                     heroSecondary.onclick = window.handleLogout;
+                    if (heroPlay) heroPlay.style.display = "none";
+                    if (heroSecondary) heroSecondary.style.display = "";
                 } else {
                     navGuest.classList.remove("auth-hidden");
                     navUser.classList.add("auth-hidden");
@@ -934,6 +1071,8 @@
                     heroSecondary.href = "login.html";
                     heroSecondary.innerText = "ENTRAR AGORA";
                     heroSecondary.onclick = null;
+                    if (heroPlay) heroPlay.style.display = "";
+                    if (heroSecondary) heroSecondary.style.display = "none";
                 }
             });
         </script>

@@ -1,7 +1,7 @@
 import { auth, db, rtdb } from "../../firebase-config.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { doc, getDoc, setDoc, updateDoc, collection, getDocs, deleteDoc, serverTimestamp, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { ref, get as rtdbGet, update as rtdbUpdate, remove, set as rtdbSet, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { ref, get as rtdbGet, update as rtdbUpdate, remove, set as rtdbSet, onChildAdded, onChildChanged, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 const urlParams = new URLSearchParams(window.location.search);
 const pin = urlParams.get('pin');
 if (!pin) {
@@ -335,6 +335,11 @@ async function startQuestion(index) {
     await runCountdown(question);
     isQuestionActive = true;
     renderQuestion(question, index);
+    // Initialize inline answers badge
+    const inlineCount = document.getElementById('inline-answers-count');
+    const inlineTotal = document.getElementById('inline-answers-total');
+    if (inlineCount) inlineCount.textContent = '0';
+    if (inlineTotal) inlineTotal.textContent = totalPlayers;
     timeLeft = question.timeLimit || question.time_limit || question.time || 30;
     const isSlide = question.type === 'slide';
     const playersSnap = await rtdbGet(ref(rtdb, `live_games/${pin}/players`));
@@ -435,14 +440,12 @@ function renderQuestion(question, index) {
                 <div class="option-btn opt-false" data-index="1"><div class="opt-icon"><i class="fa-solid fa-xmark"></i></div><span class="answer-text">Falso</span><span class="answer-count" id="count-1">0</span></div>
             `;
         } else if (type === 'typing') {
-            const accepted = question.acceptedAnswers || [];
-            const acceptedList = accepted.length > 0
-                ? accepted.map(a => `<span class="typing-accepted-tag">${a}</span>`).join(' ')
-                : '<em style="color:#999;">Nenhuma resposta definida</em>';
             optionsHtml = `
                 <div class="typing-host-display">
-                    <div class="typing-host-label"><i class="fa-solid fa-keyboard"></i> Modo Escrever - Respostas aceites:</div>
-                    <div class="typing-accepted-list">${acceptedList}</div>
+                    <div class="typing-host-label"><i class="fa-solid fa-keyboard"></i> Modo Escrever</div>
+                    <div class="typing-accepted-list">
+                        <span style="color:#888; font-style:italic;"><i class="fa-solid fa-hourglass-start"></i> A aguardar respostas dos jogadores...</span>
+                    </div>
                 </div>
             `;
         } else {
@@ -488,7 +491,13 @@ function renderQuestion(question, index) {
                 <button class="btn-host-action" id="btn-action">Saltar</button>
             </div>
             ${mediaHtml}
-            <div class="question-text">${questionText}</div>
+            <div class="question-text">
+                <div class="inline-answers-badge" id="inline-answers-badge">
+                    <i class="fa-solid fa-reply"></i>
+                    <span id="inline-answers-count">0</span>/<span id="inline-answers-total">0</span>
+                </div>
+                <span class="question-text-content">${questionText}</span>
+            </div>
             <div class="options-grid">${optionsHtml}</div>
         `;
     }
@@ -545,6 +554,8 @@ async function endQuestion() {
     const correctIdx = question._shuffledCorrectIndex !== undefined ? question._shuffledCorrectIndex : getCorrectIndex(question);
     const card = document.getElementById(`card-${currentQuestionIndex}`);
     if (card && !isSlide) {
+        const ctrlSec = card.querySelector('.controls-section');
+        if (ctrlSec) ctrlSec.style.display = 'none';
         if (type === 'typing') {
             const accepted = question.acceptedAnswers || [];
             const displayEl = card.querySelector('.typing-host-display');
@@ -596,7 +607,7 @@ async function endQuestion() {
         const firestoreCorrectOption = question._shuffledCorrectIndex !== undefined
             ? ['A', 'B', 'C', 'D'][question._shuffledCorrectIndex] || "A"
             : (question.correct_option ?? question.correctOption ?? question.correct ?? question.answer ?? "A");
-        const shuffledOptions = question._shuffledOptions || normalizedOptions;
+        const shuffledOptions = question._shuffledOptions || normalizeOptions(question.options || question.answers);
         try {
             await rtdbUpdate(gameDocRef, {
                 status: 'question_results',
@@ -702,49 +713,116 @@ async function calculateScores() {
         await rtdbUpdate(ref(rtdb), scoreUpdates);
     }
 }
-function buildBarChartHTML(sorted, isLastQuestion) {
-    const barColors = ['#FF4757', '#8C7AE6', '#00D2BA', '#FFA502', '#6C5CE7'];
-    const top5 = sorted.slice(0, 5);
-    const maxScore = top5.length > 0 ? Math.max(top5[0].score, 1) : 1;
-    if (top5.length === 0) {
-        const btnText = isLastQuestion
-            ? 'Ver Resultados Finais'
-            : '<i class="fa-solid fa-arrow-right"></i> Continuar';
-        return `
-            <div class="leaderboard-wrapper">
-                <h1 class="lb-title"><i class="fa-solid fa-ranking-star"></i> Ranking</h1>
-                <p class="lb-subtitle">Nenhum jogador encontrado.</p>
-                <button class="btn-leaderboard-action" id="btn-leaderboard-action">${btnText}</button>
-            </div>`;
+function getRankChangeHTML(change) {
+    if (change > 0) {
+        return `<span class="rank-change change-up"><i class="fa-solid fa-caret-up"></i> ${change}</span>`;
+    } else if (change < 0) {
+        return `<span class="rank-change change-down"><i class="fa-solid fa-caret-down"></i> ${Math.abs(change)}</span>`;
+    } else {
+        return `<span class="rank-change change-none">—</span>`;
     }
-    const barsHtml = top5.map((p, i) => {
-        const pct = p.score === 0 ? 0 : Math.max(8, Math.round((p.score / maxScore) * 100));
-        const color = barColors[i % barColors.length];
-        const avatarHTML = window.renderGeniiAvatar
-            ? window.renderGeniiAvatar(p, '44px')
-            : `<div style="width:44px;height:44px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-family:Fredoka;font-weight:700;color:white;">${(p.name || 'G').charAt(0).toUpperCase()}</div>`;
-        return `
-            <div class="bar-row" style="animation-delay:${i * 0.1}s">
-                <span class="bar-rank">${i + 1}</span>
-                <div class="bar-avatar">${avatarHTML}</div>
-                <div class="bar-info">
-                    <div class="bar-name">${p.name}</div>
-                    <div class="bar-track">
-                        <div class="bar-fill" style="width:${pct}%;background:linear-gradient(90deg, ${color}, ${color}dd);"></div>
-                    </div>
-                </div>
-                <span class="bar-points">${p.score}</span>
-            </div>`;
-    }).join('');
+}
+
+function buildBarChartHTML(sorted, isLastQuestion) {
     const btnText = isLastQuestion
         ? 'Ver Resultados Finais'
         : '<i class="fa-solid fa-arrow-right"></i> Próxima Pergunta';
+
+    if (sorted.length === 0) {
+        return `
+            <div class="leaderboard-container">
+                <div class="leaderboard-header">
+                    <h1 class="lb-title"><i class="fa-solid fa-ranking-star"></i> Ranking</h1>
+                    <button class="btn-leaderboard-action" id="btn-leaderboard-action">${btnText}</button>
+                </div>
+                <div class="leaderboard-body" style="justify-content:center;">
+                    <p class="lb-subtitle">Nenhum jogador encontrado.</p>
+                </div>
+            </div>`;
+    }
+
+    const top3 = sorted.slice(0, 3);
+    const others = sorted.slice(3);
+
+    const renderPodiumPlayer = (p, rank) => {
+        if (!p) return '';
+        const changeHtml = getRankChangeHTML(p.rankChange);
+        const avatarSize = rank === 1 ? '72px' : '56px';
+        const avatarHtml = window.renderGeniiAvatar
+            ? window.renderGeniiAvatar(p, avatarSize)
+            : `<div style="width:${avatarSize};height:${avatarSize};border-radius:50%;background:#a270f4;display:flex;align-items:center;justify-content:center;font-family:Fredoka;font-weight:700;color:white;">${(p.name || 'J').charAt(0).toUpperCase()}</div>`;
+        
+        let height = '100px';
+        if (rank === 1) height = '170px';
+        if (rank === 2) height = '130px';
+        if (rank === 3) height = '90px';
+
+        return `
+            <div class="podium-player">
+                <div class="podium-details">
+                    <div class="podium-avatar">${avatarHtml}</div>
+                    <div class="podium-name" title="${p.name}">${p.name}</div>
+                    <div class="podium-points">${p.score} pts</div>
+                    ${changeHtml}
+                </div>
+                <div class="podium-bar place-${rank}" style="height: ${height};">
+                    <span class="podium-rank-num">${rank}</span>
+                </div>
+            </div>
+        `;
+    };
+
+    const p1 = top3[0];
+    const p2 = top3[1];
+    const p3 = top3[2];
+
+    const podiumHtml = `
+        <div class="leaderboard-podium">
+            <div class="podium-col col-2nd">
+                ${renderPodiumPlayer(p2, 2)}
+            </div>
+            <div class="podium-col col-1st">
+                ${renderPodiumPlayer(p1, 1)}
+            </div>
+            <div class="podium-col col-3rd">
+                ${renderPodiumPlayer(p3, 3)}
+            </div>
+        </div>
+    `;
+
+    const listHtml = sorted.length > 0 ? `
+        <div class="leaderboard-list">
+            ${sorted.map((p, idx) => {
+                const rank = idx + 1;
+                const changeHtml = getRankChangeHTML(p.rankChange);
+                const avatarHtml = window.renderGeniiAvatar
+                    ? window.renderGeniiAvatar(p, '40px')
+                    : `<div style="width:40px;height:40px;border-radius:50%;background:#888;display:flex;align-items:center;justify-content:center;font-family:Fredoka;font-weight:700;color:white;">${(p.name || 'J').charAt(0).toUpperCase()}</div>`;
+                return `
+                    <div class="list-player-row" style="animation-delay: ${1.2 + idx * 0.1}s;">
+                        <div class="list-rank">${rank}</div>
+                        <div class="list-avatar">${avatarHtml}</div>
+                        <div class="list-name">${p.name}</div>
+                        <div class="list-points">${p.score} pts</div>
+                        <div class="list-change">${changeHtml}</div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    ` : '';
+
     return `
-        <div class="leaderboard-wrapper">
-            <h1 class="lb-title"><i class="fa-solid fa-ranking-star"></i> Ranking</h1>
-            <div class="bar-chart-section">${barsHtml}</div>
-            <button class="btn-leaderboard-action" id="btn-leaderboard-action">${btnText}</button>
-        </div>`;
+        <div class="leaderboard-container">
+            <div class="leaderboard-header">
+                <h1 class="lb-title"><i class="fa-solid fa-ranking-star"></i> Classificação</h1>
+                <button class="btn-leaderboard-action" id="btn-leaderboard-action">${btnText}</button>
+            </div>
+            <div class="leaderboard-body">
+                ${podiumHtml}
+                ${listHtml}
+            </div>
+        </div>
+    `;
 }
 function buildFinalPodium(sorted) {
     const p1 = sorted[0];
@@ -896,6 +974,15 @@ function attachExitListener() {
     resetHeader();
     const feedbackBar = document.getElementById("footer-feedback");
     if (feedbackBar) feedbackBar.classList.remove("visible");
+    // Calculate previous ranks
+    const prevSorted = Object.entries(playerScores)
+        .map(([uid, data]) => ({ uid, ...data }))
+        .sort((a, b) => b.score - a.score);
+    const prevRanks = {};
+    prevSorted.forEach((p, idx) => {
+        prevRanks[p.uid] = idx;
+    });
+
     try {
         await rtdbUpdate(gameDocRef, { status: 'leaderboard' });
     } catch (err) {
@@ -920,6 +1007,17 @@ function attachExitListener() {
     const sorted = Object.entries(playerScores)
         .map(([uid, data]) => ({ uid, ...data }))
         .sort((a, b) => b.score - a.score);
+
+    // Calculate rank changes
+    sorted.forEach((p, idx) => {
+        const oldIdx = prevRanks[p.uid];
+        if (oldIdx !== undefined) {
+            p.rankChange = oldIdx - idx;
+        } else {
+            p.rankChange = 0;
+        }
+    });
+
     const isLastQuestion = currentQuestionIndex >= quizData.questions.length - 1;
     DOM.leaderboardScreen.innerHTML = buildBarChartHTML(sorted, isLastQuestion);
     const btn = document.getElementById('btn-leaderboard-action');
@@ -1032,34 +1130,60 @@ async function finishGame() {
         if (Date.now() < end) requestAnimationFrame(frame);
     }());
 }
+let activePlayers = {};
+let updatePending = false;
+function updateAnswersStats() {
+    const playerKeys = Object.keys(activePlayers);
+    totalPlayers = playerKeys.length;
+    DOM.playerCountEl.textContent = totalPlayers;
+    DOM.totalPlayersEl.textContent = totalPlayers;
+    if (!isQuestionActive) return;
+    let currentAnswers = 0;
+    let newAnswersCount = [0, 0, 0, 0];
+    playerKeys.forEach(key => {
+        const playerData = activePlayers[key];
+        const playerAnswer = playerData.answerIndex;
+        const typingAnswer = playerData.typingAnswer;
+        if ((playerAnswer !== undefined && playerAnswer !== null) || (typingAnswer && typingAnswer.trim() !== '')) {
+            currentAnswers++;
+            if (playerAnswer !== undefined && playerAnswer !== null && playerAnswer >= 0 && playerAnswer < 4) {
+                newAnswersCount[playerAnswer]++;
+            }
+        }
+    });
+    answersCount = newAnswersCount;
+    totalAnswered = currentAnswers;
+    DOM.answersReceivedEl.textContent = currentAnswers;
+    // Update inline answers badge inside question card
+    const inlineCount = document.getElementById('inline-answers-count');
+    const inlineTotal = document.getElementById('inline-answers-total');
+    if (inlineCount) inlineCount.textContent = currentAnswers;
+    if (inlineTotal) inlineTotal.textContent = totalPlayers;
+    if (currentAnswers >= totalPlayers && totalPlayers > 0 && timeLeft > 0) {
+        endQuestion();
+    }
+}
+function queueStatsUpdate() {
+    if (updatePending) return;
+    updatePending = true;
+    requestAnimationFrame(() => {
+        updatePending = false;
+        updateAnswersStats();
+    });
+}
 function listenToPlayers() {
     const playersRef = ref(rtdb, `live_games/${pin}/players`);
-    onValue(playersRef, (snapshot) => {
-        const players = snapshot.val() || {};
-        const playerKeys = Object.keys(players);
-        totalPlayers = playerKeys.length;
-        DOM.playerCountEl.textContent = totalPlayers;
-        DOM.totalPlayersEl.textContent = totalPlayers;
-        if (!isQuestionActive) return;
-        let currentAnswers = 0;
-        let newAnswersCount = [0, 0, 0, 0];
-        playerKeys.forEach(key => {
-            const playerData = players[key];
-            const playerAnswer = playerData.answerIndex;
-            const typingAnswer = playerData.typingAnswer;
-            if ((playerAnswer !== undefined && playerAnswer !== null) || (typingAnswer && typingAnswer.trim() !== '')) {
-                currentAnswers++;
-                if (playerAnswer !== undefined && playerAnswer !== null && playerAnswer >= 0 && playerAnswer < 4) {
-                    newAnswersCount[playerAnswer]++;
-                }
-            }
-        });
-        answersCount = newAnswersCount;
-        totalAnswered = currentAnswers;
-        DOM.answersReceivedEl.textContent = currentAnswers;
-        if (currentAnswers >= totalPlayers && totalPlayers > 0 && timeLeft > 0) {
-            endQuestion();
-        }
+    onChildAdded(playersRef, (snapshot) => {
+        activePlayers[snapshot.key] = snapshot.val() || {};
+        queueStatsUpdate();
+    });
+    onChildChanged(playersRef, (snapshot) => {
+        activePlayers[snapshot.key] = snapshot.val() || {};
+        queueStatsUpdate();
+    });
+    onChildRemoved(playersRef, (snapshot) => {
+        delete activePlayers[snapshot.key];
+        queueStatsUpdate();
     });
 }
 function initQuestionNav() {

@@ -3,8 +3,6 @@ fontLink.href =
   "https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;600;700;800&display=swap";
 fontLink.rel = "stylesheet";
 document.head.appendChild(fontLink);
-localStorage.removeItem("theme");
-document.body.classList.remove("dark-mode");
 const CACHE_KEY = "genii_user_cache";
 const CACHE_TTL = 5 * 60 * 1000;
 function getCachedUser() {
@@ -796,6 +794,9 @@ window.renderGeniiAvatar = function (userData, size = "50px") {
       "/static/img/avatareditor",
     );
     return `<div style="${containerStyle}background:transparent;border:2px solid rgba(108,92,231,0.15);">${layers}</div>`;
+  }
+  if (userData.isGuest) {
+    return `<div style="${containerStyle}background:transparent;border:2px solid rgba(108,92,231,0.15);"><img src="/static/img/default-genii.png" alt="Convidado" style="width:100%;height:100%;object-fit:cover;"></div>`;
   }
   const name =
     userData.displayName || userData.name || userData.nickname || "G";

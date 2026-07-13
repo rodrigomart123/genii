@@ -165,6 +165,59 @@
     const playerDataMap = {};
     const kickingUids = new Set();
 
+    function computeNameColor(name) {
+        if (!name) return '#6c5ce7';
+        let value = 0;
+        for (let i = 0; i < name.length; i++) {
+            let cValue = name.charCodeAt(i);
+            let reverseIndex = name.length - (i + 1) + 1;
+            if (name.length % 2 === 1) {
+                reverseIndex = reverseIndex - 1;
+            }
+            if (reverseIndex % 4 >= 2) {
+                cValue = -cValue;
+            }
+            value = value + cValue;
+        }
+        const colors = [
+            '#6c5ce7', // Genii Purple
+            '#00d2ba', // Genii Teal
+            '#ff9f43', // Genii Orange
+            '#0984e3', // Genii Blue
+            '#2ed573', // Genii Green
+            '#e84393', // Genii Pink
+            '#ff4757', // Genii Red
+            '#3f51b5'  // Genii Indigo
+        ];
+        const index = Math.abs(value) % colors.length;
+        return colors[index];
+    }
+
+    function getDarkenedColor(hex, percent) {
+        if (!hex) return '#000000';
+        const cleanHex = hex.replace('#', '');
+        let r = parseInt(cleanHex.substring(0, 2), 16);
+        let g = parseInt(cleanHex.substring(2, 4), 16);
+        let b = parseInt(cleanHex.substring(4, 6), 16);
+        r = Math.max(0, Math.floor(r * (1 - percent / 100)));
+        g = Math.max(0, Math.floor(g * (1 - percent / 100)));
+        b = Math.max(0, Math.floor(b * (1 - percent / 100)));
+        const rHex = r.toString(16).padStart(2, '0');
+        const gHex = g.toString(16).padStart(2, '0');
+        const bHex = b.toString(16).padStart(2, '0');
+        return `#${rHex}${gHex}${bHex}`;
+    }
+
+    function getContrastColor(hex) {
+        if (!hex) return '#ffffff';
+        const cleanHex = hex.replace('#', '');
+        const r = parseInt(cleanHex.substring(0, 2), 16);
+        const g = parseInt(cleanHex.substring(2, 4), 16);
+        const b = parseInt(cleanHex.substring(4, 6), 16);
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+        return brightness > 180 ? '#1a1a2e' : '#ffffff';
+    }
+
     onChildAdded(playersRef, (snap) => {
         const uid = snap.key;
         const p = snap.val();
@@ -188,6 +241,13 @@
         div.className = 'player-card';
         div.dataset.uid = uid;
 
+        const playerName = p.name || 'Jogador';
+        const playerColor = computeNameColor(playerName);
+        const darkColor = getDarkenedColor(playerColor, 20);
+        const textColor = getContrastColor(playerColor);
+        div.style.backgroundColor = playerColor;
+        div.style.boxShadow = `0 8px 0 ${darkColor}`;
+
         let avatarHtml = '';
         if (p.avatarRenderUrl) {
             avatarHtml = `<div class="player-avatar"><img src="${p.avatarRenderUrl}"></div>`;
@@ -205,8 +265,8 @@
                 ${avatarHtml}
             </div>
             <div class="player-card-info">
-                <div class="player-card-name">${p.name || 'Jogador'}</div>
-                <div class="player-card-status">À espera...</div>
+                <div class="player-card-name" style="color: ${textColor};">${playerName}</div>
+                <div class="player-card-status" style="color: ${textColor}; background: ${textColor === '#ffffff' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 0, 0, 0.08)'};">À espera...</div>
             </div>
         `;
 
@@ -326,9 +386,12 @@
             if (isSystem) {
                 msgDiv.innerHTML = `<div class="chat-text chat-system-text">${escapeHtml(text)}</div>`;
             } else {
+                const nameColor = isHost ? '#824dd6' : computeNameColor(sender);
                 msgDiv.innerHTML = `
-                    <div class="chat-sender">${escapeHtml(sender)}${isHost ? ' <span class="host-badge">Dono</span>' : ''}</div>
-                    <div class="chat-text">${escapeHtml(text)}</div>
+                    <div class="chat-bubble">
+                        <div class="chat-sender" style="color: ${nameColor};">${escapeHtml(sender)}${isHost ? ' <span class="host-badge">Dono</span>' : ''}</div>
+                        <div class="chat-text">${escapeHtml(text)}</div>
+                    </div>
                 `;
             }
             chatMessagesEl.appendChild(msgDiv);

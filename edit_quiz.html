@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -262,28 +262,38 @@
     }
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
+        if (user && !user.isAnonymous) {
+            localStorage.removeItem("genii_user_cache");
             currentUser = user;
             user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
             document.body.style.opacity = "1";
 
-            if (!isCacheFresh(getCachedUser())) {
+            let userData = getCachedUser();
+            if (!isCacheFresh(userData)) {
                 try {
                     const docRef = doc(db, "users", user.uid);
                     const docSnap = await getDoc(docRef);
                     if (docSnap.exists()) {
                         const d = docSnap.data();
-                        const userData = { ...d, displayName: d.username || d.displayName || user.email.split('@')[0] };
+                        userData = { ...d, displayName: d.username || d.displayName || user.email.split('@')[0] };
                         saveUserToCache(userData);
-                        renderLayout('', userData);
-                    } else {
-                        renderLayout('', { displayName: user.displayName || user.email.split('@')[0] });
                     }
                 } catch(e) {
                     console.error("Erro user data:", e);
-                    renderLayout('', { displayName: user.displayName || 'User' });
                 }
             }
+
+            if (!userData) {
+                userData = {
+                    displayName: user.displayName || user.email.split('@')[0],
+                    uid: user.uid,
+                    photoURL: user.photoURL,
+                    profileType: 'image',
+                    avatar: {}
+                };
+            }
+
+            renderLayout('', userData);
             if(localStorage.getItem('genii_ai_disabled')==='true') setTimeout(hideAIElements, 50);
             loadQuizData();
         } else {
@@ -291,7 +301,7 @@
         }
     });
 
-    document.addEventListener('app-logout', async () => { await signOut(auth); window.location.href="login.html"; });
+    document.addEventListener('app-logout', async () => { localStorage.removeItem("genii_user_cache"); await signOut(auth); window.location.href="login.html"; });
 
     function hideAIElements() {
         const aiTab = document.getElementById('cover-tab-ai');

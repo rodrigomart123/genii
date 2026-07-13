@@ -7,6 +7,22 @@
     { "source": "/login", "destination": "/login.html" },
     { "source": "/register", "destination": "/register.html" },
     { "source": "/profile", "destination": "/profile.html" },
-    { "source": "/create-quiz", "destination": "/create_quiz.html" }
+    { "source": "/create-quiz", "destination": "/create_quiz.html" },
+    { "source": "/edit-quiz", "destination": "/edit_quiz.html" },
+    { "source": "/play-quiz", "destination": "/play_quiz.html" },
+    { "source": "/host-game", "destination": "/host_game.html" },
+    { "source": "/host-lobby", "destination": "/host_lobby.html" },
+    { "source": "/player-game", "destination": "/player_game.html" },
+    { "source": "/player-lobby", "destination": "/player_lobby.html" },
+    { "source": "/my-profile", "destination": "/my_profile.html" },
+    { "source": "/my-sets", "destination": "/my_sets.html" },
+    { "source": "/forgot", "destination": "/forgot.html" },
+    { "source": "/reset", "destination": "/reset.html" },
+    { "source": "/discover", "destination": "/discover.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/studio", "destination": "/studio.html" },
+    { "source": "/join", "destination": "/join.html" },
+    { "source": "/quiz", "destination": "/quiz.html" },
+    { "source": "/favorites", "destination": "/favorites.html" }
   ]
 }

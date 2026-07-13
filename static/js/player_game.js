@@ -6,7 +6,10 @@ import { recordGame, updateStreak } from "./gamification.js";
 import { checkMissionsAfterGame, progressMission } from "./daily-missions.js";
 const params = new URLSearchParams(window.location.search);
 const pin = params.get('pin');
+let isRedirecting = false;
+let dbToken = null;
 if (!pin) {
+    isRedirecting = true;
     window.location.href = "join.html";
 }
 const DOM = {
@@ -22,6 +25,8 @@ const DOM = {
     endScreen: document.getElementById('end-screen'),
     finalScore: document.getElementById('final-score'),
 };
+
+
 let currentUser = null;
 let hasAnsweredCurrentQuestion = false;
 let currentQuestionIndex = -1;
@@ -95,10 +100,12 @@ function getCorrectIndex(q) {
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
+        user.getIdToken().then(t => { dbToken = t; }).catch(() => {});
         const myPlayerRef = ref(rtdb, `live_games/${pin}/players/${user.uid}`);
         const myPlayerSnap = await rtdbGet(myPlayerRef);
         if (!myPlayerSnap.exists()) {
             if (window.showGeniiToast) window.showGeniiToast("Não está registado nesta sala.", "error");
+            isRedirecting = true;
             setTimeout(() => window.location.href = "join.html", 200);
             return;
         }
@@ -108,11 +115,11 @@ onAuthStateChanged(auth, async (user) => {
         }
         listenToGame();
     } else {
+        isRedirecting = true;
         window.location.href = `login.html?returnUrl=player_game.html?pin=${pin}`;
     }
 });
 function listenToGame() {
-    const gameRef = ref(rtdb, `live_games/${pin}`);
     if (currentUser) {
         let hasSeenMyDoc = false;
         const myPlayerRef = ref(rtdb, `live_games/${pin}/players/${currentUser.uid}`);
@@ -122,12 +129,32 @@ function listenToGame() {
             } else if (hasSeenMyDoc && !window.isGameFinishedLocally) {
                 if (window.showGeniiToast) window.showGeniiToast("Foi removido da sala pelo anfitrião.", "error");
                 showStatusOverlay("Foi removido", "O anfitrião removeu-o da sala.", "fa-ban");
+                isRedirecting = true;
                 setTimeout(() => window.location.href = "join.html", 3000);
             }
         });
     }
-    onValue(gameRef, (snap) => {
-        if (!snap.exists()) {
+    let gameData = {
+        status: null,
+        theme_colors: null,
+        current_question: null,
+        current_question_index: null,
+        pre_question_text: null,
+        pre_question_image: null
+    };
+    let statusInitialized = false;
+    let gameUpdatePending = false;
+    function queueGameUpdate() {
+        if (gameUpdatePending) return;
+        gameUpdatePending = true;
+        requestAnimationFrame(() => {
+            gameUpdatePending = false;
+            handleGameUpdate();
+        });
+    }
+    function handleGameUpdate() {
+        if (!statusInitialized) return;
+        if (!gameData.status) {
             if (window.isGameFinishedLocally) return;
             const cachedStr = localStorage.getItem(`genii_game_state_${pin}`);
             if (cachedStr) {
@@ -144,18 +171,20 @@ function listenToGame() {
             }
             if (window.showGeniiToast) window.showGeniiToast("O jogo não existe ou foi encerrado.", "error");
             showStatusOverlay("Sala Encerrada", "O anfitrião fechou a sala.", "fa-door-closed");
+            isRedirecting = true;
             setTimeout(() => window.location.href = "join.html", 3000);
             return;
         }
-        const gameData = snap.val();
-        if (gameData) {
-            localStorage.setItem(`genii_game_state_${pin}`, JSON.stringify(gameData));
-        }
+        localStorage.setItem(`genii_game_state_${pin}`, JSON.stringify(gameData));
         if (gameData.theme_colors && Array.isArray(gameData.theme_colors) && gameData.theme_colors.length >= 4) {
             gameColors = gameData.theme_colors;
         }
         const status = gameData.status;
         currentGameStatus = status;
+        if (status !== 'question_active') {
+            const oldModal = document.getElementById('confirm-answer-modal');
+            if (oldModal) oldModal.remove();
+        }
         DOM.loadingOverlay.style.display = 'none';
         if (status !== 'pre_question') {
             const startScreen = document.getElementById('start-screen');
@@ -166,14 +195,17 @@ function listenToGame() {
             }
         }
         if (status === 'lobby' || status === 'waiting') {
+            resetHeader();
             showStatusOverlay("A preparar...", "O jogo está prestes a começar!", "fa-hourglass-half");
             hasAnsweredCurrentQuestion = false;
             currentQuestionIndex = -1;
         }
         else if (status === 'paused') {
+            resetHeader();
             showStatusOverlay("Jogo pausado", "O anfitrião pausou o jogo. Relaxa!", "fa-pause");
         }
         else if (status === 'pre_question') {
+            resetHeader();
             hideStatusOverlay();
             const questionText = gameData.pre_question_text || "Próxima pergunta...";
             const questionImage = gameData.pre_question_image || "";
@@ -203,19 +235,46 @@ function listenToGame() {
             hasAnsweredCurrentQuestion = false;
         }
         else if (status === 'leaderboard') {
+            resetHeader();
             showStatusOverlay("Ranking", "Veja a sua posição no pódio!", "fa-trophy");
             fetchMyScore();
         }
         else if (status === 'cancelled' || status === 'finished') {
+            resetHeader();
             window.isGameFinishedLocally = true;
             fetchMyScore();
             if (window.showGeniiToast) window.showGeniiToast("Jogo terminado!", "success");
             renderPlayerEndDashboard(gameData).catch(console.error);
             recordMultiplayerResult(gameData);
         }
+    }
+    onValue(ref(rtdb, `live_games/${pin}/status`), (snap) => {
+        statusInitialized = true;
+        gameData.status = snap.val();
+        queueGameUpdate();
     }, (error) => {
         console.error("Erro ao ouvir o jogo:", error);
         if (window.showGeniiToast) window.showGeniiToast("Erro de ligação.", "error");
+    });
+    onValue(ref(rtdb, `live_games/${pin}/theme_colors`), (snap) => {
+        gameData.theme_colors = snap.val();
+        queueGameUpdate();
+    });
+    onValue(ref(rtdb, `live_games/${pin}/current_question`), (snap) => {
+        gameData.current_question = snap.val();
+        queueGameUpdate();
+    });
+    onValue(ref(rtdb, `live_games/${pin}/current_question_index`), (snap) => {
+        gameData.current_question_index = snap.val();
+        queueGameUpdate();
+    });
+    onValue(ref(rtdb, `live_games/${pin}/pre_question_text`), (snap) => {
+        gameData.pre_question_text = snap.val();
+        queueGameUpdate();
+    });
+    onValue(ref(rtdb, `live_games/${pin}/pre_question_image`), (snap) => {
+        gameData.pre_question_image = snap.val();
+        queueGameUpdate();
     });
 }
 function renderQuestion(question, index) {
@@ -225,6 +284,10 @@ function renderQuestion(question, index) {
         c.classList.add('slide-out');
         setTimeout(() => c.remove(), 600);
     });
+    const oldDrawers = DOM.stage.querySelectorAll('.mobile-question-drawer');
+    oldDrawers.forEach(d => d.remove());
+    const oldEyeBtns = DOM.stage.querySelectorAll('.center-eye-btn');
+    oldEyeBtns.forEach(b => b.remove());
     const card = document.createElement('div');
     card.className = 'question-card slide-in';
     card.id = `player-card-${index}`;
@@ -256,10 +319,10 @@ function renderQuestion(question, index) {
         const keyMap = ['A', 'B', 'C', 'D'];
         if (type === 'boolean') {
             optionsHtml = `
-                <div class="option-btn opt-true" data-index="0" onclick="window._selectAnswer(0, this)">
+                <div class="option-btn opt-true" data-index="0" onclick="window._selectAnswer(0, this, event)">
                     <div class="opt-icon"><i class="fa-solid fa-check"></i></div> Verdadeiro
                 </div>
-                <div class="option-btn opt-false" data-index="1" onclick="window._selectAnswer(1, this)">
+                <div class="option-btn opt-false" data-index="1" onclick="window._selectAnswer(1, this, event)">
                     <div class="opt-icon"><i class="fa-solid fa-xmark"></i></div> Falso
                 </div>
             `;
@@ -300,7 +363,7 @@ function renderQuestion(question, index) {
                 }
                 const imgHtml = ansImg ? `<img src="${ansImg}" class="opt-ans-img" alt="">` : '';
                 optionsHtml += `
-                    <div class="option-btn ${colorClass}" data-index="${i}" ${visibility} ${styleAttr} onclick="window._selectAnswer(${i}, this)">
+                    <div class="option-btn ${colorClass}" data-index="${i}" ${visibility} ${styleAttr} onclick="window._selectAnswer(${i}, this, event)">
                         <div class="opt-icon">${letters[i]}</div>
                         ${imgHtml}
                         ${opt}
@@ -308,6 +371,31 @@ function renderQuestion(question, index) {
                 `;
             });
         }
+        const drawer = document.createElement('div');
+        drawer.className = 'mobile-question-drawer';
+        drawer.id = 'mobile-drawer';
+        drawer.innerHTML = `
+            <button class="drawer-close-btn" onclick="window._toggleDrawer()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="drawer-content">
+                ${mediaHtml}
+                <div class="drawer-q-text">${questionText}</div>
+            </div>
+        `;
+        DOM.stage.appendChild(drawer);
+        
+        const eyeBtn = document.createElement('button');
+        eyeBtn.className = 'center-eye-btn';
+        eyeBtn.id = 'center-eye-btn';
+        if (type === 'typing') {
+            eyeBtn.classList.add('bottom-position');
+        }
+        eyeBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
+        eyeBtn.onclick = (e) => {
+            e.stopPropagation();
+            window._toggleDrawer();
+        };
+        DOM.stage.appendChild(eyeBtn);
+
         card.innerHTML = `
             ${mediaHtml}
             <div class="question-text">${questionText}</div>
@@ -332,36 +420,116 @@ function renderQuestion(question, index) {
         });
     });
 }
-window._selectAnswer = async (answerIndex, btnElement) => {
-    if (!currentUser || hasAnsweredCurrentQuestion || currentGameStatus !== 'question_active') return;
-    hasAnsweredCurrentQuestion = true;
-    const card = btnElement.closest('.question-card');
-    if (card) card.classList.add('locked');
-    btnElement.style.border = '4px solid white';
-    btnElement.style.transform = 'scale(1.05)';
-    const allBtns = card ? card.querySelectorAll('.option-btn') : [];
-    allBtns.forEach(btn => {
-        if (btn !== btnElement) {
-            btn.classList.add('dimmed');
+window._toggleDrawer = () => {
+    const drawer = document.getElementById('mobile-drawer');
+    const icon = document.getElementById('drawer-icon');
+    if (drawer) {
+        drawer.classList.toggle('open');
+        if (icon) {
+            if (drawer.classList.contains('open')) {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
         }
-    });
-    DOM.headerTitle.innerHTML = '<i class="fa-solid fa-clock"></i> A aguardar...';
-    try {
-        const playerRef = ref(rtdb, `live_games/${pin}/players/${currentUser.uid}`);
-        await rtdbUpdate(playerRef, {
-            answerIndex: answerIndex,
-            answeredAt: Date.now()
-        });
-    } catch (error) {
-        console.error("Erro ao enviar resposta:", error);
-        if (window.showGeniiToast) window.showGeniiToast("Erro ao enviar resposta.", "error");
-        hasAnsweredCurrentQuestion = false;
-        if (card) card.classList.remove('locked');
-        allBtns.forEach(btn => btn.classList.remove('dimmed'));
-        btnElement.style.border = '';
-        btnElement.style.transform = '';
     }
 };
+
+window.showConfirmAnswerModal = (onConfirm) => {
+    const oldModal = document.getElementById('confirm-answer-modal');
+    if (oldModal) oldModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'confirm-answer-modal';
+    modal.className = 'confirm-modal-overlay';
+    modal.innerHTML = `
+        <div class="confirm-modal-card">
+            <h3>Confirmar Resposta?</h3>
+            <p>Clicou muito perto do botão de ver a pergunta. Quer mesmo submeter esta resposta?</p>
+            <div class="confirm-modal-buttons">
+                <button class="btn-confirm-yes">Sim</button>
+                <button class="btn-confirm-no">Não</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const close = () => {
+        modal.classList.add('fade-out');
+        setTimeout(() => modal.remove(), 250);
+    };
+
+    modal.querySelector('.btn-confirm-yes').addEventListener('click', () => {
+        close();
+        onConfirm();
+    });
+    modal.querySelector('.btn-confirm-no').addEventListener('click', () => {
+        close();
+    });
+};
+
+window._selectAnswer = async (answerIndex, btnElement, event) => {
+    if (!currentUser || hasAnsweredCurrentQuestion || currentGameStatus !== 'question_active') return;
+    
+    const submitSelection = async () => {
+        if (currentGameStatus !== 'question_active') {
+            if (window.showGeniiToast) window.showGeniiToast("O tempo acabou! Não foi possível enviar a resposta.", "warning");
+            return;
+        }
+        hasAnsweredCurrentQuestion = true;
+        const card = btnElement.closest('.question-card');
+        if (card) card.classList.add('locked');
+        btnElement.style.border = '4px solid white';
+        btnElement.style.transform = 'scale(1.05)';
+        const allBtns = card ? card.querySelectorAll('.option-btn') : [];
+        allBtns.forEach(btn => {
+            if (btn !== btnElement) {
+                btn.classList.add('dimmed');
+            }
+        });
+        
+        const eyeBtn = document.getElementById('center-eye-btn');
+        if (eyeBtn) eyeBtn.remove();
+
+        DOM.headerTitle.innerHTML = '<i class="fa-solid fa-clock"></i> A aguardar...';
+        try {
+            const playerRef = ref(rtdb, `live_games/${pin}/players/${currentUser.uid}`);
+            await rtdbUpdate(playerRef, {
+                answerIndex: answerIndex,
+                answeredAt: Date.now()
+            });
+        } catch (error) {
+            console.error("Erro ao enviar resposta:", error);
+            if (window.showGeniiToast) window.showGeniiToast("Erro ao enviar resposta.", "error");
+            hasAnsweredCurrentQuestion = false;
+            if (card) card.classList.remove('locked');
+            allBtns.forEach(btn => btn.classList.remove('dimmed'));
+            btnElement.style.border = '';
+            btnElement.style.transform = '';
+        }
+    };
+
+    const eyeBtn = document.getElementById('center-eye-btn');
+    if (eyeBtn && event) {
+        const rect = eyeBtn.getBoundingClientRect();
+        const eyeCenterX = rect.left + rect.width / 2;
+        const eyeCenterY = rect.top + rect.height / 2;
+        const clickX = event.clientX;
+        const clickY = event.clientY;
+        const dist = Math.sqrt(Math.pow(clickX - eyeCenterX, 2) + Math.pow(clickY - eyeCenterY, 2));
+        
+        // If distance is less than 85px (button is 60px so 30px radius, 85px covers 55px safe margin)
+        if (dist < 85) {
+            window.showConfirmAnswerModal(submitSelection);
+            return;
+        }
+    }
+
+    submitSelection();
+};
+
 window._selectTypingAnswer = async (qIndex) => {
     if (!currentUser || hasAnsweredCurrentQuestion || currentGameStatus !== 'question_active') return;
     const input = document.getElementById(`typing-input-${qIndex}`);
@@ -375,6 +543,8 @@ window._selectTypingAnswer = async (qIndex) => {
         const btn = container.querySelector('.typing-game-submit');
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-check"></i> Enviada'; }
     }
+    const eyeBtn = document.getElementById('center-eye-btn');
+    if (eyeBtn) eyeBtn.remove();
     DOM.headerTitle.innerHTML = '<i class="fa-solid fa-clock"></i> A aguardar...';
     try {
         const playerRef = ref(rtdb, `live_games/${pin}/players/${currentUser.uid}`);
@@ -387,8 +557,13 @@ window._selectTypingAnswer = async (qIndex) => {
         if (window.showGeniiToast) window.showGeniiToast("Erro ao enviar resposta.", "error");
         hasAnsweredCurrentQuestion = false;
         input.disabled = false;
+        if (container) {
+            const btn = container.querySelector('.typing-game-submit');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar'; }
+        }
     }
 };
+
 window.openLightbox = function(url) {
     const overlay = document.getElementById('lightbox');
     const img = document.getElementById('lightbox-img');
@@ -418,9 +593,9 @@ function showResultFeedback(question) {
         const container = card.querySelector('.typing-game-container');
         if (container) {
             container.innerHTML = `
-                <div style="text-align:center; padding:10px;">
-                    <div style="font-weight:700; color:#00b894; margin-bottom:8px;"><i class="fa-solid fa-check-circle"></i> Respostas aceites:</div>
-                    <div>${accepted.map(a => `<span style="display:inline-block; background:#e8f8f5; color:#00b894; padding:4px 12px; border-radius:20px; margin:3px; font-weight:600;">${a}</span>`).join('')}</div>
+                <div style="width: 100%; text-align:center; padding:20px 10px;">
+                    <div style="font-weight:800; font-size:1.1rem; color:#00b894; margin-bottom:12px;"><i class="fa-solid fa-check-circle"></i> Respostas aceites:</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">${accepted.map(a => `<span style="background:rgba(0,184,148,0.15); color:#00b894; padding:6px 16px; border-radius:20px; font-weight:700; font-size:1rem;">${a}</span>`).join('')}</div>
                 </div>
             `;
         }
@@ -443,6 +618,7 @@ async function fetchMyTypingAnswerAndShowHeader(question, acceptedAnswers) {
             const isCorrect = myTyping && accepted.includes(myTyping);
             const correctText = acceptedAnswers[0] || "";
             showFeedbackBar(isCorrect, correctText, !myTyping);
+            DOM.mainHeader.classList.remove('header-correct', 'header-wrong');
             if (isCorrect) {
                 myCorrectCount++;
                 DOM.mainHeader.classList.add('header-correct');
@@ -494,6 +670,7 @@ async function fetchMyAnswerAndShowHeader(question, correctIdx) {
                 correctText = options[correctIdx];
             }
             showFeedbackBar(isCorrect, correctText, myAnswer === null || myAnswer === undefined);
+            DOM.mainHeader.classList.remove('header-correct', 'header-wrong');
             if (isCorrect) {
                 myCorrectCount++;
                 DOM.mainHeader.classList.add('header-correct');
@@ -665,7 +842,11 @@ async function renderPlayerEndDashboard(gameData) {
     DOM.endScreen.style.background = '#0AC7BE';
     try {
         let allPlayers = [];
-        const playersVal = gameData?.players || {};
+        let playersVal = gameData?.players;
+        if (!playersVal) {
+            const playersSnap = await rtdbGet(ref(rtdb, `live_games/${pin}/players`));
+            playersVal = playersSnap.exists() ? playersSnap.val() : {};
+        }
         Object.keys(playersVal).forEach(key => {
             const d = playersVal[key];
             allPlayers.push({
@@ -743,3 +924,58 @@ async function renderPlayerEndDashboard(gameData) {
         DOM.endScreen.innerHTML = '<div style="padding:40px;text-align:center;"><h2>Resultados Finais</h2><a href="join.html">Sair</a></div>';
     }
 }
+window.addEventListener('beforeunload', (e) => {
+    if (isRedirecting || window.isGameFinishedLocally) return;
+    e.preventDefault();
+    e.returnValue = '';
+});
+
+let hasSentCleanup = false;
+function sendCleanup() {
+    if (hasSentCleanup || isRedirecting || window.isGameFinishedLocally) return;
+    if (currentUser && pin && dbToken) {
+        hasSentCleanup = true;
+        try {
+            fetch(`https://playgenii-default-rtdb.europe-west1.firebasedatabase.app/live_games/${pin}/players/${currentUser.uid}.json?auth=${dbToken}`, {
+                method: 'DELETE',
+                keepalive: true
+            });
+        } catch (err) {
+        }
+    }
+}
+window.addEventListener('unload', sendCleanup);
+window.addEventListener('pagehide', sendCleanup);
+// Touch handlers for mobile drawer
+let drawerTouchStartY = 0;
+document.addEventListener('touchstart', (e) => {
+    const drawer = document.getElementById('mobile-drawer');
+    if (!drawer) return;
+    
+    if (e.target.closest('#mobile-drawer')) {
+        drawerTouchStartY = e.touches[0].clientY;
+    } else {
+        drawerTouchStartY = null;
+    }
+}, {passive: true});
+
+document.addEventListener('touchend', (e) => {
+    if (drawerTouchStartY === null) return;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diff = touchEndY - drawerTouchStartY;
+    
+    const drawer = document.getElementById('mobile-drawer');
+    if (!drawer) return;
+    
+    const isDrawerOpen = drawer.classList.contains('open');
+    
+    if (diff > 40 && !isDrawerOpen) {
+        // Swipe down -> open
+        window._toggleDrawer();
+    } else if (diff < -40 && isDrawerOpen) {
+        // Swipe up -> close, but check scroll
+        const drawerContent = drawer.querySelector('.drawer-content');
+        if (drawerContent && drawerContent.scrollTop > 5) return;
+        window._toggleDrawer();
+    }
+}, {passive: true});

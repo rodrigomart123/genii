@@ -3024,7 +3024,8 @@ NUNCA incluas texto fora do JSON. Responde APENAS com o objeto JSON.`;
     if(localStorage.getItem('genii_ai_disabled')==='true') setTimeout(hideAIElements, 100);
 
     onAuthStateChanged(auth, async (user) => {
-        if (user) {
+        if (user && !user.isAnonymous) {
+            localStorage.removeItem("genii_user_cache");
             user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
             document.body.style.opacity = "1";
             refreshCredits();

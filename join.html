@@ -40,11 +40,12 @@
             
             <form id="joinGameForm">
                 <input type="tel" id="gamePin" class="pin-input" placeholder="PIN do Jogo" maxlength="7" autocomplete="off" required>
+                <input type="text" id="guestNickname" class="pin-input" placeholder="O teu Apelido" maxlength="15" autocomplete="off" style="display:none;">
                 <button type="submit" class="btn-enter">Entrar</button>
             </form>
         </div>
 
-        <div class="quick-actions">
+        <div class="quick-actions" id="quickActions" style="display: none;">
             <a href="discover.html" class="action-chip"><i class="fa-solid fa-compass"></i> Descobrir</a>
             <a href="create_quiz.html" class="action-chip"><i class="fa-solid fa-plus"></i> Criar</a>
         </div>
@@ -55,7 +56,7 @@
 
 <script type="module">
     import { renderLayout, getCachedUser, saveUserToCache, isCacheFresh } from "./static/js/components.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { ref, get as rtdbGet, set as rtdbSet } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
     import { auth, db, rtdb } from "./firebase-config.js";
@@ -64,7 +65,19 @@
 
     let currentUserData = null;
 
-    const cached = getCachedUser();
+    const params = new URLSearchParams(window.location.search);
+    const isGuestParam = params.get('mode') === 'guest' || params.get('guest') === 'true';
+
+    let hasFirebaseUser = false;
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('firebase:authUser')) {
+            hasFirebaseUser = true;
+            break;
+        }
+    }
+
+    const cached = (!isGuestParam && hasFirebaseUser) ? getCachedUser() : null;
     if (cached) {
         document.body.style.opacity = "1";
         renderLayout('join', cached);
@@ -75,65 +88,194 @@
             document.getElementById('greeting-skeleton').style.display = 'none';
         }
         currentUserData = cached;
+    } else {
+        document.body.style.opacity = "1";
     }
 
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             if (!cached) document.body.style.opacity = "1";
 
-            if (!isCacheFresh(getCachedUser())) {
-                try {
-                    const docRef = doc(db, "users", user.uid);
-                    const docSnap = await getDoc(docRef);
-                    
-                    let userData = { 
-                        displayName: user.displayName || user.email.split('@')[0],
+            if (user.isAnonymous) {
+                localStorage.removeItem("genii_user_cache");
+                currentUserData = {
+                    uid: user.uid,
+                    displayName: 'Convidado',
+                    profileType: 'avatar',
+                    avatar: {}
+                };
+                renderLayout('join', currentUserData);
+
+                const sidebar = document.getElementById('sidebar-container');
+                if (sidebar) sidebar.style.display = 'none';
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) mainContent.style.marginLeft = '0';
+                const quickActions = document.querySelector('.quick-actions');
+                if (quickActions) quickActions.style.display = 'none';
+
+                const greetingHeading = document.getElementById('greeting-heading');
+                const greetingSubtitle = document.getElementById('greeting-subtitle');
+                const greetingSkeleton = document.getElementById('greeting-skeleton');
+
+                if (greetingHeading) {
+                    greetingHeading.innerHTML = 'Olá, Convidado! <span class="wave">👋</span>';
+                    greetingHeading.style.display = '';
+                }
+                if (greetingSubtitle) {
+                    greetingSubtitle.innerText = 'Insere o PIN do jogo para começar!';
+                    greetingSubtitle.style.display = '';
+                }
+                if (greetingSkeleton) {
+                    greetingSkeleton.style.display = 'none';
+                }
+                
+                let headerContainer = document.getElementById("user-header-container");
+                if (headerContainer) {
+                    headerContainer.innerHTML = `
+                        <div class="blooket-widget guest-widget" id="userWidgetBtn" style="cursor: default;">
+                            <div class="b-avatar-box">
+                                <img src="static/img/default-genii.png" alt="Genii" class="widget-photo" style="object-fit:contain; padding:4px;">
+                            </div>
+                            <div class="b-info" style="margin-right: 15px;">
+                                <span class="b-username">Convidado</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                let userData = getCachedUser();
+                if (!isCacheFresh(userData)) {
+                    try {
+                        const docRef = doc(db, "users", user.uid);
+                        const docSnap = await getDoc(docRef);
+                        
+                        userData = { 
+                            displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Convidado'),
+                            uid: user.uid,
+                            photoURL: user.photoURL,
+                            profileType: 'image',
+                            avatar: {},
+                            ...(docSnap.exists() ? docSnap.data() : {})
+                        };
+                        
+                        if (docSnap.exists() && docSnap.data().username) userData.displayName = docSnap.data().username;
+
+                        saveUserToCache(userData);
+                    } catch(e) { console.error(e); }
+                }
+
+                if (!userData) {
+                    userData = { 
+                        displayName: user.displayName || (user.email ? user.email.split('@')[0] : 'Convidado'),
                         uid: user.uid,
                         photoURL: user.photoURL,
                         profileType: 'image',
-                        avatar: {},
-                        ...(docSnap.exists() ? docSnap.data() : {})
+                        avatar: {}
                     };
-                    
-                    if (docSnap.exists() && docSnap.data().username) userData.displayName = docSnap.data().username;
+                }
 
-                    saveUserToCache(userData);
-                    currentUserData = userData;
+                currentUserData = userData;
 
-                    renderLayout('join', userData);
-                    if(document.getElementById('userDisplay')) {
-                        document.getElementById('userDisplay').innerText = userData.displayName;
-                        document.getElementById('greeting-heading').style.display = '';
-                        document.getElementById('greeting-subtitle').style.display = '';
-                        document.getElementById('greeting-skeleton').style.display = 'none';
-                    }
-                } catch(e) { console.error(e); }
+                renderLayout('join', userData);
+                if(document.getElementById('userDisplay')) {
+                    document.getElementById('userDisplay').innerText = userData.displayName;
+                    document.getElementById('greeting-heading').style.display = '';
+                    document.getElementById('greeting-subtitle').style.display = '';
+                    document.getElementById('greeting-skeleton').style.display = 'none';
+                }
+
+                const quickActions = document.getElementById('quickActions');
+                if (quickActions) quickActions.style.display = 'flex';
+
+                updateStreak(user.uid).then(result => {
+                    if (result.isNewDay) progressMission(user.uid, 'daily_login').catch(() => {});
+                }).catch(() => {});
             }
 
-            updateStreak(user.uid).then(result => {
-                if (result.isNewDay) progressMission(user.uid, 'daily_login').catch(() => {});
-            }).catch(() => {});
-
         } else {
-            window.location.href = "login.html";
+            signInAnonymously(auth).catch((error) => {
+                console.error(error);
+                window.location.href = "login.html";
+            });
         }
     });
 
     document.addEventListener('app-logout', async () => {
+        localStorage.removeItem("genii_user_cache");
         await signOut(auth);
         window.location.href = "login.html";
     });
 
     const form = document.getElementById('joinGameForm');
+    let isNicknameStep = false;
+    let validatedPin = null;
     
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const pin = document.getElementById('gamePin').value.trim();
+
+        if (auth.currentUser?.isAnonymous && !isNicknameStep) {
+            const pin = document.getElementById('gamePin').value.trim();
+            const btn = form.querySelector('button');
+            const originalText = btn.innerText;
+
+            if(!pin) return;
+            btn.innerText = "A verificar...";
+            btn.style.opacity = "0.7";
+            btn.disabled = true;
+
+            try {
+                const gameRef = ref(rtdb, `live_games/${pin}`);
+                const gameSnap = await rtdbGet(gameRef);
+
+                if (!gameSnap.exists()) {
+                    if (window.showGeniiToast) window.showGeniiToast("Jogo não encontrado! Verifique o PIN.", "error");
+                    else alert("Jogo não encontrado! Verifique o PIN.");
+                    throw new Error("Game not found");
+                }
+
+                const gameData = gameSnap.val();
+                if (gameData.status === 'finished') {
+                    if (window.showGeniiToast) window.showGeniiToast("Este jogo já terminou.", "error");
+                    else alert("Este jogo já terminou.");
+                    throw new Error("Game finished");
+                }
+
+                validatedPin = pin;
+                document.getElementById('gamePin').style.display = 'none';
+                
+                const nickInput = document.getElementById('guestNickname');
+                nickInput.style.display = 'block';
+                nickInput.focus();
+
+                const greetingHeading = document.getElementById('greeting-heading');
+                const greetingSubtitle = document.getElementById('greeting-subtitle');
+                if (greetingHeading) greetingHeading.style.display = 'none';
+                if (greetingSubtitle) {
+                    greetingSubtitle.innerHTML = '<span style="color:var(--accent); font-weight:700; font-size:1.4rem; display:block; margin-bottom:10px;"><i class="fa-solid fa-circle-check"></i> Sala Encontrada!</span> Insere um nome para entrar';
+                    greetingSubtitle.style.display = '';
+                }
+
+                if (window.showGeniiToast) window.showGeniiToast("Sala encontrada!", "success");
+                
+                btn.innerText = "Começar a Jogar";
+                btn.style.opacity = "1";
+                btn.disabled = false;
+                isNicknameStep = true;
+            } catch (error) {
+                console.error(error);
+                btn.innerText = originalText;
+                btn.style.opacity = "1";
+                btn.disabled = false;
+            }
+            return;
+        }
+
+        const pin = validatedPin || document.getElementById('gamePin').value.trim();
         const btn = form.querySelector('button');
         const originalText = btn.innerText;
 
         if(!pin) return;
-        btn.innerText = "A verificar...";
+        btn.innerText = "A entrar...";
         btn.style.opacity = "0.7";
         btn.disabled = true;
 
@@ -142,28 +284,43 @@
             const gameSnap = await rtdbGet(gameRef);
 
             if (!gameSnap.exists()) {
-                showGeniiToast("Jogo não encontrado! Verifique o PIN.", "error");
+                if (window.showGeniiToast) window.showGeniiToast("Jogo não encontrado! Verifique o PIN.", "error");
+                else alert("Jogo não encontrado! Verifique o PIN.");
                 throw new Error("Game not found");
             }
 
             const gameId = pin;
             const gameData = gameSnap.val();
 
-            if (auth.currentUser && gameData.hostId === auth.currentUser.uid) {
-                showGeniiToast("Não pode jogar na sala que está a hospedar! 🧞‍♂️", "error");
+            if (auth.currentUser && gameData.hostId === auth.currentUser.uid && !auth.currentUser.isAnonymous) {
+                if (window.showGeniiToast) window.showGeniiToast("Não pode jogar na sala que está a hospedar! 🧞‍♂️", "error");
+                else alert("Não pode jogar na sala que está a hospedar!");
                 throw new Error("Host cannot join own game");
             }
 
             if (gameData.status === 'finished') {
-                showGeniiToast("Este jogo já terminou.", "error");
+                if (window.showGeniiToast) window.showGeniiToast("Este jogo já terminou.", "error");
+                else alert("Este jogo já terminou.");
                 throw new Error("Game finished");
             }
 
             if (!auth.currentUser) throw new Error("No user");
 
             const playerRef = ref(rtdb, `live_games/${gameId}/players/${auth.currentUser.uid}`);
-            
-            const finalName = currentUserData?.displayName || auth.currentUser.displayName || "Jogador";
+            const playerSnap = await rtdbGet(playerRef);
+            if (playerSnap.exists()) {
+                window.location.href = `/player_lobby?gameId=${gameId}`;
+                return;
+            }
+
+            let finalName = "Jogador";
+            if (auth.currentUser.isAnonymous) {
+                finalName = document.getElementById('guestNickname').value.trim() || "Convidado";
+                currentUserData = { ...currentUserData, displayName: finalName };
+            } else {
+                finalName = currentUserData?.displayName || auth.currentUser.displayName || "Jogador";
+            }
+
             const finalPhoto = currentUserData?.photoURL || auth.currentUser.photoURL;
             const finalAvatar = currentUserData?.avatar || {};
             const finalType = currentUserData?.profileType || 'image';
@@ -178,7 +335,7 @@
                 avatarRenderUrl: finalAvatarRenderUrl || null,
                 customPhotoUrl: finalCustomPhotoUrl || null,
                 profileType: finalType,
-                score: 0,
+                isGuest: auth.currentUser.isAnonymous,
                 joinedAt: Date.now()
             });
 

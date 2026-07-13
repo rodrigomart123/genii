@@ -356,7 +356,8 @@
     };
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user) {
+        if (!user || user.isAnonymous) {
+            localStorage.removeItem("genii_user_cache");
             window.location.href = "login.html";
             return;
         }

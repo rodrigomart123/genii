@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt">
     <head>
         <meta charset="UTF-8" />
@@ -1849,7 +1849,8 @@
 
 
             onAuthStateChanged(auth, async (user) => {
-                if (user) {
+                if (user && !user.isAnonymous) {
+                    localStorage.removeItem("genii_user_cache");
                     currentUser = user;
                     user.getIdToken().then(t => _cloudinaryToken = t).catch(() => {});
                     if (!cached) document.body.style.opacity = "1";
@@ -1882,7 +1883,7 @@
                             );
                         }
                     } else {
-                                                 const d = freshCached;
+                        const d = freshCached;
                         currentUser.avatar = d.avatar || {
                             skin: "001",
                             face: "001",
@@ -1894,6 +1895,10 @@
                             d.customPhotoUrl || d.photoURL || null;
                         currentUser.displayName =
                             d.username || user.displayName || "Utilizador";
+                        renderLayout("", {
+                            ...d,
+                            displayName: currentUser.displayName,
+                        });
                         renderMiniAvatar(
                             d,
                             document.getElementById("currentUserAvatar"),
@@ -1909,6 +1914,7 @@
 
 
             document.addEventListener("app-logout", async () => {
+                localStorage.removeItem("genii_user_cache");
                 await signOut(auth);
                 window.location.href = "login.html";
             });
@@ -1992,7 +1998,7 @@
                                     }
                                 }
                             } catch (e) {
-                                console.log("Erro avatar professor banner", e);
+                                console.error("Erro avatar professor banner", e);
                             }
                         }
                     } else {
@@ -2086,7 +2092,7 @@
                         membersCache[authorId] = userData;                          return userData;
                     }
                 } catch (e) {
-                    console.log("Erro fetch user", authorId);
+                    console.warn("Erro fetch user", authorId);
                 }
 
 
@@ -2490,16 +2496,20 @@
 
             async function fetchAssignments() {
                 if (cachedAssignments) return cachedAssignments;
-                const q2 = query(
-                    collection(db, `classrooms/${classId}/posts`),
-                    where("type", "==", "assignment"),
-                    orderBy("createdAt", "desc"),
-                );
-                const snap = await getDocs(q2);
-                cachedAssignments = snap.docs.map((d) => ({
-                    id: d.id,
-                    ...d.data(),
-                }));
+                try {
+                    const q2 = query(
+                        collection(db, `classrooms/${classId}/posts`),
+                        where("type", "==", "assignment"),
+                    );
+                    const snap = await getDocs(q2);
+                    cachedAssignments = snap.docs.map((d) => ({
+                        id: d.id,
+                        ...d.data(),
+                    }));
+                } catch (e) {
+                    console.error("Error fetching assignments for calendar:", e);
+                    cachedAssignments = [];
+                }
                 return cachedAssignments;
             }
 
@@ -3069,7 +3079,7 @@
                         }
                     }
                 } catch (e) {
-                    console.log("Erro notif prefs:", e);
+                    console.error("Erro notif prefs:", e);
                 }
                 syncNotifUI();
             }

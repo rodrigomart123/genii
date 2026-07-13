@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -60,6 +60,7 @@
     }
 
     document.addEventListener('app-logout', async () => {
+        localStorage.removeItem("genii_user_cache");
         await signOut(auth);
         window.location.href = "login.html";
     });
@@ -91,22 +92,34 @@
     }
 
     onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "login.html"; return; }
+        if (!user || user.isAnonymous) { localStorage.removeItem("genii_user_cache"); window.location.href = "login.html"; return; }
 
         if (!cached) document.body.style.opacity = "1";
 
-        if (!isCacheFresh(getCachedUser())) {
+        let userData = getCachedUser();
+        if (!isCacheFresh(userData)) {
             try {
                 const docRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const d = docSnap.data();
-                    const userData = { ...d, displayName: d.username || user.email.split('@')[0] };
+                    userData = { ...d, displayName: d.username || user.email.split('@')[0] };
                     saveUserToCache(userData);
-                    renderLayout('favorites', userData);
                 }
             } catch(e) { console.error("Erro user data:", e); }
         }
+
+        if (!userData) {
+            userData = {
+                displayName: user.displayName || user.email.split('@')[0],
+                uid: user.uid,
+                photoURL: user.photoURL,
+                profileType: 'image',
+                avatar: {}
+            };
+        }
+
+        renderLayout('favorites', userData);
 
         await loadFavorites(user.uid);
     });

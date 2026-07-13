@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt">
     <head>
         <meta charset="UTF-8" />
@@ -277,10 +277,6 @@
 
             const CACHE_KEY_DISCOVER = "genii_cached_discover";
 
-            sessionStorage.removeItem(CACHE_KEY_DISCOVER);
-            sessionStorage.removeItem("genii_cached_trending");
-            sessionStorage.removeItem("genii_cached_new");
-
             function getCachedData(key) {
                 try {
                     const raw = sessionStorage.getItem(key);
@@ -306,29 +302,41 @@
                 renderCarouselCards(newCarousel, cachedNew);
 
             onAuthStateChanged(auth, async (user) => {
-                if (!user) {
+                if (!user || user.isAnonymous) {
                     window.location.href = "login.html";
                     return;
                 }
                 if (!cached) document.body.style.opacity = "1";
 
-                if (!isCacheFresh(getCachedUser())) {
+                let userData = getCachedUser();
+                if (!isCacheFresh(userData)) {
                     try {
                         const docRef = doc(db, "users", user.uid);
                         const docSnap = await getDoc(docRef);
                         if (docSnap.exists()) {
                             const d = docSnap.data();
-                            const userData = {
+                            userData = {
                                 ...d,
                                 displayName: d.username || user.email.split("@")[0],
                             };
                             saveUserToCache(userData);
-                            renderLayout("discover", userData);
                         }
                     } catch (e) {
                         console.error("Erro ao carregar user:", e);
                     }
                 }
+
+                if (!userData) {
+                    userData = {
+                        displayName: user.displayName || user.email.split("@")[0],
+                        uid: user.uid,
+                        photoURL: user.photoURL,
+                        profileType: 'image',
+                        avatar: {}
+                    };
+                }
+
+                renderLayout("discover", userData);
 
                 loadAllSections();
             });

@@ -285,7 +285,8 @@
             const assignmentPostId = params.get("postId");
 
                           onAuthStateChanged(auth, async (user) => {
-                if (!user) {
+                if (!user || user.isAnonymous) {
+                    localStorage.removeItem("genii_user_cache");
                     window.location.href = "login.html?returnUrl=/play_quiz?id=" + (quizId || "");
                     return;
                 }
@@ -325,7 +326,7 @@
                             return;
                         }
                     } catch (e) {
-                        console.log("Erro check submission:", e);
+                        console.error("Erro check submission:", e);
                     }
                 }
 
@@ -399,7 +400,7 @@
 
             window.startGame = () => {
                 if (!isMuted && bgMusic)
-                    bgMusic.play().catch((e) => console.log("Audio block", e));
+                    bgMusic.play().catch((e) => console.warn("Audio block", e));
                 renderQuestion(0, "slide-in");
                 setTimeout(() => {
                     const card = document.getElementById(`card-0`);
@@ -481,7 +482,7 @@
                         document.getElementById('result-avatar-wrapper').innerHTML = _buildLobbyAvatar({});
                     }
                 } catch(e) {
-                    console.log("Erro ao carregar avatar no lobby", e);
+                    console.error("Erro ao carregar avatar no lobby", e);
                     document.getElementById('lobbyPlayerAvatar').innerHTML = _buildLobbyAvatar({});
                     document.getElementById('result-avatar-wrapper').innerHTML = _buildLobbyAvatar({});
                 }
